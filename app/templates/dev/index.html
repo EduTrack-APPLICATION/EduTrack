@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% block title %}Panel del desarrollador · EduTrack{% endblock %}
+{% block page_title %}Panel del desarrollador{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-terminal-fill text-primary fs-4"></i>
+    <div>
+        <h4 class="mb-0">Panel del desarrollador</h4>
+        <small class="text-muted">
+            Diagnóstico, mantenimiento y configuración del sistema · acceso restringido
+        </small>
+    </div>
+    <span class="badge bg-primary-subtle text-primary ms-auto">SUPER ADMIN</span>
+</div>
+
+<div class="row g-3">
+    {# ===================== COL IZQ ===================== #}
+    <div class="col-lg-7">
+
+        {# Sistema #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-cpu text-info"></i>
+                <strong>Sistema</strong>
+                <span class="text-muted small ms-auto">Uptime: {{ system_info.uptime }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 small">
+                    <div class="col-md-6">
+                        <div class="text-muted">Python</div>
+                        <div class="fw-semibold"><code>{{ system_info.python_version }}</code></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted">Plataforma</div>
+                        <div class="fw-semibold">{{ system_info.platform }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted">Entorno Flask</div>
+                        <div class="fw-semibold">
+                            <code>{{ system_info.flask_env }}</code>
+                            {% if system_info.debug %}
+                                <span class="badge bg-warning-subtle text-warning ms-1">DEBUG</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted">Servidor iniciado</div>
+                        <div class="fw-semibold">{{ system_info.server_start }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Base de datos #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-database text-success"></i>
+                <strong>Base de datos</strong>
+                <span class="badge bg-success-subtle text-success ms-auto">{{ db_type }}</span>
+            </div>
+            <div class="card-body">
+                <div class="small text-muted mb-2">URL</div>
+                <code class="d-block mb-3 text-truncate" style="font-size:0.78rem;">
+                    {{ db_url_safe }}
+                </code>
+
+                <div class="small text-muted mb-2">Registros por tabla</div>
+                <div class="db-stats-grid">
+                    {% for s in db_stats %}
+                    <div class="db-stat-cell">
+                        <div class="db-stat-name">{{ s.nombre }}</div>
+                        <div class="db-stat-count">{{ '{:,}'.format(s.count) }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row g-2 mt-3 small">
+                    <div class="col-6">
+                        <div class="dev-mini-stat">
+                            <i class="bi bi-trash3 text-muted"></i>
+                            <span>{{ estudiantes_papelera }} en papelera</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="dev-mini-stat">
+                            <i class="bi bi-shield-lock text-muted"></i>
+                            <span>{{ intentos_24h }} intentos login (24h)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Email #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-envelope text-warning"></i>
+                <strong>Email (SMTP)</strong>
+                {% if email_config.enabled %}
+                    <span class="badge bg-success-subtle text-success ms-auto">Activo</span>
+                {% else %}
+                    <span class="badge bg-secondary-subtle text-muted ms-auto">Solo consola</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-2 small">
+                    <div class="col-6">
+                        <div class="text-muted">Servidor</div>
+                        <div class="fw-semibold">{{ email_config.server }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Puerto</div>
+                        <div class="fw-semibold">{{ email_config.port }}</div>
+                    </div>
+                </div>
+                <form method="POST" action="{{ url_for('dev.test_email') }}" class="mt-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-send"></i> Enviar email de prueba
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {# Recent errors #}
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle text-danger"></i>
+                <strong>Errores recientes</strong>
+                <span class="text-muted small ms-auto">
+                    {% if recent_errors %}
+                        {{ recent_errors|length }} capturado{{ '' if recent_errors|length == 1 else 's' }}
+                    {% else %}
+                        ninguno
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_errors %}
+                <div class="dev-error-list">
+                    {% for err in recent_errors %}
+                    <div class="dev-error-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <code class="text-danger small">{{ err.type }}</code>
+                            <small class="text-muted">{{ err.timestamp.strftime('%H:%M:%S') }}</small>
+                        </div>
+                        <div class="small text-muted mt-1">{{ err.message }}</div>
+                        <div class="small mt-1">
+                            <code>{{ err.path }}</code>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted small">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    Sin errores capturados desde el inicio del servidor.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ===================== COL DER ===================== #}
+    <div class="col-lg-5">
+
+        {# Feature flags #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-toggles2 text-primary"></i>
+                <strong>Feature flags</strong>
+            </div>
+            <div class="card-body p-0">
+                {% for f in flags %}
+                <form method="POST" action="{{ url_for('dev.toggle_flag') }}"
+                      class="dev-flag-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="clave" value="{{ f.clave }}">
+
+                    <div class="dev-flag-info">
+                        <div class="dev-flag-name">
+                            <code>{{ f.clave }}</code>
+                            {% if f.valor %}
+                                <span class="badge bg-success-subtle text-success">ON</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-muted">OFF</span>
+                            {% endif %}
+                        </div>
+                        <div class="dev-flag-desc">{{ f.descripcion }}</div>
+                    </div>
+
+                    <label class="dev-toggle">
+                        <input type="checkbox" {% if f.valor %}checked{% endif %}
+                               onchange="this.form.submit()">
+                        <span class="dev-toggle-slider"></span>
+                    </label>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Acciones de mantenimiento #}
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-tools text-warning"></i>
+                <strong>Mantenimiento</strong>
+            </div>
+            <div class="card-body p-0">
+
+                <form method="POST" action="{{ url_for('dev.vaciar_papelera') }}"
+                      class="dev-action-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="dev-action-info">
+                        <div class="fw-semibold">Vaciar papelera</div>
+                        <div class="small text-muted">
+                            Elimina permanentemente {{ estudiantes_papelera }} registro{{ '' if estudiantes_papelera == 1 else 's' }}
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger"
+                            {% if estudiantes_papelera == 0 %}disabled{% endif %}
+                            data-confirm="Esto elimina PERMANENTEMENTE los registros en papelera. ¿Continuar?">
+                        <i class="bi bi-trash3"></i> Vaciar
+                    </button>
+                </form>
+
+                <form method="POST" action="{{ url_for('dev.limpiar_logs') }}"
+                      class="dev-action-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="dev-action-info">
+                        <div class="fw-semibold">Limpiar logs antiguos</div>
+                        <div class="small text-muted">
+                            Borra intentos de login mayores a 6 meses
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-warning"
+                            data-confirm="Eliminar registros de auditoría mayores a 6 meses?">
+                        <i class="bi bi-eraser"></i> Limpiar
+                    </button>
+                </form>
+
+                <form method="POST" action="{{ url_for('dev.forzar_logout_todos') }}"
+                      class="dev-action-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="dev-action-info">
+                        <div class="fw-semibold">Resetear contadores</div>
+                        <div class="small text-muted">
+                            Limpia intentos fallidos y bloqueos de todos
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-confirm="Resetear los contadores de seguridad de TODOS los usuarios?">
+                        <i class="bi bi-arrow-counterclockwise"></i> Resetear
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        {# Info card #}
+        <div class="card mt-3">
+            <div class="card-body small">
+                <div class="d-flex align-items-start gap-2 text-muted">
+                    <i class="bi bi-shield-check text-success mt-1"></i>
+                    <div>
+                        Este panel es visible solo para cuentas con rol
+                        <code>super_admin</code>. Para crear más, usa la BD directamente.
+                        Ningún cambio aquí accede a contraseñas ni permite
+                        impersonar usuarios.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

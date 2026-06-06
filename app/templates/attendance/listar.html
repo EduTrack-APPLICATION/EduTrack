@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Asistencia{% endblock %}
+{% block page_title %}Asistencia{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <h4 class="mb-0">Control de asistencia</h4>
+    <small class="text-muted">Selecciona un grupo para registrar o consultar la asistencia</small>
+</div>
+
+<div class="row g-3">
+    {% for grupo in grupos %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100 group-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary-subtle text-primary">{{ grupo.codigo }}</span>
+                    <span class="text-muted small"><i class="bi bi-people"></i> {{ grupo.estudiantes.count() }}</span>
+                </div>
+                <h6 class="mb-1">{{ grupo.nombre }}</h6>
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-book"></i> {{ grupo.materia.nombre if grupo.materia else '—' }}<br>
+                    {% if grupo.horario %}<i class="bi bi-clock"></i> {{ grupo.horario }}<br>{% endif %}
+                    {% if grupo.aula %}<i class="bi bi-door-closed"></i> {{ grupo.aula }}{% endif %}
+                </p>
+            </div>
+            <div class="card-footer bg-transparent d-flex gap-2">
+                <a href="{{ url_for('attendance.tomar', grupo_id=grupo.id) }}" class="btn btn-sm btn-primary flex-grow-1">
+                    <i class="bi bi-calendar-plus"></i> Tomar asistencia
+                </a>
+                <a href="{{ url_for('attendance.historial', grupo_id=grupo.id) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-clock-history"></i> Historial
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-calendar-x fs-1 text-muted"></i>
+            <p class="text-muted mt-2">No tienes grupos asignados.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Recuperar contraseña · EduTrack{% endblock %}
+
+{% block auth_content %}
+<div class="login-split">
+    <aside class="login-aside">
+        <div class="login-aside-bg" aria-hidden="true">
+            <svg viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" class="login-pattern">
+                <defs>
+                    <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#0f172a"/>
+                        <stop offset="100%" stop-color="#1e293b"/>
+                    </linearGradient>
+                    <radialGradient id="rg2" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18"/>
+                        <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <rect width="600" height="800" fill="url(#rg1)"/>
+                <circle cx="400" cy="300" r="240" fill="url(#rg2)"/>
+                <circle cx="180" cy="600" r="160" fill="url(#rg2)"/>
+            </svg>
+        </div>
+
+        <div class="login-aside-content">
+            <div class="login-brand">
+                <div class="login-brand-mark">
+                    <svg viewBox="0 0 40 40" width="40" height="40">
+                        <path d="M8 12 L20 6 L32 12 L32 28 L20 34 L8 28 Z"
+                              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M14 18 L20 21 L26 18 M20 21 L20 28"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="login-brand-text">
+                    <div class="login-brand-name">EduTrack</div>
+                    <div class="login-brand-tag">Sistema académico</div>
+                </div>
+            </div>
+
+            <div class="login-aside-hero">
+                <h1>¿Olvidaste tu<br/>contraseña?</h1>
+                <p>Te enviaremos un enlace seguro<br/>a tu correo para restablecerla.</p>
+            </div>
+
+            <div class="login-features">
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Enlace seguro y firmado</span>
+                </div>
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Expira en 30 minutos</span>
+                </div>
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Solo tú puedes usarlo</span>
+                </div>
+            </div>
+
+            <div class="login-aside-foot">
+                <span>© 2026 EduTrack</span>
+                <span class="login-dot">·</span>
+                <span>v1.0</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="login-main">
+        <div class="login-form-wrap">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="login-alert login-alert-{{ 'danger' if category == 'error' else category }}">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="login-heading">
+                <h2>Restablecer contraseña</h2>
+                <p>Ingresa tu correo y te enviaremos un enlace para crear una nueva contraseña.</p>
+            </div>
+
+            <form method="POST" novalidate class="login-form" id="resetForm" data-skip-transition>
+                {{ form.hidden_tag() }}
+
+                <div class="login-field">
+                    <label for="email">Correo electrónico</label>
+                    <div class="login-input-wrap">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18" class="login-input-ico">
+                            <rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                            <path d="M3 7l7 5 7-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                        {{ form.email(class="login-input", id="email",
+                                       placeholder="tu@correo.com",
+                                       autocomplete="email", autofocus=true) }}
+                    </div>
+                    {% for err in form.email.errors %}
+                        <div class="login-field-error">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="login-submit" id="btnSend">
+                    <span>Enviar enlace</span>
+                    <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                        <path d="M3 10h14m0 0l-5-5m5 5l-5 5" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('auth.login') }}" class="login-link-small" data-skip-transition>
+                    <svg viewBox="0 0 20 20" fill="none" width="14" height="14" style="vertical-align:-2px;">
+                        <path d="M11 5l-5 5 5 5" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Volver al inicio de sesión
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const form = document.getElementById('resetForm');
+    const btn = document.getElementById('btnSend');
+    if (form && btn) {
+        form.addEventListener('submit', () => {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="login-spinner"></span><span>Enviando...</span>';
+        });
+    }
+})();
+</script>
+{% endblock %}

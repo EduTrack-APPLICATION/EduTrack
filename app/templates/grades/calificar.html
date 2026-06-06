@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block title %}Calificar - {{ evaluacion.nombre }}{% endblock %}
+{% block page_title %}Calificar evaluación{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <a href="{{ url_for('evaluations.listar') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left"></i> Volver a evaluaciones
+        </a>
+        <h4 class="mt-2 mb-0">
+            {{ evaluacion.tipo|icono_tipo|safe }} {{ evaluacion.nombre }}
+        </h4>
+        <div class="text-muted small">
+            <i class="bi bi-book"></i> {{ evaluacion.materia.nombre }}
+            · <i class="bi bi-people"></i> {{ grupo.nombre }}
+            · <i class="bi bi-calendar"></i> {{ evaluacion.fecha|fecha }}
+            · <i class="bi bi-bullseye"></i> {{ evaluacion.puntaje_maximo }} pts
+            · <i class="bi bi-percent"></i> {{ evaluacion.porcentaje }}%
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-success" form="formCalificar" type="submit">
+            <i class="bi bi-save"></i> Guardar todo
+        </button>
+    </div>
+</div>
+
+<!-- Mini-stats -->
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Estudiantes</div>
+            <div class="mini-stat-value">{{ total_estudiantes }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Notas registradas</div>
+            <div class="mini-stat-value">
+                <span id="contadorRegistradas">{{ notas_registradas }}</span> / {{ total_estudiantes }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Promedio actual</div>
+            <div class="mini-stat-value"><span id="promedioActual">{{ promedio }}</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Info bar -->
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+    <div>
+        <i class="bi bi-info-circle"></i>
+        <strong>Modo grupal:</strong> escribe la nota y presiona
+        <kbd>↓</kbd> o <kbd>Enter</kbd> para avanzar al siguiente estudiante.
+        Las notas se <strong>guardan automáticamente</strong>.
+    </div>
+    <span id="autoSaveStatus" class="badge bg-light text-secondary">
+        <i class="bi bi-cloud-check"></i> Listo
+    </span>
+</div>
+
+<!-- Bulk grading form -->
+<form id="formCalificar" method="POST"
+      action="{{ url_for('grades.guardar_masivo', evaluacion_id=evaluacion.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-grading mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">#</th>
+                            <th>Estudiante</th>
+                            <th>Código</th>
+                            <th style="width:200px;">
+                                Nota <small class="text-muted">(0 - {{ evaluacion.puntaje_maximo }})</small>
+                            </th>
+                            <th>Observaciones</th>
+                            <th style="width:80px;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr data-estudiante-id="{{ item.estudiante.id }}">
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm">{{ item.estudiante.nombre[0]|upper }}</div>
+                                    <div>
+                                        <div class="fw-semibold">{{ item.estudiante.nombre_completo }}</div>
+                                        <small class="text-muted">{{ item.estudiante.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><code>{{ item.estudiante.codigo or '—' }}</code></td>
+                            <td>
+                                <input
+                                    type="number"
+                                    name="puntaje_{{ item.estudiante.id }}"
+                                    class="form-control grade-input"
+                                    min="0"
+                                    max="{{ evaluacion.puntaje_maximo }}"
+                                    step="0.01"
+                                    value="{{ item.puntaje if item.puntaje is not none else '' }}"
+                                    placeholder="—"
+                                    data-est-id="{{ item.estudiante.id }}"
+                                    data-max="{{ evaluacion.puntaje_maximo }}"
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    name="obs_{{ item.estudiante.id }}"
+                                    class="form-control form-control-sm obs-input"
+                                    value="{{ item.observaciones or '' }}"
+                                    placeholder="Opcional"
+                                    data-est-id="{{ item.estudiante.id }}"
+                                />
+                            </td>
+                            <td class="text-center">
+                                <span class="status-dot {% if item.puntaje is not none %}status-saved{% endif %}"
+                                      id="status-{{ item.estudiante.id }}">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex justify-content-between">
+            <a href="{{ url_for('evaluations.listar') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Guardar todas las notas
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const evaluacionId = {{ evaluacion.id }};
+    const puntajeMax = {{ evaluacion.puntaje_maximo }};
+    const status = document.getElementById('autoSaveStatus');
+    const contadorEl = document.getElementById('contadorRegistradas');
+    const promedioEl = document.getElementById('promedioActual');
+    const totalEstudiantes = {{ total_estudiantes }};
+
+    const timers = {};
+
+    function setStatus(msg, type) {
+        if (!status) return;
+        const colors = {
+            saving: 'bg-warning text-dark',
+            saved: 'bg-success text-white',
+            error: 'bg-danger text-white',
+            idle: 'bg-light text-secondary'
+        };
+        status.className = 'badge ' + (colors[type] || colors.idle);
+        const icons = {
+            saving: 'bi-cloud-arrow-up',
+            saved: 'bi-cloud-check',
+            error: 'bi-cloud-slash',
+            idle: 'bi-cloud-check'
+        };
+        status.innerHTML = '<i class="bi ' + (icons[type] || icons.idle) + '"></i> ' + msg;
+    }
+
+    function setRowState(estId, state) {
+        const dot = document.getElementById('status-' + estId);
+        if (!dot) return;
+        dot.classList.remove('status-saved', 'status-saving', 'status-error');
+        if (state === 'saved') {
+            dot.classList.add('status-saved');
+            dot.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+        } else if (state === 'saving') {
+            dot.classList.add('status-saving');
+            dot.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        } else if (state === 'error') {
+            dot.classList.add('status-error');
+            dot.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>';
+        } else {
+            dot.innerHTML = '';
+        }
+    }
+
+    function actualizarStats() {
+        const inputs = document.querySelectorAll('.grade-input');
+        let registradas = 0;
+        let suma = 0;
+        inputs.forEach(function (inp) {
+            if (inp.value !== '' && !isNaN(parseFloat(inp.value))) {
+                registradas++;
+                suma += parseFloat(inp.value);
+            }
+        });
+        if (contadorEl) contadorEl.textContent = registradas;
+        if (promedioEl) promedioEl.textContent = registradas > 0 ? (suma / registradas).toFixed(2) : '0';
+    }
+
+    async function guardarNota(estId, puntaje, observaciones) {
+        setRowState(estId, 'saving');
+        setStatus('Guardando…', 'saving');
+
+        try {
+            const res = await fetch(
+                '/notas/api/nota/' + evaluacionId + '/' + estId,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': window.CSRF_TOKEN || ''
+                    },
+                    body: JSON.stringify({ puntaje: puntaje, observaciones: observaciones })
+                }
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                setRowState(estId, 'error');
+                setStatus(data.error || 'Error al guardar', 'error');
+                return;
+            }
+            setRowState(estId, 'saved');
+            setStatus('Guardado', 'saved');
+            actualizarStats();
+        } catch (err) {
+            setRowState(estId, 'error');
+            setStatus('Sin conexión', 'error');
+        }
+    }
+
+    function programarGuardado(estId) {
+        if (timers[estId]) clearTimeout(timers[estId]);
+        timers[estId] = setTimeout(function () {
+            const row = document.querySelector('tr[data-estudiante-id="' + estId + '"]');
+            if (!row) return;
+            const puntInp = row.querySelector('.grade-input');
+            const obsInp = row.querySelector('.obs-input');
+
+            const val = puntInp.value.trim();
+            if (val !== '') {
+                const num = parseFloat(val);
+                if (isNaN(num) || num < 0 || num > puntajeMax) {
+                    setRowState(estId, 'error');
+                    setStatus('Puntaje fuera de rango', 'error');
+                    return;
+                }
+            }
+            guardarNota(estId, val, obsInp ? obsInp.value : '');
+        }, 700);
+    }
+
+    // Auto-save on input change
+    document.querySelectorAll('.grade-input, .obs-input').forEach(function (inp) {
+        inp.addEventListener('input', function () {
+            const estId = inp.getAttribute('data-est-id');
+            programarGuardado(estId);
+        });
+
+        inp.addEventListener('blur', function () {
+            const estId = inp.getAttribute('data-est-id');
+            if (timers[estId]) {
+                clearTimeout(timers[estId]);
+                delete timers[estId];
+                programarGuardado(estId);
+            }
+        });
+    });
+
+    setStatus('Listo', 'idle');
+})();
+</script>
+{% endblock %}

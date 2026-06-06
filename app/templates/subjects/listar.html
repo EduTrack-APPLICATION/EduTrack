@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Materias{% endblock %}
+{% block page_title %}Materias{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-0">Gestión de materias</h4>
+        <small class="text-muted">{{ materias.total }} materias registradas</small>
+    </div>
+    {% if current_user.is_admin() %}
+    <a href="{{ url_for('subjects.crear') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nueva materia
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-10">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ buscar or '' }}"
+                           class="form-control" placeholder="Código o nombre de materia">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100"><i class="bi bi-funnel"></i> Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for m in materias.items %}
+    {% set total_grupos = m.grupos.count() %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100 {% if total_grupos == 0 %}border-warning{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary-subtle text-primary">{{ m.codigo }}</span>
+                    <span class="badge bg-{{ 'success' if m.activa else 'secondary' }}-subtle text-{{ 'success' if m.activa else 'secondary' }}">
+                        {{ 'Activa' if m.activa else 'Inactiva' }}
+                    </span>
+                </div>
+                <h6 class="mb-2">{{ m.nombre }}</h6>
+                <p class="text-muted small mb-3">{{ m.descripcion or 'Sin descripción' }}</p>
+                <div class="d-flex justify-content-between text-muted small mb-2">
+                    <span><i class="bi bi-award"></i> {{ m.creditos }} créd.</span>
+                    <span><i class="bi bi-clock"></i> {{ m.horas_semana }} h/sem</span>
+                    <span>
+                        <i class="bi bi-people"></i>
+                        {{ total_grupos }} grupo{{ '' if total_grupos == 1 else 's' }}
+                    </span>
+                </div>
+
+                {% if total_grupos == 0 and current_user.is_admin() %}
+                <div class="alert alert-warning small mb-0 mt-2 py-2">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Sin grupos.</strong> Crea un grupo para poder asignar evaluaciones.
+                </div>
+                {% endif %}
+            </div>
+            {% if current_user.is_admin() %}
+            <div class="card-footer bg-transparent d-flex justify-content-between gap-1">
+                {% if total_grupos == 0 %}
+                    <a href="{{ url_for('groups.crear', materia_id=m.id) }}"
+                       class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-lg"></i> Crear grupo
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('groups.listar', materia=m.id) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver grupos
+                    </a>
+                {% endif %}
+                <div class="d-flex gap-1">
+                    <a href="{{ url_for('subjects.editar', id=m.id) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form action="{{ url_for('subjects.eliminar', id=m.id) }}" method="POST" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-outline-danger"
+                                data-confirm="¿Eliminar la materia {{ m.nombre }}?">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-book fs-1 text-muted"></i>
+            <p class="text-muted mt-2">No hay materias registradas.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if materias.pages > 1 %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if materias.has_prev %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('subjects.listar', page=materias.prev_num, q=buscar) }}"><i class="bi bi-chevron-left"></i></a></li>
+        {% endif %}
+        {% for pg in materias.iter_pages() %}
+            {% if pg %}
+                <li class="page-item {% if pg == materias.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('subjects.listar', page=pg, q=buscar) }}">{{ pg }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+        {% if materias.has_next %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('subjects.listar', page=materias.next_num, q=buscar) }}"><i class="bi bi-chevron-right"></i></a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+

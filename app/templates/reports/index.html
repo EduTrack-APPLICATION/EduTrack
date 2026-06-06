@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Reportes{% endblock %}
+{% block page_title %}Reportes y exportaciones{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">Centro de reportes</h4>
+    <small class="text-muted">Genera boletines, informes de grupo y exportaciones en PDF o Excel</small>
+</div>
+
+<div class="row g-3">
+    <!-- Group reports -->
+    {% for grupo in grupos %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100 report-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-primary-subtle text-primary">{{ grupo.codigo }}</span>
+                    <span class="text-muted small">
+                        <i class="bi bi-people"></i> {{ grupo.estudiantes.count() }} est.
+                    </span>
+                </div>
+                <h6 class="mb-1">{{ grupo.nombre }}</h6>
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-book"></i> {{ grupo.materia.nombre if grupo.materia else '—' }}<br>
+                    <i class="bi bi-person-badge"></i> {{ grupo.profesor.nombre_completo if grupo.profesor else '—' }}
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('reports.grupo_pdf', grupo_id=grupo.id) }}"
+                       class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-file-pdf-fill"></i> Reporte de notas (PDF)
+                    </a>
+                    <a href="{{ url_for('reports.grupo_excel', grupo_id=grupo.id) }}"
+                       class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-file-excel-fill"></i> Notas detalladas (Excel)
+                    </a>
+                    <a href="{{ url_for('reports.asistencia_excel', grupo_id=grupo.id) }}"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-calendar-check"></i> Asistencia (Excel)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-file-earmark-bar-graph fs-1 text-muted"></i>
+            <p class="text-muted mt-2">No tienes grupos a cargo.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Individual student report card -->
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-file-person-fill text-primary"></i> Boletín individual de estudiante</h6>
+        <p class="text-muted small mb-3">
+            Accede al detalle de cualquier estudiante y descarga su boletín académico en PDF.
+        </p>
+        <a href="{{ url_for('students.listar') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-search"></i> Buscar estudiante
+        </a>
+    </div>
+</div>
+{% endblock %}

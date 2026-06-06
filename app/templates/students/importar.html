@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}Importar estudiantes{% endblock %}
+{% block page_title %}Importar estudiantes{% endblock %}
+
+{% block content %}
+{# ===== HERO ===== #}
+<section class="imp-hero stagger-item" style="--i:0">
+    <div class="imp-hero-bg" aria-hidden="true">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+    </div>
+    <div class="imp-hero-content">
+        <div class="imp-hero-icon">
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+        </div>
+        <div class="imp-hero-text">
+            <h2 class="mb-1">Importa muchos estudiantes a la vez</h2>
+            <p class="mb-0 opacity-75">
+                Sube un archivo Excel o CSV con tu lista de estudiantes y los
+                agregamos al sistema en segundos. Ideal para inicio de curso.
+            </p>
+        </div>
+        <a href="{{ url_for('students.listar') }}"
+           class="btn btn-outline-light btn-hero" data-skip-transition>
+            <i class="bi bi-arrow-left"></i> Volver al listado
+        </a>
+    </div>
+</section>
+
+<div class="row g-3">
+    {# ===== COLUMNA IZQUIERDA: 3 PASOS ===== #}
+    <div class="col-lg-7">
+        <div class="card shadow-sm stagger-item" style="--i:1">
+            <div class="card-body p-4">
+                <ol class="imp-steps">
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>1</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Descarga la plantilla</h6>
+                            <p class="imp-step-desc">
+                                Excel con los encabezados correctos y dos filas de
+                                ejemplo. Las columnas con asterisco son obligatorias.
+                            </p>
+                            <a href="{{ url_for('students.importar_plantilla') }}"
+                               class="btn btn-primary"
+                               data-skip-transition>
+                                <i class="bi bi-file-earmark-arrow-down"></i>
+                                Descargar plantilla.xlsx
+                            </a>
+                        </div>
+                    </li>
+
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>2</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Llena los datos</h6>
+                            <p class="imp-step-desc">
+                                Abre la plantilla en Excel o Google Sheets, borra las
+                                dos filas de ejemplo y agrega tus estudiantes (uno por
+                                fila). Guarda el archivo.
+                            </p>
+                            <div class="imp-tip">
+                                <i class="bi bi-lightbulb-fill"></i>
+                                <span>
+                                    Si ya tienes un Excel con datos de estudiantes,
+                                    no necesitas usar esta plantilla — basta con que
+                                    las columnas se llamen "Código", "Nombre",
+                                    "Apellido", etc.
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>3</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Sube el archivo</h6>
+                            <p class="imp-step-desc">
+                                Arrastra el archivo sobre la zona o haz clic.
+                                Te mostraremos una <strong>vista previa</strong>
+                                antes de confirmar la importación.
+                            </p>
+
+                            <form id="formImportar"
+                                  action="{{ url_for('students.importar_preview') }}"
+                                  method="POST" enctype="multipart/form-data"
+                                  class="no-track">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <label for="archivo" class="dropzone-v2" id="dropzone">
+                                    <div class="dropzone-empty" id="dropzoneEmpty">
+                                        <div class="dropzone-icon-wrap">
+                                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                                        </div>
+                                        <strong>Arrastra el archivo aquí</strong>
+                                        <span class="text-muted small">o haz clic para buscar</span>
+                                        <div class="dropzone-formats">
+                                            <span class="format-pill"><i class="bi bi-filetype-xlsx"></i> XLSX</span>
+                                            <span class="format-pill"><i class="bi bi-filetype-xls"></i> XLS</span>
+                                            <span class="format-pill"><i class="bi bi-filetype-csv"></i> CSV</span>
+                                        </div>
+                                    </div>
+                                    <div class="dropzone-selected" id="dropzoneSelected" style="display:none;"></div>
+                                    <input type="file" name="archivo" id="archivo"
+                                           accept=".xlsx,.xls,.csv" hidden required>
+                                </label>
+
+                                <button type="submit" class="btn btn-success btn-lg w-100 mt-3"
+                                        id="btnSubir" disabled>
+                                    <i class="bi bi-eye-fill"></i>
+                                    Procesar y mostrar vista previa
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    {# ===== COLUMNA DERECHA: AYUDA ===== #}
+    <div class="col-lg-5">
+        <div class="card shadow-sm mb-3 stagger-item" style="--i:2">
+            <div class="card-body">
+                <h6 class="mb-3 d-flex align-items-center gap-2">
+                    <span class="card-title-icon card-title-icon-primary">
+                        <i class="bi bi-table"></i>
+                    </span>
+                    Columnas reconocidas
+                </h6>
+                <div class="imp-cols">
+                    {% set cols = [
+                        ('Código',              True,  'Único',       'bi-hash'),
+                        ('Nombre',              True,  None,          'bi-person'),
+                        ('Apellido',            True,  None,          'bi-person'),
+                        ('Cédula',              False, 'Única',       'bi-card-text'),
+                        ('Email',               False, 'Único',       'bi-envelope'),
+                        ('Teléfono',            False, None,          'bi-telephone'),
+                        ('Fecha de nacimiento', False, 'DD/MM/AAAA',  'bi-calendar3'),
+                        ('Dirección',           False, None,          'bi-geo-alt'),
+                        ('Sección',             False, None,          'bi-collection'),
+                        ('Encargado',           False, None,          'bi-people'),
+                        ('Teléfono encargado',  False, None,          'bi-telephone-plus'),
+                    ] %}
+                    {% for label, req, extra, icon in cols %}
+                    <div class="imp-col-row">
+                        <i class="bi {{ icon }} imp-col-icon"></i>
+                        <span class="imp-col-label">{{ label }}</span>
+                        <div class="imp-col-tags">
+                            {% if req %}
+                                <span class="tag tag-required">Obligatorio</span>
+                            {% else %}
+                                <span class="tag tag-optional">Opcional</span>
+                            {% endif %}
+                            {% if extra %}
+                                <span class="tag tag-info">{{ extra }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm imp-tips-card stagger-item" style="--i:3">
+            <div class="card-body">
+                <h6 class="mb-3 d-flex align-items-center gap-2">
+                    <span class="card-title-icon card-title-icon-warning">
+                        <i class="bi bi-shield-check"></i>
+                    </span>
+                    Antes de importar
+                </h6>
+                <ul class="imp-tips">
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Los <strong>códigos</strong> deben ser únicos por estudiante.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Si un código, cédula o email ya existe, esa fila se <strong>omite automáticamente</strong>.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Verás una <strong>vista previa</strong> con todo antes de confirmar.</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>La importación es <strong>transaccional</strong>: o se importan todos o ninguno.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('archivo');
+    const emptyDiv = document.getElementById('dropzoneEmpty');
+    const selectedDiv = document.getElementById('dropzoneSelected');
+    const btnSubir = document.getElementById('btnSubir');
+    const form = document.getElementById('formImportar');
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function showSelected(file) {
+        if (!file) {
+            emptyDiv.style.display = '';
+            selectedDiv.style.display = 'none';
+            btnSubir.disabled = true;
+            return;
+        }
+        const icono = file.name.toLowerCase().endsWith('.csv')
+            ? 'bi-filetype-csv'
+            : (file.name.toLowerCase().endsWith('.xlsx')
+                ? 'bi-filetype-xlsx' : 'bi-file-earmark-spreadsheet');
+
+        emptyDiv.style.display = 'none';
+        selectedDiv.style.display = '';
+        selectedDiv.innerHTML = `
+            <div class="dropzone-file-card">
+                <div class="dropzone-file-icon">
+                    <i class="bi ${icono}"></i>
+                </div>
+                <div class="dropzone-file-info">
+                    <div class="dropzone-file-name">${file.name}</div>
+                    <div class="dropzone-file-meta">
+                        <span><i class="bi bi-hdd"></i> ${formatBytes(file.size)}</span>
+                        <span class="dropzone-file-ok">
+                            <i class="bi bi-check-circle-fill"></i> Listo para procesar
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-clear" id="btnClear" title="Quitar archivo">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>`;
+        btnSubir.disabled = false;
+        document.getElementById('btnClear').addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInput.value = '';
+            showSelected(null);
+        });
+    }
+
+    fileInput.addEventListener('change', () => {
+        const f = fileInput.files[0];
+        if (f) showSelected(f);
+    });
+
+    // Drag & drop
+    ['dragenter', 'dragover'].forEach(evt =>
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault();
+            dropzone.classList.add('is-dragover');
+        }));
+
+    ['dragleave', 'drop'].forEach(evt =>
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault();
+            dropzone.classList.remove('is-dragover');
+        }));
+
+    dropzone.addEventListener('drop', e => {
+        const f = e.dataTransfer.files[0];
+        if (f) {
+            fileInput.files = e.dataTransfer.files;
+            showSelected(f);
+        }
+    });
+
+    // Indicador de carga al enviar
+    form.addEventListener('submit', () => {
+        btnSubir.disabled = true;
+        btnSubir.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando archivo...';
+    });
+})();
+</script>
+{% endblock %}

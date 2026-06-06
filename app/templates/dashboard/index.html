@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+{% block title %}Inicio · EduTrack{% endblock %}
+{% block page_title %}Inicio{% endblock %}
+
+{% block content %}
+{# ============================================================
+   FILA SUPERIOR: Cabecera editorial (sin gradiente)
+   ============================================================ #}
+<header class="dash2-header stagger-item" style="--i:0">
+    <div class="dash2-header-left">
+        <div class="dash2-date">
+            <span class="dash2-date-day">{{ hoy.day }}</span>
+            <div class="dash2-date-meta">
+                <div class="dash2-date-month">{{ fecha_legible.split(' ')[2]|capitalize }}</div>
+                <div class="dash2-date-year">{{ hoy.year }}</div>
+            </div>
+        </div>
+        <div class="dash2-greeting">
+            <div class="dash2-greeting-line">{{ saludo }},</div>
+            <h1 class="dash2-greeting-name">{{ current_user.nombre_completo.split()[0] }}</h1>
+            <div class="dash2-greeting-sub">{{ mensaje_extra }}</div>
+        </div>
+    </div>
+
+    <div class="dash2-header-right">
+        {% if tareas_pendientes %}
+            <div class="dash2-tasks">
+                <div class="dash2-tasks-title">
+                    <span class="dash2-pulse"></span>
+                    <span>Pendientes</span>
+                </div>
+                {% for tarea in tareas_pendientes[:3] %}
+                <a href="{{ tarea.url }}" class="dash2-task dash2-task-{{ tarea.color }}">
+                    <i class="bi {{ tarea.icono }}"></i>
+                    <span>{{ tarea.texto }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="dash2-clear">
+                <div class="dash2-clear-ico">
+                    <svg viewBox="0 0 32 32" fill="none" width="28" height="28">
+                        <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="2"/>
+                        <path d="M10 16l4 4 8-8" stroke="currentColor" stroke-width="2.4"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="dash2-clear-title">Todo al día</div>
+                    <div class="dash2-clear-sub">Sin tareas pendientes</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</header>
+
+{# ============================================================
+   FILA: KPIs con sparkline y zonas
+   ============================================================ #}
+<section class="dash2-kpis">
+    {# Promedio con sparkline #}
+    <article class="kpi-card kpi-spark stagger-item" style="--i:1">
+        <div class="kpi-head">
+            <span class="kpi-label">Promedio general</span>
+            {% if delta_promedio > 0 %}
+                <span class="kpi-delta kpi-delta-up">▲ {{ delta_promedio }}</span>
+            {% elif delta_promedio < 0 %}
+                <span class="kpi-delta kpi-delta-down">▼ {{ delta_promedio|abs }}</span>
+            {% else %}
+                <span class="kpi-delta kpi-delta-neutral">—</span>
+            {% endif %}
+        </div>
+        <div class="kpi-value" data-counter="{{ '%.1f'|format(promedio_general or 0) }}" data-counter-decimals="1">0</div>
+        <div class="kpi-sub">
+            de 100 puntos · últimos 7 días
+        </div>
+        {# Sparkline SVG inline (sin Chart.js) #}
+        <div class="kpi-spark-wrap">
+            {% set vals = sparkline_notas|select|list %}
+            {% if vals|length > 1 %}
+                {% set mx = vals|max %}
+                {% set mn = vals|min %}
+                {% set rng = (mx - mn) if (mx - mn) > 0 else 1 %}
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" class="kpi-spark-svg">
+                    <defs>
+                        <linearGradient id="sparkGrad1" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="currentColor" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    {% set pts = [] %}
+                    {% for v in sparkline_notas %}
+                        {% if v is not none %}
+                            {% set x = loop.index0 * (100 / 6) %}
+                            {% set y = 28 - ((v - mn) / rng) * 24 %}
+                            {% set _ = pts.append(x ~ ',' ~ y) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if pts %}
+                    <polyline points="{{ pts|join(' ') }}"
+                              fill="none" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    <polygon points="{{ pts|join(' ') }} 100,30 0,30"
+                             fill="url(#sparkGrad1)"/>
+                    {% endif %}
+                </svg>
+            {% else %}
+                <div class="kpi-spark-empty">Sin datos suficientes</div>
+            {% endif %}
+        </div>
+    </article>
+
+    {# Estudiantes con badge #}
+    <article class="kpi-card stagger-item" style="--i:2">
+        <div class="kpi-head">
+            <span class="kpi-label">Estudiantes</span>
+            {% if estudiantes_nuevos > 0 %}
+                <span class="kpi-delta kpi-delta-up">+{{ estudiantes_nuevos }}</span>
+            {% endif %}
+        </div>
+        <div class="kpi-value" data-counter="{{ total_estudiantes or 0 }}">0</div>
+        <div class="kpi-sub">
+            en {{ total_grupos }} grupo{{ '' if total_grupos == 1 else 's' }}
+            · {{ total_materias }} materia{{ '' if total_materias == 1 else 's' }}
+        </div>
+        <div class="kpi-ring">
+            <svg viewBox="0 0 60 60" width="56" height="56">
+                <circle cx="30" cy="30" r="25" fill="none" stroke="var(--border)" stroke-width="4"/>
+                {% set pct_act = (total_estudiantes / 50 * 100) if total_estudiantes < 50 else 100 %}
+                <circle cx="30" cy="30" r="25" fill="none"
+                        stroke="var(--primary)" stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-dasharray="157"
+                        stroke-dashoffset="{{ 157 * (1 - pct_act / 100) }}"
+                        transform="rotate(-90 30 30)"/>
+                <text x="30" y="35" text-anchor="middle"
+                      font-size="14" font-weight="700" fill="var(--text-primary)">
+                    {{ total_estudiantes }}
+                </text>
+            </svg>
+        </div>
+    </article>
+
+    {# Aprobación con segmentos #}
+    <article class="kpi-card kpi-bars stagger-item" style="--i:3">
+        <div class="kpi-head">
+            <span class="kpi-label">Aprobación</span>
+            <span class="kpi-delta {% if pct_aprobacion >= 70 %}kpi-delta-up{% elif pct_aprobacion >= 50 %}kpi-delta-warning{% else %}kpi-delta-down{% endif %}">
+                {{ pct_aprobacion }}%
+            </span>
+        </div>
+        <div class="kpi-value" data-counter="{{ pct_aprobacion }}">0<span class="kpi-unit">%</span></div>
+        <div class="kpi-sub">
+            {{ aprobados }} aprobados · {{ recuperacion }} en recuperación · {{ reprobados }} reprobados
+        </div>
+        {# Barra segmentada #}
+        {% if total_calificados > 0 %}
+        <div class="kpi-segmented">
+            {% set seg_a = (aprobados / total_calificados * 100)|round(1) %}
+            {% set seg_r = (recuperacion / total_calificados * 100)|round(1) %}
+            {% set seg_x = (reprobados / total_calificados * 100)|round(1) %}
+            <div class="kpi-seg kpi-seg-success" style="width:{{ seg_a }}%" title="{{ aprobados }} aprobados"></div>
+            <div class="kpi-seg kpi-seg-warning" style="width:{{ seg_r }}%" title="{{ recuperacion }} en recuperación"></div>
+            <div class="kpi-seg kpi-seg-danger" style="width:{{ seg_x }}%" title="{{ reprobados }} reprobados"></div>
+        </div>
+        {% endif %}
+    </article>
+
+    {# Asistencia hoy con sparkline #}
+    <article class="kpi-card kpi-spark stagger-item" style="--i:4">
+        <div class="kpi-head">
+            <span class="kpi-label">Asistencia hoy</span>
+            {% if pct_asis_hoy is not none %}
+                <span class="kpi-delta {% if pct_asis_hoy >= 90 %}kpi-delta-up{% elif pct_asis_hoy >= 75 %}kpi-delta-warning{% else %}kpi-delta-down{% endif %}">
+                    en vivo
+                </span>
+            {% endif %}
+        </div>
+        <div class="kpi-value">
+            {% if pct_asis_hoy is not none %}
+                {{ pct_asis_hoy }}<span class="kpi-unit">%</span>
+            {% else %}
+                <span class="kpi-empty">—</span>
+            {% endif %}
+        </div>
+        <div class="kpi-sub">
+            {% if asis_hoy_total > 0 %}
+                {{ asis_hoy_total }} registro{{ '' if asis_hoy_total == 1 else 's' }} hoy
+            {% else %}
+                Sin asistencia registrada hoy
+            {% endif %}
+        </div>
+        {# Sparkline #}
+        <div class="kpi-spark-wrap kpi-spark-asis">
+            {% set vals2 = sparkline_asistencia|select|list %}
+            {% if vals2|length > 1 %}
+                {% set mx2 = vals2|max %}
+                {% set mn2 = vals2|min %}
+                {% set rng2 = (mx2 - mn2) if (mx2 - mn2) > 0 else 1 %}
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" class="kpi-spark-svg">
+                    {% set pts2 = [] %}
+                    {% for v in sparkline_asistencia %}
+                        {% if v is not none %}
+                            {% set x = loop.index0 * (100 / 6) %}
+                            {% set y = 28 - ((v - mn2) / rng2) * 24 %}
+                            {% set _ = pts2.append(x ~ ',' ~ y) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if pts2 %}
+                    <polyline points="{{ pts2|join(' ') }}"
+                              fill="none" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    {% endif %}
+                </svg>
+            {% endif %}
+        </div>
+    </article>
+</section>
+
+{# ============================================================
+   FILA PRINCIPAL: 2 columnas asimétricas
+   ============================================================ #}
+<section class="dash2-grid">
+
+    {# ===== COLUMNA PRINCIPAL ===== #}
+    <div class="dash2-main">
+
+        {# Hoy específicamente #}
+        <article class="panel stagger-item" style="--i:5">
+            <header class="panel-head">
+                <div class="panel-title">
+                    <span class="panel-dot"></span>
+                    <span>Hoy en EduTrack</span>
+                </div>
+                <span class="panel-tag">{{ hoy.strftime('%d %b').lower() }}</span>
+            </header>
+
+            <div class="dash2-today">
+                {% if eval_hoy %}
+                <div class="today-item today-item-eval">
+                    <div class="today-ico"><i class="bi bi-clipboard-check-fill"></i></div>
+                    <div class="today-body">
+                        <div class="today-title">
+                            {{ eval_hoy|length }} evaluación{{ '' if eval_hoy|length == 1 else 'es' }} programada{{ '' if eval_hoy|length == 1 else 's' }}
+                        </div>
+                        <div class="today-list">
+                            {% for ev in eval_hoy[:3] %}
+                            <a href="{{ url_for('grades.calificar', evaluacion_id=ev.id) }}" class="today-chip">
+                                {{ ev.nombre[:30] }}{% if ev.nombre|length > 30 %}…{% endif %}
+                                <span class="today-chip-meta">{{ ev.materia.nombre if ev.materia else '' }}</span>
+                            </a>
+                            {% endfor %}
+                            {% if eval_hoy|length > 3 %}
+                                <span class="today-more">+{{ eval_hoy|length - 3 }} más</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if proxima_eval and not eval_hoy %}
+                <div class="today-item today-item-next">
+                    <div class="today-ico"><i class="bi bi-calendar-event-fill"></i></div>
+                    <div class="today-body">
+                        <div class="today-title">Próxima evaluación en {{ dias_proxima }} día{{ '' if dias_proxima == 1 else 's' }}</div>
+                        <div class="today-sub">
+                            <strong>{{ proxima_eval.nombre }}</strong>
+                            {% if proxima_eval.materia %} · {{ proxima_eval.materia.nombre }}{% endif %}
+                            · {{ proxima_eval.fecha.strftime('%d %b') }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if total_riesgo > 0 %}
+                <div class="today-item today-item-risk">
+                    <div class="today-ico"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    <div class="today-body">
+                        <div class="today-title">
+                            {{ total_riesgo }} estudiante{{ '' if total_riesgo == 1 else 's' }} en riesgo académico
+                        </div>
+                        <div class="today-sub">
+                            <a href="#en-riesgo" class="today-link">Ver lista →</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if not eval_hoy and not proxima_eval and total_riesgo == 0 %}
+                <div class="today-empty">
+                    <i class="bi bi-cup-hot"></i>
+                    <span>Día tranquilo. Sin eventos urgentes.</span>
+                </div>
+                {% endif %}
+            </div>
+        </article>
+
+        {# Riesgo + Actividad lado a lado #}
+        <div class="row g-3">
+            <div class="col-md-6 stagger-item" style="--i:6">
+                <article class="panel h-100" id="en-riesgo">
+                    <header class="panel-head">
+                        <div class="panel-title">
+                            <span class="panel-dot panel-dot-danger"></span>
+                            <span>En riesgo</span>
+                        </div>
+                        {% if total_riesgo > en_riesgo|length %}
+                        <a href="{{ url_for('students.listar') }}?estado=riesgo" class="panel-link">
+                            +{{ total_riesgo - en_riesgo|length }} más
+                        </a>
+                        {% endif %}
+                    </header>
+
+                    {% if en_riesgo %}
+                    <ul class="dash2-list">
+                        {% for item in en_riesgo %}
+                        {% set est = item.estudiante %}
+                        <li>
+                            <a href="{{ url_for('students.detalle', id=est.id) }}" class="dash2-list-row">
+                                <div class="dash2-avatar dash2-avatar-danger">{{ est.nombre[0]|upper }}</div>
+                                <div class="dash2-list-info">
+                                    <div class="dash2-list-name">{{ est.nombre_completo }}</div>
+                                    <div class="dash2-list-meta">
+                                        <code>{{ est.codigo }}</code>
+                                        {% if item.grupo %} · {{ item.grupo.nombre }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="dash2-list-value dash2-list-value-danger">
+                                    {{ '%.0f'|format(item.nota_final) }}
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="dash2-empty">
+                        <div class="dash2-empty-ico dash2-empty-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="dash2-empty-text">Sin estudiantes en riesgo</div>
+                    </div>
+                    {% endif %}
+                </article>
+            </div>
+
+            <div class="col-md-6 stagger-item" style="--i:7">
+                <article class="panel h-100">
+                    <header class="panel-head">
+                        <div class="panel-title">
+                            <span class="panel-dot panel-dot-info"></span>
+                            <span>Actividad reciente</span>
+                        </div>
+                        <a href="{{ url_for('evaluations.listar') }}" class="panel-link">Ver todo</a>
+                    </header>
+
+                    {% if actividad_reciente %}
+                    <ul class="dash2-list">
+                        {% for ev in actividad_reciente[:5] %}
+                        <li>
+                            <a href="{{ url_for('grades.calificar', evaluacion_id=ev.id) }}" class="dash2-list-row">
+                                <div class="dash2-act-ico">{{ ev.tipo|icono_tipo|safe }}</div>
+                                <div class="dash2-list-info">
+                                    <div class="dash2-list-name">{{ ev.nombre }}</div>
+                                    <div class="dash2-list-meta">
+                                        {{ ev.materia.nombre if ev.materia else '' }}
+                                        {% if ev.grupo %} · {{ ev.grupo.nombre }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="dash2-list-date">{{ ev.fecha|fecha }}</div>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="dash2-empty">
+                        <div class="dash2-empty-ico"><i class="bi bi-inbox"></i></div>
+                        <div class="dash2-empty-text">Sin actividad reciente</div>
+                    </div>
+                    {% endif %}
+                </article>
+            </div>
+        </div>
+    </div>
+
+    {# ===== COLUMNA LATERAL ===== #}
+    <aside class="dash2-side">
+
+        {# Acciones rápidas #}
+        <article class="panel stagger-item" style="--i:8">
+            <header class="panel-head">
+                <div class="panel-title">Acciones rápidas</div>
+            </header>
+            <div class="dash2-actions">
+                <a href="{{ url_for('evaluations.crear') }}" class="dash2-action">
+                    <div class="dash2-action-ico"><i class="bi bi-plus-circle"></i></div>
+                    <div>
+                        <div class="dash2-action-title">Nueva evaluación</div>
+                        <div class="dash2-action-sub">Examen, tarea, proyecto…</div>
+                    </div>
+                </a>
+                <a href="{{ url_for('attendance.listar') }}" class="dash2-action">
+                    <div class="dash2-action-ico"><i class="bi bi-calendar-check"></i></div>
+                    <div>
+                        <div class="dash2-action-title">Tomar asistencia</div>
+                        <div class="dash2-action-sub">Registrar presentes/ausentes</div>
+                    </div>
+                </a>
+                {% if current_user.is_admin() %}
+                <a href="{{ url_for('students.importar') }}" class="dash2-action">
+                    <div class="dash2-action-ico"><i class="bi bi-cloud-arrow-up"></i></div>
+                    <div>
+                        <div class="dash2-action-title">Importar Excel</div>
+                        <div class="dash2-action-sub">Cargar estudiantes en lote</div>
+                    </div>
+                </a>
+                {% endif %}
+                <a href="{{ url_for('reports.index') }}" class="dash2-action">
+                    <div class="dash2-action-ico"><i class="bi bi-file-earmark-bar-graph"></i></div>
+                    <div>
+                        <div class="dash2-action-title">Generar reporte</div>
+                        <div class="dash2-action-sub">Boletines y PDFs</div>
+                    </div>
+                </a>
+            </div>
+        </article>
+
+        {# Cuadro de honor compacto #}
+        {% if top_estudiantes %}
+        <article class="panel stagger-item" style="--i:9">
+            <header class="panel-head">
+                <div class="panel-title">
+                    <span class="panel-dot panel-dot-warning"></span>
+                    <span>Cuadro de honor</span>
+                </div>
+                <a href="{{ url_for('honor.index') }}" class="panel-link">Ver todos</a>
+            </header>
+            <ol class="dash2-podium">
+                {% for item in top_estudiantes[:3] %}
+                <li class="dash2-podium-row dash2-podium-{{ loop.index }}">
+                    <a href="{{ url_for('students.detalle', id=item.estudiante.id) }}">
+                        <span class="dash2-podium-pos">{{ loop.index }}</span>
+                        <span class="dash2-podium-name">{{ item.estudiante.nombre_completo }}</span>
+                        <span class="dash2-podium-score">{{ '%.1f'|format(item.promedio) }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ol>
+        </article>
+        {% endif %}
+
+        {# Métrica de evaluaciones pendientes #}
+        <article class="panel panel-stat stagger-item" style="--i:10">
+            <header class="panel-head">
+                <div class="panel-title">Evaluaciones</div>
+            </header>
+            <div class="dash2-stat-big">
+                <div class="dash2-stat-num">{{ total_evaluaciones }}</div>
+                <div class="dash2-stat-bar">
+                    {% if pct_calificadas > 0 %}
+                    <div class="dash2-stat-bar-fill" style="width:{{ pct_calificadas }}%"></div>
+                    {% endif %}
+                </div>
+                <div class="dash2-stat-meta">
+                    <strong>{{ pct_calificadas }}%</strong> calificadas
+                    {% if proximas|length > 0 %}
+                    · {{ proximas|length }} próxima{{ '' if proximas|length == 1 else 's' }}
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+    </aside>
+</section>
+{% endblock %}

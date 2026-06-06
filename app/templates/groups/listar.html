@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Grupos{% endblock %}
+{% block page_title %}Grupos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-0">Grupos académicos</h4>
+        <small class="text-muted">{{ grupos.total }} grupos</small>
+    </div>
+    {% if current_user.is_admin() %}
+    <a href="{{ url_for('groups.crear') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nuevo grupo
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-10">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ buscar or '' }}"
+                           class="form-control" placeholder="Código o nombre">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100"><i class="bi bi-funnel"></i> Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Materia</th>
+                        <th>Profesor</th>
+                        <th>Periodo</th>
+                        <th class="text-center">Estudiantes</th>
+                        <th>Aula</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in grupos.items %}
+                    <tr>
+                        <td><span class="badge bg-primary-subtle text-primary">{{ g.codigo }}</span></td>
+                        <td><strong>{{ g.nombre }}</strong></td>
+                        <td>{{ g.materia.nombre if g.materia else '—' }}</td>
+                        <td>{{ g.profesor.nombre_completo if g.profesor else '—' }}</td>
+                        <td>{{ g.periodo }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-secondary">
+                                {{ g.estudiantes.count() }} / {{ g.cupo_maximo }}
+                            </span>
+                        </td>
+                        <td>{{ g.aula or '—' }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('groups.detalle', id=g.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if current_user.is_admin() %}
+                            <a href="{{ url_for('groups.editar', id=g.id) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('groups.eliminar', id=g.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"
+                                        data-confirm="¿Eliminar el grupo {{ g.nombre }}?">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8">
+                        <div class="empty-state-rich">
+                            <div class="empty-state-illustration">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="empty-state-title">
+                                {% if buscar %}
+                                    Ningún grupo coincide con tu búsqueda
+                                {% else %}
+                                    Aún no hay grupos creados
+                                {% endif %}
+                            </div>
+                            <div class="empty-state-message">
+                                {% if buscar %}
+                                    Prueba con otros términos.
+                                {% else %}
+                                    Un grupo conecta una materia con un profesor y sus estudiantes.
+                                    Crea el primero para empezar a registrar evaluaciones.
+                                {% endif %}
+                            </div>
+                            {% if current_user.is_admin() and not buscar %}
+                            <a href="{{ url_for('groups.crear') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-lg"></i> Crear primer grupo
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if grupos.pages > 1 %}
+    <div class="card-footer bg-transparent">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if grupos.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('groups.listar', page=grupos.prev_num, q=buscar) }}"><i class="bi bi-chevron-left"></i></a></li>
+                {% endif %}
+                {% for pg in grupos.iter_pages() %}
+                    {% if pg %}
+                        <li class="page-item {% if pg == grupos.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('groups.listar', page=pg, q=buscar) }}">{{ pg }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if grupos.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('groups.listar', page=grupos.next_num, q=buscar) }}"><i class="bi bi-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

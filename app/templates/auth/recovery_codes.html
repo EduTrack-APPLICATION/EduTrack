@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Códigos de recuperación{% endblock %}
+{% block page_title %}Códigos de recuperación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-7">
+    {% if primera_vez %}
+    <div class="alert alert-warning d-flex align-items-start gap-3">
+        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+        <div>
+            <h6 class="mb-1">⚠️ Guarda estos códigos AHORA</h6>
+            <p class="mb-0 small">
+                Solo los verás <strong>una vez</strong>. Cada código se puede usar una sola
+                vez para entrar si pierdes acceso a tu app de autenticación.
+                Guárdalos en un gestor de contraseñas o imprímelos.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="card-title mb-1">
+                <i class="bi bi-key-fill text-warning"></i> Tus códigos de recuperación
+            </h5>
+            <p class="text-muted small mb-4">
+                {{ codigos|length }} códigos generados.
+                Úsalos solo si no puedes acceder a tu app de autenticación.
+            </p>
+
+            <div class="recovery-codes-grid" id="codigosBox">
+                {% for c in codigos %}
+                <div class="recovery-code">{{ c }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex gap-2 mt-4 flex-wrap">
+                <button class="btn btn-primary" id="btnCopiar">
+                    <i class="bi bi-clipboard"></i> Copiar todos
+                </button>
+                <button class="btn btn-outline-secondary" id="btnImprimir">
+                    <i class="bi bi-printer"></i> Imprimir
+                </button>
+                <button class="btn btn-outline-secondary" id="btnDescargar">
+                    <i class="bi bi-download"></i> Descargar .txt
+                </button>
+                <a href="{{ url_for('auth.config_2fa') }}" class="btn btn-success ms-auto">
+                    <i class="bi bi-check-lg"></i> Ya los guardé
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const codigos = Array.from(document.querySelectorAll('.recovery-code'))
+        .map(el => el.textContent.trim());
+    const texto = 'EduTrack - Códigos de recuperación 2FA\n' +
+                  '=======================================\n\n' +
+                  codigos.join('\n') +
+                  '\n\nGenerados: ' + new Date().toLocaleString() +
+                  '\n\nIMPORTANTE:\n' +
+                  '- Cada código solo puede usarse UNA VEZ\n' +
+                  '- Guárdalos en un lugar seguro\n' +
+                  '- Si los pierdes, no podrás recuperar tu cuenta sin contactar al admin\n';
+
+    document.getElementById('btnCopiar').addEventListener('click', e => {
+        navigator.clipboard.writeText(texto);
+        e.target.innerHTML = '<i class="bi bi-check2"></i> ¡Copiado!';
+        setTimeout(() => {
+            e.target.innerHTML = '<i class="bi bi-clipboard"></i> Copiar todos';
+        }, 2000);
+    });
+
+    document.getElementById('btnDescargar').addEventListener('click', () => {
+        const blob = new Blob([texto], {type: 'text/plain;charset=utf-8'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'edutrack-recovery-codes.txt';
+        link.click();
+    });
+
+    document.getElementById('btnImprimir').addEventListener('click', () => {
+        window.print();
+    });
+})();
+</script>
+{% endblock %}

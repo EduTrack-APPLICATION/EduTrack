@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantenimiento · EduTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafaf9;
+            color: #1c1917;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background: #0c0a09; color: #fafaf9; }
+            .text-muted { color: #a8a29e !important; }
+            .btn-back { border-color: #44403c; color: #d6d3d1; }
+            .btn-back:hover { background: #292524; }
+        }
+        .container {
+            max-width: 480px;
+        }
+        .icon-wrap {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 3rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+        p {
+            color: #78716c;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .small {
+            font-size: 0.85rem;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.6rem 1.25rem;
+            background: transparent;
+            border: 1px solid #d6d3d1;
+            border-radius: 8px;
+            color: #44403c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .btn-back:hover {
+            background: #f5f5f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-wrap">
+            <i class="bi bi-tools"></i>
+        </div>
+        <h1>Volveremos pronto</h1>
+        <p>
+            EduTrack está en mantenimiento programado.
+            Estamos realizando algunas mejoras al sistema.
+        </p>
+        <p class="small text-muted">
+            Si eres administrador y necesitas acceso, contacta al equipo técnico.
+        </p>
+        <a href="/auth/login" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver al login
+        </a>
+    </div>
+</body>
+</html>

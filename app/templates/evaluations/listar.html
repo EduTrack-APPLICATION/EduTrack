@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Evaluaciones{% endblock %}
+{% block page_title %}Evaluaciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-0">Evaluaciones</h4>
+        <small class="text-muted">{{ evaluaciones.total }} en total</small>
+    </div>
+    <a href="{{ url_for('evaluations.crear') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nueva evaluación
+    </a>
+</div>
+
+{% if not grupos %}
+<div class="alert alert-warning d-flex align-items-center mb-3">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+    <div class="flex-grow-1">
+        <strong>No tienes grupos disponibles para crear evaluaciones.</strong>
+        {% if current_user.is_admin() %}
+            Primero crea una materia, luego un grupo para esa materia, y matricula estudiantes.
+        {% else %}
+            Pide al administrador que te asigne como profesor de algún grupo.
+        {% endif %}
+    </div>
+    {% if current_user.is_admin() %}
+    <a href="{{ url_for('subjects.listar') }}" class="btn btn-sm btn-primary">
+        Ir a Materias
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-5">
+                <select name="grupo" class="form-select">
+                    <option value="">Todos los grupos</option>
+                    {% for g in grupos %}
+                        <option value="{{ g.id }}" {% if grupo_id == g.id %}selected{% endif %}>
+                            {{ g.codigo }} - {{ g.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <select name="tipo" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    {% for v, lbl in [('examen','Examen'),('quiz','Quiz'),('tarea','Tarea'),('proyecto','Proyecto'),('exposicion','Exposición'),('practica','Práctica'),('participacion','Participación')] %}
+                        <option value="{{ v }}" {% if tipo == v %}selected{% endif %}>{{ lbl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100"><i class="bi bi-funnel"></i> Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Evaluación</th>
+                        <th>Materia / Grupo</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Puntaje</th>
+                        <th class="text-center">Peso</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in evaluaciones.items %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ ev.tipo|icono_tipo|safe }} {{ ev.nombre }}</div>
+                            {% if ev.descripcion %}<small class="text-muted">{{ ev.descripcion[:80] }}{% if ev.descripcion|length > 80 %}…{% endif %}</small>{% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ ev.materia.nombre if ev.materia else '—' }}</strong>
+                            <br><small class="text-muted">{{ ev.grupo.codigo if ev.grupo else '' }} · {{ ev.grupo.nombre if ev.grupo else '' }}</small>
+                        </td>
+                        <td>{{ ev.fecha|fecha }}</td>
+                        <td class="text-center">{{ ev.puntaje_maximo }}</td>
+                        <td class="text-center"><span class="badge bg-info-subtle text-info">{{ ev.porcentaje }}%</span></td>
+                        <td class="text-end">
+                            <a href="{{ url_for('grades.calificar', evaluacion_id=ev.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil-square"></i> Calificar
+                            </a>
+                            <a href="{{ url_for('evaluations.editar', id=ev.id) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('evaluations.eliminar', id=ev.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"
+                                        data-confirm="¿Eliminar evaluación {{ ev.nombre }}?">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6">
+                        <div class="empty-state-rich">
+                            <div class="empty-state-illustration">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <div class="empty-state-title">
+                                {% if grupo_id or tipo %}
+                                    Sin evaluaciones con esos filtros
+                                {% else %}
+                                    No hay evaluaciones aún
+                                {% endif %}
+                            </div>
+                            <div class="empty-state-message">
+                                {% if grupo_id or tipo %}
+                                    Cambia los filtros o crea una evaluación nueva.
+                                {% else %}
+                                    Las evaluaciones son la base para calcular las notas finales.
+                                    Crea exámenes, tareas, proyectos y más.
+                                {% endif %}
+                            </div>
+                            {% if grupos %}
+                            <a href="{{ url_for('evaluations.crear') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-lg"></i> Crear primera evaluación
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if evaluaciones.pages > 1 %}
+    <div class="card-footer bg-transparent">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if evaluaciones.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('evaluations.listar', page=evaluaciones.prev_num, grupo=grupo_id, tipo=tipo) }}"><i class="bi bi-chevron-left"></i></a></li>
+                {% endif %}
+                {% for p in evaluaciones.iter_pages() %}
+                    {% if p %}
+                        <li class="page-item {% if p == evaluaciones.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('evaluations.listar', page=p, grupo=grupo_id, tipo=tipo) }}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if evaluaciones.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('evaluations.listar', page=evaluaciones.next_num, grupo=grupo_id, tipo=tipo) }}"><i class="bi bi-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

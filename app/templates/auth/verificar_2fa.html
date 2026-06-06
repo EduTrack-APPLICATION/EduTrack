@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Verificación 2FA{% endblock %}
+
+{% block auth_content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; padding:2rem 1rem;">
+<div class="card shadow-lg" style="max-width:440px; width:100%;">
+    <div class="card-body p-4 p-md-5">
+
+        {# Flash messages (igual que en login.html) #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="text-center mb-4">
+            <div class="mfa-icon">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h4 class="mt-3 mb-1">Verificación en dos pasos</h4>
+            <p class="text-muted small mb-0">
+                Hola <strong>{{ username }}</strong>, ingresa el código de 6 dígitos
+                de tu app de autenticación
+            </p>
+        </div>
+
+        <form method="POST" id="form2FA" data-skip-transition>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div id="modoNormal">
+                <div class="mb-3">
+                    <label class="form-label">Código de 6 dígitos</label>
+                    <input type="text" name="codigo" id="codigoInput"
+                           class="form-control form-control-lg mfa-code-input"
+                           maxlength="7" inputmode="numeric"
+                           autocomplete="one-time-code"
+                           placeholder="123456" autofocus required>
+                    <small class="text-muted">
+                        Abre Google Authenticator, Authy, Microsoft Authenticator, etc.
+                    </small>
+                </div>
+                <button class="btn btn-primary btn-lg w-100" type="submit" id="btnVerificar">
+                    <i class="bi bi-check-lg"></i> Verificar
+                </button>
+            </div>
+
+            <div id="modoRecovery" style="display:none;">
+                <input type="hidden" name="recovery" value="1" disabled id="hiddenRecovery">
+                <div class="mb-3">
+                    <label class="form-label">Código de recuperación</label>
+                    <input type="text" name="codigo_recovery"
+                           class="form-control form-control-lg"
+                           placeholder="XXXX-XXXX" style="font-family:monospace;" disabled>
+                    <small class="text-muted">
+                        Uno de los 10 códigos que guardaste al configurar el 2FA.
+                    </small>
+                </div>
+                <button class="btn btn-warning btn-lg w-100" type="submit" disabled>
+                    <i class="bi bi-key"></i> Usar código de recuperación
+                </button>
+            </div>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+            <button type="button" class="btn btn-sm btn-link" id="toggleMode">
+                <i class="bi bi-key"></i> No tengo acceso a mi app, usar código de recuperación
+            </button>
+            {% if recovery_restantes > 0 %}
+                <div class="small text-muted mt-1">
+                    Tienes {{ recovery_restantes }} código{{ '' if recovery_restantes == 1 else 's' }} de recuperación
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{{ url_for('auth.login') }}" class="text-muted small" data-skip-transition>
+                <i class="bi bi-arrow-left"></i> Volver al login
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const form = document.getElementById('form2FA');
+    const codeInput = document.getElementById('codigoInput');
+    const btnVerificar = document.getElementById('btnVerificar');
+    const toggle = document.getElementById('toggleMode');
+    const modoNormal = document.getElementById('modoNormal');
+    const modoRecovery = document.getElementById('modoRecovery');
+
+    // Solo numeros, max 6 (sin auto-submit, sin formato con espacio)
+    if (codeInput) {
+        codeInput.addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+        });
+    }
+
+    // Protección contra doble-submit
+    if (form && btnVerificar) {
+        let enviando = false;
+        form.addEventListener('submit', e => {
+            if (enviando) {
+                e.preventDefault();
+                return false;
+            }
+            enviando = true;
+            btnVerificar.disabled = true;
+            btnVerificar.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2"></span>Verificando...';
+            // Re-habilitar tras 5 segundos por si el servidor falla
+            setTimeout(() => {
+                enviando = false;
+                if (btnVerificar) {
+                    btnVerificar.disabled = false;
+                    btnVerificar.innerHTML = '<i class="bi bi-check-lg"></i> Verificar';
+                }
+            }, 5000);
+        });
+    }
+
+    // Toggle modo recovery
+    if (toggle) {
+        let modoRecov = false;
+        toggle.addEventListener('click', () => {
+            modoRecov = !modoRecov;
+            modoNormal.style.display = modoRecov ? 'none' : '';
+            modoRecovery.style.display = modoRecov ? '' : 'none';
+
+            // Habilitar/deshabilitar inputs para que el form correcto se envie
+            modoNormal.querySelectorAll('input, button').forEach(el => {
+                el.disabled = modoRecov;
+            });
+            modoRecovery.querySelectorAll('input, button').forEach(el => {
+                el.disabled = !modoRecov;
+            });
+            // El input del recovery debe llamarse "codigo" cuando se usa
+            const recInput = modoRecovery.querySelector('input[name="codigo_recovery"]');
+            if (recInput) {
+                recInput.name = modoRecov ? 'codigo' : 'codigo_recovery';
+            }
+
+            toggle.innerHTML = modoRecov
+                ? '<i class="bi bi-shield-lock"></i> Volver a usar la app de autenticación'
+                : '<i class="bi bi-key"></i> No tengo acceso a mi app, usar código de recuperación';
+        });
+    }
+})();
+</script>
+{% endblock %}

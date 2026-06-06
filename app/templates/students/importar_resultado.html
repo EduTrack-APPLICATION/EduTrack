@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Importación completada{% endblock %}
+{% block page_title %}Importación completada{% endblock %}
+
+{% block content %}
+<div class="imp-result-hero stagger-item" style="--i:0">
+    <div class="imp-result-celebration">
+        {% if resumen.creados > 0 %}
+        <div class="imp-result-circle imp-result-circle-success">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        {% else %}
+        <div class="imp-result-circle imp-result-circle-warning">
+            <i class="bi bi-info-lg"></i>
+        </div>
+        {% endif %}
+    </div>
+    <h2 class="imp-result-title">
+        {% if resumen.creados > 0 %}
+            ¡Importación completada!
+        {% else %}
+            Importación procesada
+        {% endif %}
+    </h2>
+    <p class="imp-result-subtitle">
+        {% if resumen.creados > 0 %}
+            Se crearon <strong>{{ resumen.creados }}</strong>
+            estudiante{{ '' if resumen.creados == 1 else 's' }} nuevo{{ '' if resumen.creados == 1 else 's' }}
+            correctamente.
+        {% else %}
+            No se creó ningún estudiante nuevo en esta importación.
+        {% endif %}
+    </p>
+</div>
+
+<div class="row g-3 mb-4 justify-content-center">
+    <div class="col-md-3 col-6 stagger-item" style="--i:1">
+        <div class="summary-pill summary-pill-success">
+            <div class="summary-pill-icon"><i class="bi bi-person-check-fill"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ resumen.creados }}">0</div>
+                <div class="summary-pill-label">Creados</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 stagger-item" style="--i:2">
+        <div class="summary-pill summary-pill-warning">
+            <div class="summary-pill-icon"><i class="bi bi-arrow-repeat"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ resumen.omitidos }}">0</div>
+                <div class="summary-pill-label">Omitidos (duplicados)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 stagger-item" style="--i:3">
+        <div class="summary-pill summary-pill-danger">
+            <div class="summary-pill-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ resumen.con_error }}">0</div>
+                <div class="summary-pill-label">Con errores</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if resumen.estudiantes_creados %}
+<div class="card shadow-sm mb-3 stagger-item" style="--i:4">
+    <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="mb-0 d-flex align-items-center gap-2">
+            <span class="card-title-icon card-title-icon-success">
+                <i class="bi bi-person-plus-fill"></i>
+            </span>
+            Estudiantes recién creados
+        </h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Sección</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for est in resumen.estudiantes_creados %}
+                <tr>
+                    <td><code>{{ est.codigo }}</code></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-sm" style="background:linear-gradient(135deg,#10b981,#34d399);">
+                                {{ est.nombre[0]|upper }}
+                            </div>
+                            <div class="fw-semibold">{{ est.nombre_completo }}</div>
+                        </div>
+                    </td>
+                    <td class="text-muted small">{{ est.email or '—' }}</td>
+                    <td class="text-muted small">{{ est.seccion or '—' }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('students.detalle', id=est.id) }}"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-eye"></i> Ver perfil
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-center gap-2 mt-4 stagger-item" style="--i:5">
+    <a href="{{ url_for('students.listar') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-people-fill"></i> Ver todos los estudiantes
+    </a>
+    <a href="{{ url_for('students.importar') }}" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-arrow-repeat"></i> Importar más
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{# Counters animados son manejados por el script global en app.js #}
+{% endblock %}

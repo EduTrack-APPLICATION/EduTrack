@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}EduTrack{% endblock %} | EduTrack</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- App styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Anti-flash de tema: aplicar tema guardado ANTES de pintar el body -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('edutrack-theme');
+                if (!saved) {
+                    saved = window.matchMedia('(prefers-color-scheme: dark)').matches
+                        ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-theme', saved);
+            } catch (e) { /* localStorage no disponible */ }
+        })();
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if current_user.is_authenticated %}
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" data-tour="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-logo">
+            <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div>
+            <div class="brand-name">EduTrack</div>
+            <div class="brand-sub">Sistema Académico</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+           href="{{ url_for('dashboard.index') }}">
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </a>
+
+        <div class="nav-section">Gestión</div>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('students') %}active{% endif %}"
+           href="{{ url_for('students.listar') }}">
+            <i class="bi bi-mortarboard"></i> <span>Estudiantes</span>
+        </a>
+        {% if current_user.is_admin() %}
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('teachers') %}active{% endif %}"
+           href="{{ url_for('teachers.listar') }}">
+            <i class="bi bi-person-badge"></i> <span>Profesores</span>
+        </a>
+        {% endif %}
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('subjects') %}active{% endif %}"
+           href="{{ url_for('subjects.listar') }}">
+            <i class="bi bi-book"></i> <span>Materias</span>
+        </a>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('groups') %}active{% endif %}"
+           href="{{ url_for('groups.listar') }}">
+            <i class="bi bi-people"></i> <span>Grupos</span>
+        </a>
+
+        <div class="nav-section">Académico</div>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('evaluations') %}active{% endif %}"
+           href="{{ url_for('evaluations.listar') }}">
+            <i class="bi bi-clipboard-check"></i> <span>Evaluaciones</span>
+        </a>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('attendance') %}active{% endif %}"
+           href="{{ url_for('attendance.listar') }}">
+            <i class="bi bi-calendar-check"></i> <span>Asistencia</span>
+        </a>
+
+        <div class="nav-section">Reportes</div>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('honor') %}active{% endif %}"
+           href="{{ url_for('honor.index') }}">
+            <i class="bi bi-trophy-fill"></i> <span>Cuadro de honor</span>
+        </a>
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('reports') %}active{% endif %}"
+           href="{{ url_for('reports.index') }}">
+            <i class="bi bi-file-earmark-bar-graph"></i> <span>Reportes</span>
+        </a>
+
+        {% if current_user.is_admin() %}
+        <div class="nav-section">Sistema</div>
+        <a class="nav-link {% if request.endpoint == 'auth.auditoria_intentos' %}active{% endif %}"
+           href="{{ url_for('auth.auditoria_intentos') }}">
+            <i class="bi bi-shield-lock"></i> <span>Auditoría de accesos</span>
+        </a>
+        <a class="nav-link {% if request.endpoint == 'students.papelera' %}active{% endif %}"
+           href="{{ url_for('students.papelera') }}">
+            <i class="bi bi-trash3"></i> <span>Papelera</span>
+        </a>
+        {% if current_user.is_super_admin() %}
+        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('dev.') %}active{% endif %}"
+           href="{{ url_for('dev.index') }}">
+            <i class="bi bi-terminal-fill"></i> <span>Panel del developer</span>
+        </a>
+        {% endif %}
+        {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-mini">
+            <div class="avatar">{{ current_user.nombre_completo[:1]|upper }}</div>
+            <div class="user-info">
+                <div class="user-name">{{ current_user.nombre_completo }}</div>
+                <div class="user-role">{{ current_user.rol|capitalize }}</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Main content -->
+<div class="main-wrapper">
+    <!-- Topbar -->
+    <header class="navbar-top">
+        <button class="btn-icon d-lg-none" id="toggleSidebar" aria-label="Menú">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title">{% block page_title %}{% endblock %}</div>
+        <div class="navbar-actions">
+            <button class="search-trigger" id="searchTrigger" data-tour="search"
+                    title="Buscar y ejecutar acciones — Ctrl+K">
+                <i class="bi bi-search"></i>
+                <span class="search-trigger-text">Buscar...</span>
+                <span class="search-trigger-kbd"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+            </button>
+            <button class="btn-icon" id="themeToggle" data-tour="theme"
+                    title="Cambiar entre modo claro y oscuro">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li class="dropdown-header">
+                        <strong>{{ current_user.nombre_completo }}</strong><br>
+                        <small class="text-muted">{{ current_user.email }}</small>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.cambiar_password') }}">
+                        <i class="bi bi-key"></i> <span>Cambiar contraseña</span></a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.config_2fa') }}">
+                        <i class="bi bi-shield-lock"></i> <span>Verificación en dos pasos</span>
+                        {% if current_user.totp_habilitado %}
+                            <span class="badge bg-success-subtle text-success ms-1">Activo</span>
+                        {% endif %}
+                    </a></li>
+                    <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> <span>Cerrar sesión</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toasts container (los flash() se convierten en toasts via JS) -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    {% if current_user.is_authenticated %}
+    <!-- Botón flotante de ayuda (?) -->
+    <button type="button" class="fab-help d-none d-lg-flex" id="fabHelp"
+            title="Ayuda y atajos (?)" aria-label="Ayuda">
+        <i class="bi bi-question-lg"></i>
+    </button>
+
+    <!-- Overlay del tour de bienvenida -->
+    <div class="tour-overlay" id="tourOverlay" aria-hidden="true">
+        <div class="tour-highlight" id="tourHighlight"></div>
+        <div class="tour-popover" id="tourPopover">
+            <div class="tour-step-num" id="tourStepNum">1 / 5</div>
+            <h5 class="tour-title" id="tourTitle"></h5>
+            <p class="tour-text" id="tourText"></p>
+            <div class="tour-actions">
+                <button type="button" class="btn btn-sm btn-link" id="tourSkip">Saltar tour</button>
+                <div class="ms-auto d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="tourPrev">
+                        Anterior
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" id="tourNext">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <script>
+            window.__pendingToasts = window.__pendingToasts || [];
+            {% for category, message in messages %}
+            window.__pendingToasts.push({
+                category: {{ category|tojson }},
+                message: {{ message|tojson }}
+            });
+            {% endfor %}
+        </script>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Page content -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="page-footer">
+        <small>&copy; {{ now_year or '2026' }} EduTrack · Sistema de Gestión Académica</small>
+    </footer>
+</div>
+
+<!-- Modal de atajos de teclado (?) -->
+<div class="shortcuts-modal" id="shortcutsModal" aria-hidden="true">
+    <div class="shortcuts-modal-backdrop" data-shortcuts-close></div>
+    <div class="shortcuts-modal-content" role="dialog" aria-modal="true">
+        <div class="shortcuts-header">
+            <h5><i class="bi bi-keyboard"></i> Atajos de teclado</h5>
+            <button class="btn-icon" data-shortcuts-close aria-label="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="shortcuts-body">
+            <div class="shortcuts-section">
+                <h6>Navegación</h6>
+                <div class="shortcut-row">
+                    <span>Ir al Dashboard</span>
+                    <span><kbd>g</kbd> <kbd>d</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Estudiantes</span>
+                    <span><kbd>g</kbd> <kbd>e</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Grupos</span>
+                    <span><kbd>g</kbd> <kbd>g</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Materias</span>
+                    <span><kbd>g</kbd> <kbd>m</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Evaluaciones</span>
+                    <span><kbd>g</kbd> <kbd>v</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Asistencia</span>
+                    <span><kbd>g</kbd> <kbd>a</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ir a Reportes</span>
+                    <span><kbd>g</kbd> <kbd>r</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Cuadro de Honor</span>
+                    <span><kbd>g</kbd> <kbd>h</kbd></span>
+                </div>
+            </div>
+            <div class="shortcuts-section">
+                <h6>Acciones rápidas</h6>
+                <div class="shortcut-row">
+                    <span>Búsqueda global</span>
+                    <span><kbd>Ctrl</kbd> <kbd>K</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Búsqueda (alternativa)</span>
+                    <span><kbd>/</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Nuevo (contextual)</span>
+                    <span><kbd>n</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Cambiar tema</span>
+                    <span><kbd>t</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Ver esta ayuda</span>
+                    <span><kbd>?</kbd></span>
+                </div>
+            </div>
+            <div class="shortcuts-section">
+                <h6>En tablas de notas</h6>
+                <div class="shortcut-row">
+                    <span>Siguiente estudiante</span>
+                    <span><kbd>↓</kbd> o <kbd>Enter</kbd></span>
+                </div>
+                <div class="shortcut-row">
+                    <span>Estudiante anterior</span>
+                    <span><kbd>↑</kbd></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación personalizado (para data-confirm) -->
+<div class="confirm-modal" id="confirmModal" aria-hidden="true">
+    <div class="confirm-modal-backdrop" data-confirm-close></div>
+    <div class="confirm-modal-content" role="dialog" aria-modal="true">
+        <div class="confirm-modal-icon" id="confirmModalIcon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h5 class="confirm-modal-title" id="confirmModalTitle">¿Confirmar acción?</h5>
+        <p class="confirm-modal-text" id="confirmModalText"></p>
+        <div class="confirm-modal-actions">
+            <button class="btn btn-outline-secondary" data-confirm-close>Cancelar</button>
+            <button class="btn btn-danger" id="confirmModalAccept">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de búsqueda global (Ctrl+K) -->
+<div class="search-modal" id="searchModal" aria-hidden="true">
+    <div class="search-modal-backdrop" data-search-close></div>
+    <div class="search-modal-content" role="dialog" aria-modal="true" aria-labelledby="searchModalLabel">
+        <div class="search-modal-header">
+            <i class="bi bi-search search-input-icon"></i>
+            <input type="text" id="searchInput" class="search-input"
+                   placeholder="Buscar estudiantes, profesores, materias o grupos..."
+                   autocomplete="off" spellcheck="false">
+            <kbd class="search-modal-esc">ESC</kbd>
+        </div>
+        <div class="search-modal-body" id="searchResults">
+            <div class="search-empty">
+                <i class="bi bi-search fs-2"></i>
+                <p>Escribe al menos 2 caracteres para buscar</p>
+                <div class="search-hints">
+                    <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+                    <span><kbd>↵</kbd> abrir</span>
+                    <span><kbd>ESC</kbd> cerrar</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- App JS -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+{% block extra_scripts %}{% endblock %}
+
+{# ===== Bottom navigation (mobile) - solo cuando usuario autenticado ===== #}
+{% if current_user.is_authenticated %}
+<nav class="bottom-nav d-lg-none" aria-label="Navegación móvil">
+    <a href="{{ url_for('dashboard.index') }}"
+       class="bottom-nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+        <i class="bi bi-house-door-fill"></i>
+        <span>Inicio</span>
+    </a>
+    <a href="{{ url_for('students.listar') }}"
+       class="bottom-nav-item {% if request.endpoint and request.endpoint.startswith('students') %}active{% endif %}">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span>Estudiantes</span>
+    </a>
+    <a href="{{ url_for('evaluations.listar') }}"
+       class="bottom-nav-item {% if request.endpoint and request.endpoint.startswith('evaluations') %}active{% endif %}">
+        <i class="bi bi-clipboard-check-fill"></i>
+        <span>Evaluaciones</span>
+    </a>
+    <a href="{{ url_for('attendance.listar') }}"
+       class="bottom-nav-item {% if request.endpoint and request.endpoint.startswith('attendance') %}active{% endif %}">
+        <i class="bi bi-calendar-check-fill"></i>
+        <span>Asistencia</span>
+    </a>
+    <button type="button" class="bottom-nav-item" id="bottomMore" data-bs-toggle="dropdown">
+        <i class="bi bi-grid-fill"></i>
+        <span>Más</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end bottom-more-menu">
+        <li><a class="dropdown-item" href="{{ url_for('subjects.listar') }}">
+            <i class="bi bi-book"></i> <span>Materias</span></a></li>
+        <li><a class="dropdown-item" href="{{ url_for('groups.listar') }}">
+            <i class="bi bi-people"></i> <span>Grupos</span></a></li>
+        <li><a class="dropdown-item" href="{{ url_for('honor.index') }}">
+            <i class="bi bi-trophy"></i> <span>Cuadro de honor</span></a></li>
+        <li><a class="dropdown-item" href="{{ url_for('reports.index') }}">
+            <i class="bi bi-file-earmark-bar-graph"></i> <span>Reportes</span></a></li>
+    </ul>
+</nav>
+{% endif %}
+
+</body>
+</html>

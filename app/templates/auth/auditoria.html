@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Auditoría de accesos{% endblock %}
+{% block page_title %}Auditoría de accesos{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    <div>
+        <h4 class="mb-0"><i class="bi bi-shield-lock-fill text-primary"></i> Auditoría de accesos</h4>
+        <small class="text-muted">Últimos 100 intentos de inicio de sesión</small>
+    </div>
+</div>
+
+{# === Resumen 24h === #}
+<div class="row g-3 mb-3">
+    <div class="col-md-4 stagger-item" style="--i:0">
+        <div class="summary-pill summary-pill-total">
+            <div class="summary-pill-icon"><i class="bi bi-clock-history"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ total_24h }}">0</div>
+                <div class="summary-pill-label">Intentos últimas 24h</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 stagger-item" style="--i:1">
+        <div class="summary-pill summary-pill-danger">
+            <div class="summary-pill-icon"><i class="bi bi-shield-exclamation"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ fallos_24h }}">0</div>
+                <div class="summary-pill-label">Fallos últimas 24h</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 stagger-item" style="--i:2">
+        <div class="summary-pill summary-pill-warning">
+            <div class="summary-pill-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ ips_sospechosas|length }}">0</div>
+                <div class="summary-pill-label">IPs sospechosas</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if ips_sospechosas %}
+<div class="alert alert-warning d-flex align-items-start gap-3">
+    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+    <div>
+        <strong>IPs con actividad sospechosa</strong>
+        <p class="mb-1 small">Más de 5 intentos fallidos en las últimas 24 horas desde:</p>
+        <ul class="mb-0 small">
+            {% for ip, fallos in ips_sospechosas %}
+            <li><code>{{ ip }}</code> — {{ fallos }} fallos</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent border-0 pt-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+            <i class="bi bi-list-ul"></i> Registro detallado
+        </h6>
+        <small class="text-muted">Mostrando los últimos {{ intentos|length }} registros</small>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Fecha/Hora</th>
+                    <th>Usuario</th>
+                    <th>IP</th>
+                    <th>Resultado</th>
+                    <th>Motivo</th>
+                    <th class="d-none d-lg-table-cell">User Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in intentos %}
+                <tr class="{% if not i.exito %}preview-row-err{% endif %}">
+                    <td class="small text-muted text-nowrap">
+                        {{ i.timestamp.strftime('%d/%m %H:%M:%S') }}
+                    </td>
+                    <td>
+                        <code>{{ i.username_intentado or '—' }}</code>
+                    </td>
+                    <td class="small">
+                        <code>{{ i.ip or '—' }}</code>
+                    </td>
+                    <td>
+                        {% if i.exito %}
+                        <span class="status-pill status-success">
+                            <i class="bi bi-check-circle-fill"></i> Exitoso
+                        </span>
+                        {% else %}
+                        <span class="status-pill status-error">
+                            <i class="bi bi-x-circle-fill"></i> Fallido
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">
+                        {% set motivos = {
+                            'usuario_no_existe': 'Usuario no existe',
+                            'password_incorrecta': 'Contraseña incorrecta',
+                            'cuenta_inactiva': 'Cuenta desactivada',
+                            'cuenta_bloqueada': 'Cuenta bloqueada',
+                            'rate_limit_ip': 'Rate limit por IP',
+                        } %}
+                        {{ motivos.get(i.motivo_fallo, '—') if not i.exito else '—' }}
+                    </td>
+                    <td class="small text-muted d-none d-lg-table-cell" style="max-width:240px;">
+                        <span title="{{ i.user_agent }}" style="display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            {{ i.user_agent or '—' }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        Aún no se han registrado intentos de login.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtualenvs
+venv/
+env/
+ENV/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Flask
+flask_session/
+
+# Logs
+*.log
+logs/
+
+# Caché de tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Migraciones generadas (no la carpeta raíz)
+migrations/versions/__pycache__/
+
+# Archivos temporales de reportes
+*.tmp
+exports/
+
+# Python tooling
+.mypy_cache/
+.__pycache__/
+.python-version
+__pypackages__/
+pip-log.txt
+pip-delete-this-directory.txt
+coverage.xml
+*.cover
+*.py,cover
+nosetests.xml

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}{{ grupo.nombre }}{% endblock %}
+{% block page_title %}Detalle del grupo{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('groups.listar') }}" class="text-decoration-none text-muted mb-2 d-inline-block">
+    <i class="bi bi-arrow-left"></i> Volver a grupos
+</a>
+
+<!-- Header -->
+<div class="card shadow-sm mb-3">
+    <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+        <div>
+            <h4 class="mb-1">
+                <span class="badge bg-primary-subtle text-primary">{{ grupo.codigo }}</span>
+                {{ grupo.nombre }}
+            </h4>
+            <div class="text-muted">
+                <i class="bi bi-book"></i> {{ grupo.materia.nombre if grupo.materia else '—' }}
+                · <i class="bi bi-person-badge"></i> {{ grupo.profesor.nombre_completo if grupo.profesor else '—' }}
+                · <i class="bi bi-calendar"></i> {{ grupo.periodo }}
+                {% if grupo.aula %} · <i class="bi bi-door-closed"></i> {{ grupo.aula }}{% endif %}
+                {% if grupo.horario %} · <i class="bi bi-clock"></i> {{ grupo.horario }}{% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 align-items-start">
+            <a href="{{ url_for('reports.grupo_pdf', grupo_id=grupo.id) }}" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf"></i> PDF
+            </a>
+            <a href="{{ url_for('reports.grupo_excel', grupo_id=grupo.id) }}" class="btn btn-outline-success">
+                <i class="bi bi-file-excel"></i> Excel
+            </a>
+            <a href="{{ url_for('attendance.tomar', grupo_id=grupo.id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check"></i> Asistencia
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if estudiantes_info|length == 0 %}
+<div class="alert alert-warning d-flex align-items-center mb-3">
+    <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+    <div class="flex-grow-1">
+        <strong>Siguiente paso:</strong>
+        Este grupo aún no tiene estudiantes matriculados. Sin estudiantes no podrás
+        registrar notas ni tomar asistencia.
+    </div>
+    <button class="btn btn-sm btn-primary"
+            data-bs-toggle="modal" data-bs-target="#matricularModal">
+        <i class="bi bi-person-plus"></i> Matricular estudiantes
+    </button>
+</div>
+{% elif grupo.evaluaciones.count() == 0 %}
+<div class="alert alert-info d-flex align-items-center mb-3">
+    <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+    <div class="flex-grow-1">
+        <strong>Siguiente paso:</strong>
+        Este grupo tiene estudiantes pero no tiene evaluaciones aún.
+        Crea una evaluación para empezar a registrar notas.
+    </div>
+    <a href="{{ url_for('evaluations.crear') }}" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg"></i> Nueva evaluación
+    </a>
+</div>
+{% endif %}
+
+<!-- Stats summary -->
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Estudiantes</div>
+            <div class="mini-stat-value">{{ estudiantes_info|length }} / {{ grupo.cupo_maximo }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Evaluaciones</div>
+            <div class="mini-stat-value">{{ grupo.evaluaciones.count() }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mini-stat">
+            <div class="mini-stat-label">Estado</div>
+            <div class="mini-stat-value">
+                <span class="badge bg-{{ 'success' if grupo.activo else 'secondary' }}-subtle text-{{ 'success' if grupo.activo else 'secondary' }}">
+                    {{ 'Activo' if grupo.activo else 'Inactivo' }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Students Table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent pt-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0"><i class="bi bi-mortarboard text-primary"></i> Estudiantes matriculados</h6>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#matricularModal">
+            <i class="bi bi-person-plus"></i> Matricular estudiantes
+        </button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Código</th>
+                        <th class="text-center">Nota</th>
+                        <th class="text-center">Cubierto</th>
+                        <th class="text-center">Asistencia</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in estudiantes_info %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-sm">{{ info.estudiante.nombre[0]|upper }}</div>
+                                <div>
+                                    <div class="fw-semibold">{{ info.estudiante.nombre_completo }}</div>
+                                    <small class="text-muted">{{ info.estudiante.email or '' }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>{{ info.estudiante.codigo or '—' }}</code></td>
+                        <td class="text-center">{{ info.calc.nota_final|nota|safe }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-secondary">{{ '%.0f'|format(info.calc.porcentaje_acumulado or 0) }}%</span>
+                        </td>
+                        <td class="text-center">
+                            {% set pa = info.asistencia or 0 %}
+                            <span class="badge bg-{% if pa >= 80 %}success{% elif pa >= 60 %}warning{% else %}danger{% endif %}-subtle text-{% if pa >= 80 %}success{% elif pa >= 60 %}warning{% else %}danger{% endif %}">
+                                {{ '%.0f'|format(pa) }}%
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-{{ info.estado_color }}-subtle text-{{ info.estado_color }}">{{ info.estado_label }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('students.detalle', id=info.estudiante.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <form action="{{ url_for('groups.desmatricular', id=grupo.id, estudiante_id=info.estudiante.id) }}"
+                                  method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"
+                                        data-confirm="¿Desmatricular a {{ info.estudiante.nombre_completo }}?">
+                                    <i class="bi bi-person-x"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="text-muted mt-2 mb-0">No hay estudiantes matriculados aún.</p>
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Evaluations of this group -->
+{% set evs = grupo.evaluaciones.all()|sort(attribute='fecha', reverse=true) %}
+{% if evs %}
+<div class="card shadow-sm mt-3">
+    <div class="card-header bg-transparent pt-3">
+        <h6 class="mb-0"><i class="bi bi-clipboard-check text-success"></i> Evaluaciones del grupo</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Evaluación</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Puntaje</th>
+                        <th class="text-center">Peso</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in evs %}
+                    <tr>
+                        <td><strong>{{ ev.nombre }}</strong></td>
+                        <td>{{ ev.tipo|icono_tipo|safe }}</td>
+                        <td>{{ ev.fecha|fecha }}</td>
+                        <td class="text-center">{{ ev.puntaje_maximo }}</td>
+                        <td class="text-center">{{ ev.porcentaje }}%</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('grades.calificar', evaluacion_id=ev.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil-square"></i> Calificar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Matriculate Modal -->
+<div class="modal fade" id="matricularModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('groups.matricular', id=grupo.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Matricular estudiantes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-3" data-table-filter="#tbl-disponibles"
+                           placeholder="Buscar por nombre o código…">
+
+                    <table id="tbl-disponibles" class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">Sel.</th>
+                                <th>Estudiante</th>
+                                <th>Código</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for est in disponibles %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input" name="estudiante_ids" value="{{ est.id }}">
+                                </td>
+                                <td>{{ est.nombre_completo }}</td>
+                                <td><code>{{ est.codigo or '—' }}</code></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% if not disponibles %}
+                        <div class="text-center text-muted py-3">
+                            No hay estudiantes disponibles para matricular.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Matricular seleccionados
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

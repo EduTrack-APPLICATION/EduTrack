@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Historial de asistencia - {{ grupo.nombre }}{% endblock %}
+{% block page_title %}Historial de asistencia{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('attendance.listar') }}" class="text-decoration-none text-muted mb-2 d-inline-block">
+    <i class="bi bi-arrow-left"></i> Volver
+</a>
+
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-1">{{ grupo.nombre }} <small class="text-muted">· {{ grupo.codigo }}</small></h4>
+        <small class="text-muted">{{ fechas|length }} registros · {{ estudiantes|length }} estudiantes</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('attendance.tomar', grupo_id=grupo.id) }}" class="btn btn-primary">
+            <i class="bi bi-calendar-plus"></i> Nueva asistencia
+        </a>
+        <a href="{{ url_for('reports.asistencia_excel', grupo_id=grupo.id) }}" class="btn btn-outline-success">
+            <i class="bi bi-file-excel"></i> Excel
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if fechas %}
+        <div class="table-responsive attendance-matrix">
+            <table class="table table-bordered table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="sticky-col bg-light">Estudiante</th>
+                        {% for f in fechas %}
+                            <th class="text-center small">{{ f.strftime('%d/%m') }}</th>
+                        {% endfor %}
+                        <th class="text-center bg-light">% Asist.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for est in estudiantes %}
+                    <tr>
+                        <td class="sticky-col bg-white">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-sm">{{ est.nombre[0]|upper }}</div>
+                                <div>
+                                    <div class="fw-semibold small">{{ est.nombre_completo }}</div>
+                                    <small class="text-muted">{{ est.codigo or '' }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        {% for f in fechas %}
+                            {% set estado = matriz[est.id].get(f) %}
+                            <td class="text-center">
+                                {% if estado == 'presente' %}
+                                    <span class="att-cell att-presente" title="Presente">P</span>
+                                {% elif estado == 'ausente' %}
+                                    <span class="att-cell att-ausente" title="Ausente">A</span>
+                                {% elif estado == 'justificado' %}
+                                    <span class="att-cell att-justificado" title="Justificado">J</span>
+                                {% elif estado == 'tardia' %}
+                                    <span class="att-cell att-tardia" title="Tardía">T</span>
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="text-center bg-light">
+                            {% set p = porcentajes[est.id] or 0 %}
+                            <span class="badge bg-{% if p >= 80 %}success{% elif p >= 60 %}warning{% else %}danger{% endif %}-subtle text-{% if p >= 80 %}success{% elif p >= 60 %}warning{% else %}danger{% endif %}">
+                                {{ '%.0f'|format(p) }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state text-center py-5">
+                <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                <p class="text-muted mt-2">No hay registros de asistencia para este grupo.</p>
+                <a href="{{ url_for('attendance.tomar', grupo_id=grupo.id) }}" class="btn btn-primary">
+                    <i class="bi bi-calendar-plus"></i> Tomar primera asistencia
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

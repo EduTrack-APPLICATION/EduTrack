@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Tomar asistencia - {{ grupo.nombre }}{% endblock %}
+{% block page_title %}Tomar asistencia{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('attendance.listar') }}" class="text-decoration-none text-muted mb-2 d-inline-block">
+    <i class="bi bi-arrow-left"></i> Volver
+</a>
+
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-1">{{ grupo.nombre }} <small class="text-muted">· {{ grupo.codigo }}</small></h4>
+        <div class="text-muted">
+            <i class="bi bi-book"></i> {{ grupo.materia.nombre if grupo.materia else '—' }}
+            · <i class="bi bi-calendar"></i> {{ fecha|fecha }}
+        </div>
+    </div>
+    <a href="{{ url_for('attendance.historial', grupo_id=grupo.id) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-clock-history"></i> Ver historial
+    </a>
+</div>
+
+<!-- Date picker -->
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Fecha</label>
+                <input type="date" name="fecha" value="{{ fecha }}" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100">
+                    <i class="bi bi-arrow-clockwise"></i> Cargar
+                </button>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-link p-0 me-3" type="button" onclick="marcarTodos('presente')">
+                    <i class="bi bi-check-all"></i> Todos presentes
+                </button>
+                <button class="btn btn-link text-danger p-0" type="button" onclick="marcarTodos('ausente')">
+                    <i class="bi bi-x-octagon"></i> Todos ausentes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Form -->
+<form method="POST" action="{{ url_for('attendance.tomar', grupo_id=grupo.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="fecha" value="{{ fecha }}">
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-attendance align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th>Estudiante</th>
+                            <th class="text-center">Estado</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm">{{ item.estudiante.nombre[0]|upper }}</div>
+                                    <div>
+                                        <div class="fw-semibold">{{ item.estudiante.nombre_completo }}</div>
+                                        <small class="text-muted"><code>{{ item.estudiante.codigo or '' }}</code></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="attendance-buttons d-flex gap-1 justify-content-center">
+                                    {% for value, label, color in estados %}
+                                    <input type="radio" class="btn-check"
+                                           name="estado_{{ item.estudiante.id }}"
+                                           id="est_{{ item.estudiante.id }}_{{ value }}"
+                                           value="{{ value }}"
+                                           {% if item.estado == value %}checked{% endif %}>
+                                    <label class="btn btn-attendance btn-attendance-{{ color }}"
+                                           for="est_{{ item.estudiante.id }}_{{ value }}"
+                                           title="{{ label }}">
+                                        {{ label[0] }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <input type="text" name="obs_{{ item.estudiante.id }}"
+                                       class="form-control form-control-sm"
+                                       value="{{ item.observaciones or '' }}"
+                                       placeholder="Opcional">
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-2"></i><br>
+                            No hay estudiantes matriculados.
+                        </td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex justify-content-between">
+            <div class="text-muted small">
+                <strong>P</strong> Presente · <strong>A</strong> Ausente · <strong>J</strong> Justificado · <strong>T</strong> Tardía
+            </div>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Guardar asistencia
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function marcarTodos(estado) {
+    document.querySelectorAll('input[type="radio"][value="' + estado + '"]').forEach(function (r) {
+        r.checked = true;
+    });
+}
+</script>
+{% endblock %}

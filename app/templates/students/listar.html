@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Estudiantes{% endblock %}
+{% block page_title %}Estudiantes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h4 class="mb-0">Estudiantes</h4>
+        <small class="text-muted">
+            <span>Total</span>: {{ estudiantes.total }}
+            <span>registros</span>
+        </small>
+    </div>
+    {% if current_user.is_admin() %}
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('students.importar') }}" class="btn btn-outline-primary">
+            <i class="bi bi-file-earmark-arrow-up"></i>
+            <span class="d-none d-sm-inline">Importar Excel</span>
+        </a>
+        <a href="{{ url_for('students.crear') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i>
+            <span class="d-none d-sm-inline">Nuevo estudiante</span>
+            <span class="d-sm-none">Nuevo</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="buscar" value="{{ buscar or '' }}"
+                           class="form-control" placeholder="Nombre, apellido, código o correo">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="grupo" class="form-select">
+                    <option value="">Todos los grupos</option>
+                    {% for g in grupos %}
+                        <option value="{{ g.id }}" {% if grupo_id == g.id %}selected{% endif %}>
+                            {{ g.codigo }} - {{ g.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activo</option>
+                    <option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                    <option value="graduado" {% if estado == 'graduado' %}selected{% endif %}>Graduado</option>
+                    <option value="retirado" {% if estado == 'retirado' %}selected{% endif %}>Retirado</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Código</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for est in estudiantes.items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-sm">{{ est.nombre[0]|upper }}</div>
+                                <div>
+                                    <div class="fw-semibold">{{ est.nombre_completo }}</div>
+                                    {% if est.fecha_nacimiento %}
+                                        <small class="text-muted">{{ est.fecha_nacimiento|fecha }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>{{ est.codigo or '—' }}</code></td>
+                        <td>{{ est.email or '—' }}</td>
+                        <td>{{ est.telefono or '—' }}</td>
+                        <td>{{ est.estado|badge_estado|safe }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('students.detalle', id=est.id) }}"
+                               class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if current_user.is_admin() %}
+                            <a href="{{ url_for('students.editar', id=est.id) }}"
+                               class="btn btn-sm btn-outline-secondary" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('students.eliminar', id=est.id) }}"
+                                  method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger"
+                                        data-confirm="¿Eliminar a {{ est.nombre_completo }}?">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="empty-state-rich">
+                                <div class="empty-state-illustration">
+                                    <i class="bi bi-mortarboard"></i>
+                                </div>
+                                <div class="empty-state-title">
+                                    {% if buscar or grupo_id or estado %}
+                                        Ningún estudiante coincide con los filtros
+                                    {% else %}
+                                        Aún no hay estudiantes registrados
+                                    {% endif %}
+                                </div>
+                                <div class="empty-state-message">
+                                    {% if buscar or grupo_id or estado %}
+                                        Prueba con otros criterios de búsqueda o limpia los filtros.
+                                    {% else %}
+                                        Agrega el primer estudiante para empezar a llevar el control académico.
+                                    {% endif %}
+                                </div>
+                                {% if current_user.is_admin() and not (buscar or grupo_id or estado) %}
+                                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                    <a href="{{ url_for('students.crear') }}" class="btn btn-primary">
+                                        <i class="bi bi-plus-lg"></i> Agregar primer estudiante
+                                    </a>
+                                    <a href="{{ url_for('students.importar') }}" class="btn btn-outline-primary">
+                                        <i class="bi bi-file-earmark-arrow-up"></i> O importar desde Excel
+                                    </a>
+                                </div>
+                                {% elif buscar or grupo_id or estado %}
+                                <a href="{{ url_for('students.listar') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Limpiar filtros
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if estudiantes.pages > 1 %}
+    <div class="card-footer bg-transparent">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if estudiantes.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('students.listar', page=estudiantes.prev_num, buscar=buscar, grupo=grupo_id, estado=estado) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for p in estudiantes.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if p %}
+                        <li class="page-item {% if p == estudiantes.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('students.listar', page=p, buscar=buscar, grupo=grupo_id, estado=estado) }}">{{ p }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if estudiantes.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('students.listar', page=estudiantes.next_num, buscar=buscar, grupo=grupo_id, estado=estado) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

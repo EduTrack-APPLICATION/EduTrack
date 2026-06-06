@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Iniciar Sesión · EduTrack{% endblock %}
+
+{% block auth_content %}
+<div class="login-split">
+    {# ====== PANEL IZQUIERDO: Branding + ilustración SVG ====== #}
+    <aside class="login-aside">
+        <div class="login-aside-bg" aria-hidden="true">
+            {# Patrón geométrico de fondo #}
+            <svg viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" class="login-pattern">
+                <defs>
+                    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#0f172a"/>
+                        <stop offset="50%" stop-color="#1e293b"/>
+                        <stop offset="100%" stop-color="#0f172a"/>
+                    </linearGradient>
+                    <radialGradient id="g2" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <rect width="600" height="800" fill="url(#g1)"/>
+                <circle cx="450" cy="200" r="220" fill="url(#g2)"/>
+                <circle cx="150" cy="650" r="180" fill="url(#g2)"/>
+                {# Grid de puntos #}
+                <g fill="#ffffff" opacity="0.08">
+                    {% for r in range(40) %}
+                    {% for c in range(20) %}
+                    <circle cx="{{ c*32 + 12 }}" cy="{{ r*32 + 12 }}" r="1.2"/>
+                    {% endfor %}
+                    {% endfor %}
+                </g>
+            </svg>
+        </div>
+
+        <div class="login-aside-content">
+            {# Brand #}
+            <div class="login-brand">
+                <div class="login-brand-mark">
+                    <svg viewBox="0 0 40 40" width="40" height="40">
+                        <path d="M8 12 L20 6 L32 12 L32 28 L20 34 L8 28 Z"
+                              fill="none" stroke="currentColor" stroke-width="2.5"
+                              stroke-linejoin="round"/>
+                        <path d="M14 18 L20 21 L26 18 M20 21 L20 28"
+                              fill="none" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="login-brand-text">
+                    <div class="login-brand-name">EduTrack</div>
+                    <div class="login-brand-tag">Sistema académico</div>
+                </div>
+            </div>
+
+            {# Heading + frase #}
+            <div class="login-aside-hero">
+                <h1>Gestiona tu aula<br/>con claridad.</h1>
+                <p>Evaluaciones, asistencia y reportes<br/>en un solo lugar.</p>
+            </div>
+
+            {# Features mini #}
+            <div class="login-features">
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Calificaciones en tiempo real</span>
+                </div>
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Reportes en PDF y Excel</span>
+                </div>
+                <div class="login-feat">
+                    <div class="login-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Cuadro de honor automático</span>
+                </div>
+            </div>
+
+            <div class="login-aside-foot">
+                <span>© 2026 EduTrack</span>
+                <span class="login-dot">·</span>
+                <span>v1.0</span>
+            </div>
+        </div>
+    </aside>
+
+    {# ====== PANEL DERECHO: Formulario ====== #}
+    <main class="login-main">
+        <div class="login-form-wrap">
+
+            {# Flash messages #}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="login-alert login-alert-{{ 'danger' if category == 'error' else category }}">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="login-heading">
+                <h2>Bienvenido de vuelta</h2>
+                <p>Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <form method="POST" novalidate class="login-form" id="loginForm" data-skip-transition>
+                {{ form.hidden_tag() }}
+
+                <div class="login-field">
+                    <label for="username">Usuario o correo</label>
+                    <div class="login-input-wrap">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18" class="login-input-ico">
+                            <circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+                            <path d="M3 17c1.5-3 4-4.5 7-4.5s5.5 1.5 7 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                        {{ form.username(class="login-input", id="username",
+                                         placeholder="admin o correo@ejemplo.com",
+                                         autocomplete="username", autofocus=true) }}
+                    </div>
+                    {% for err in form.username.errors %}
+                        <div class="login-field-error">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="login-field">
+                    <label for="password" class="d-flex justify-content-between align-items-center">
+                        <span>Contraseña</span>
+                        <a href="{{ url_for('auth.recuperar_password') }}" class="login-link-small">
+                            <span>¿Olvidaste tu contraseña?</span>
+                        </a>
+                    </label>
+                    <div class="login-input-wrap">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18" class="login-input-ico">
+                            <rect x="4" y="9" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/>
+                            <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                        {{ form.password(class="login-input", id="password",
+                                         placeholder="••••••••",
+                                         autocomplete="current-password") }}
+                        <button type="button" class="login-input-action" id="togglePwd"
+                                aria-label="Mostrar contraseña" tabindex="-1">
+                            <svg viewBox="0 0 20 20" fill="none" width="18" height="18" id="eyeIcon">
+                                <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.6"/>
+                                <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                        </button>
+                    </div>
+                    {% for err in form.password.errors %}
+                        <div class="login-field-error">{{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <label class="login-check">
+                    {{ form.remember() }}
+                    <span>Mantener sesión iniciada</span>
+                </label>
+
+                <button type="submit" class="login-submit" id="btnLogin">
+                    <span>Iniciar sesión</span>
+                    <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                        <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+
+            {# Credenciales demo (solo en dev) #}
+            {% if config.DEBUG %}
+            <details class="login-demo">
+                <summary>
+                    <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <span>Credenciales de prueba</span></summary>
+                <div class="login-demo-body">
+                    <div class="login-demo-row">
+                        <span class="login-demo-label">Admin</span>
+                        <code>admin / admin123</code>
+                    </div>
+                    <div class="login-demo-row">
+                        <span class="login-demo-label">Profesor</span>
+                        <code>mrodriguez / profesor123</code>
+                    </div>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    // Toggle mostrar/ocultar contraseña
+    const toggle = document.getElementById('togglePwd');
+    const pwd = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (toggle && pwd && icon) {
+        toggle.addEventListener('click', () => {
+            const isPwd = pwd.type === 'password';
+            pwd.type = isPwd ? 'text' : 'password';
+            icon.innerHTML = isPwd
+                ? '<path d="M3 3l14 14M8 8a3 3 0 004 4M2 10s3-6 8-6c1.4 0 2.7.4 3.7 1M18 10s-3 6-8 6c-1.4 0-2.7-.4-3.7-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+                : '<path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/>';
+        });
+    }
+
+    // Spinner al enviar
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('btnLogin');
+    if (form && btn) {
+        form.addEventListener('submit', () => {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="login-spinner"></span><span>Ingresando…</span>';
+        });
+    }
+})();
+</script>
+{% endblock %}

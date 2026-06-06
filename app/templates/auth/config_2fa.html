@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Configuración 2FA{% endblock %}
+{% block page_title %}Verificación en dos pasos{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    <div>
+        <h4 class="mb-0"><i class="bi bi-shield-lock-fill text-primary"></i> Verificación en dos pasos</h4>
+        <small class="text-muted">Una capa extra de seguridad para tu cuenta</small>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                {% if current_user.totp_habilitado %}
+                <div class="mfa-status mfa-status-on">
+                    <div class="mfa-status-icon"><i class="bi bi-shield-check"></i></div>
+                    <div class="mfa-status-body">
+                        <h5 class="mb-1">2FA está activado</h5>
+                        <p class="text-muted mb-0">
+                            Tu cuenta está protegida con verificación en dos pasos.
+                            Cada vez que inicies sesión te pediremos un código de tu app de autenticación.
+                        </p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="mb-2">Códigos de recuperación</h6>
+                <p class="text-muted small">
+                    Te quedan <strong class="text-primary">{{ recovery_restantes }}</strong>
+                    código{{ '' if recovery_restantes == 1 else 's' }} de recuperación.
+                    Estos te permiten entrar si pierdes acceso a tu app.
+                </p>
+
+                <form method="POST" action="{{ url_for('auth.regenerar_recovery_codes') }}"
+                      class="mb-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group" style="max-width:420px;">
+                        <input type="password" name="password" class="form-control"
+                               placeholder="Tu contraseña actual" required>
+                        <button class="btn btn-outline-warning" type="submit"
+                                data-confirm="Generar nuevos códigos. Los anteriores dejarán de funcionar. ¿Continuar?">
+                            <i class="bi bi-arrow-clockwise"></i> Regenerar códigos
+                        </button>
+                    </div>
+                </form>
+
+                <h6 class="mb-2 text-danger">Zona peligrosa</h6>
+                <form method="POST" action="{{ url_for('auth.deshabilitar_2fa') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group" style="max-width:420px;">
+                        <input type="password" name="password" class="form-control"
+                               placeholder="Tu contraseña actual" required>
+                        <button class="btn btn-outline-danger" type="submit"
+                                data-confirm="¿Seguro que quieres deshabilitar el 2FA? Tu cuenta quedará menos protegida.">
+                            <i class="bi bi-shield-x"></i> Deshabilitar 2FA
+                        </button>
+                    </div>
+                </form>
+
+                {% else %}
+                <div class="mfa-status mfa-status-off">
+                    <div class="mfa-status-icon"><i class="bi bi-shield-exclamation"></i></div>
+                    <div class="mfa-status-body">
+                        <h5 class="mb-1">2FA no está activado</h5>
+                        <p class="text-muted mb-3">
+                            Activa la verificación en dos pasos para añadir una capa
+                            extra de seguridad. Toma menos de 2 minutos.
+                        </p>
+                        <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary">
+                            <i class="bi bi-shield-lock"></i> Activar 2FA ahora
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="mb-3 d-flex align-items-center gap-2">
+                    <span class="card-title-icon card-title-icon-info">
+                        <i class="bi bi-info-circle"></i>
+                    </span>
+                    ¿Qué es el 2FA?
+                </h6>
+                <p class="small text-muted">
+                    Es una capa adicional de seguridad que requiere, además de tu contraseña,
+                    un código temporal de 6 dígitos que genera una app en tu celular.
+                </p>
+                <p class="small text-muted">
+                    Aunque alguien obtenga tu contraseña, no podrá entrar a tu cuenta sin
+                    también tener acceso a tu celular.
+                </p>
+
+                <h6 class="mt-4 mb-2 d-flex align-items-center gap-2">
+                    <span class="card-title-icon card-title-icon-warning">
+                        <i class="bi bi-key"></i>
+                    </span>
+                    Códigos de recuperación
+                </h6>
+                <p class="small text-muted mb-0">
+                    Al activar el 2FA, recibirás 10 códigos de un solo uso. Guárdalos en
+                    un lugar seguro (gestor de contraseñas, papel guardado). Te servirán
+                    si pierdes acceso a tu celular.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

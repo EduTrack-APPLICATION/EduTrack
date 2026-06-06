@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Activar 2FA{% endblock %}
+{% block page_title %}Activar verificación en dos pasos{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="{{ url_for('auth.config_2fa') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Cancelar
+    </a>
+    <div>
+        <h4 class="mb-0"><i class="bi bi-shield-lock-fill text-primary"></i> Activar 2FA</h4>
+        <small class="text-muted">Configura una capa extra de seguridad en tu cuenta</small>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <ol class="imp-steps">
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>1</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Instala una app de autenticación</h6>
+                            <p class="imp-step-desc">
+                                Si no tienes una, descarga alguna de estas en tu celular:
+                            </p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <span class="format-pill">Google Authenticator</span>
+                                <span class="format-pill">Microsoft Authenticator</span>
+                                <span class="format-pill">Authy</span>
+                                <span class="format-pill">1Password</span>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>2</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Escanea el código QR</h6>
+                            <p class="imp-step-desc">
+                                Abre tu app y elige "Agregar cuenta" o "+". Escanea el QR
+                                que aparece a la derecha. Si no puedes escanearlo, usa este
+                                código manual:
+                            </p>
+                            <div class="totp-manual-code">
+                                <code id="manualCode">{{ secret }}</code>
+                                <button type="button" class="btn-clear" id="copyCode" title="Copiar">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="imp-step">
+                        <div class="imp-step-num">
+                            <span>3</span>
+                            <div class="imp-step-ring"></div>
+                        </div>
+                        <div class="imp-step-body">
+                            <h6 class="imp-step-title">Ingresa el código de 6 dígitos</h6>
+                            <p class="imp-step-desc">
+                                Tu app mostrará un código que cambia cada 30 segundos.
+                                Ingrésalo aquí para confirmar:
+                            </p>
+
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="input-group" style="max-width:280px;">
+                                    <input type="text" name="codigo"
+                                           class="form-control form-control-lg mfa-code-input"
+                                           maxlength="7" inputmode="numeric"
+                                           autocomplete="one-time-code"
+                                           placeholder="123 456" required>
+                                    <button class="btn btn-success" type="submit">
+                                        <i class="bi bi-check-lg"></i> Activar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="mb-3">Escanea con tu app</h6>
+                <div class="totp-qr-wrap">
+                    <img src="data:image/png;base64,{{ qr_data }}" alt="Código QR"
+                         class="totp-qr-img">
+                </div>
+                <p class="text-muted small mt-3 mb-0">
+                    El QR contiene una clave secreta. Una vez escaneado, tu app
+                    generará un código nuevo cada 30 segundos.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    // Auto-formato del código
+    const input = document.querySelector('input[name="codigo"]');
+    if (input) {
+        input.addEventListener('input', e => {
+            let v = e.target.value.replace(/\D/g, '').slice(0, 6);
+            if (v.length > 3) v = v.slice(0, 3) + ' ' + v.slice(3);
+            e.target.value = v;
+        });
+    }
+
+    // Copiar el código manual
+    const copyBtn = document.getElementById('copyCode');
+    const manualCode = document.getElementById('manualCode');
+    if (copyBtn && manualCode) {
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(manualCode.textContent.trim());
+            copyBtn.innerHTML = '<i class="bi bi-check2"></i>';
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            }, 1500);
+        });
+    }
+})();
+</script>
+{% endblock %}

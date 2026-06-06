@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block page_title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <a href="{{ url_for('evaluations.listar') }}" class="text-decoration-none text-muted mb-2 d-inline-block">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="card shadow-sm">
+            <div class="card-header bg-transparent pt-3">
+                <h5 class="mb-0"><i class="bi bi-clipboard-check text-primary"></i> {{ titulo }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">{{ form.nombre.label.text }} *</label>
+                            {{ form.nombre(class="form-control") }}
+                            {% for e in form.nombre.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.tipo.label.text }} *</label>
+                            {{ form.tipo(class="form-select") }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.descripcion.label.text }}</label>
+                            {{ form.descripcion(class="form-control", rows=2) }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.grupo_id.label.text }} *</label>
+                            {{ form.grupo_id(class="form-select") }}
+                            {% for e in form.grupo_id.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+                            {% if not form.grupo_id.choices %}
+                            <div class="alert alert-warning small mt-2 mb-0 py-2">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>No tienes grupos disponibles.</strong>
+                                {% if current_user.is_admin() %}
+                                    <a href="{{ url_for('groups.crear') }}">Crea un grupo</a> primero
+                                    para poder asignarle evaluaciones.
+                                {% else %}
+                                    Pide al administrador que te asigne a un grupo.
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.fecha.label.text }} *</label>
+                            {{ form.fecha(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.puntaje_maximo.label.text }} *</label>
+                            <div class="input-group">
+                                {{ form.puntaje_maximo(class="form-control") }}
+                                <span class="input-group-text">pts</span>
+                            </div>
+                            <small class="text-muted">Puntaje total que vale la evaluación.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.porcentaje.label.text }} *</label>
+                            <div class="input-group">
+                                {{ form.porcentaje(class="form-control") }}
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">Peso de esta evaluación sobre la nota final del curso.</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('evaluations.listar') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

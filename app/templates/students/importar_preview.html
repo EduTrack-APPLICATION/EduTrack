@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}Vista previa de importación{% endblock %}
+{% block page_title %}Vista previa de importación{% endblock %}
+
+{% block content %}
+{# ===== HERO DE PREVIEW ===== #}
+<section class="imp-preview-hero stagger-item" style="--i:0">
+    <div class="imp-preview-hero-icon">
+        <i class="bi bi-clipboard-data"></i>
+    </div>
+    <div class="imp-preview-hero-text">
+        <h3 class="mb-1">Vista previa de la importación</h3>
+        <p class="text-muted mb-0">
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+            <span class="fw-semibold">{{ nombre_archivo }}</span>
+            <span class="mx-1">·</span>
+            <span>{{ total }} fila{{ '' if total == 1 else 's' }} analizada{{ '' if total == 1 else 's' }}</span>
+        </p>
+    </div>
+    <a href="{{ url_for('students.importar') }}" class="btn btn-outline-secondary"
+       data-skip-transition>
+        <i class="bi bi-arrow-counterclockwise"></i> Empezar de nuevo
+    </a>
+</section>
+
+{# ===== 4 PILLS DE RESUMEN CON COUNTERS ANIMADOS ===== #}
+<div class="row g-3 mb-3">
+    <div class="col-md-3 col-6 stagger-item" style="--i:1">
+        <div class="summary-pill summary-pill-total">
+            <div class="summary-pill-icon"><i class="bi bi-list-ol"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ total }}">0</div>
+                <div class="summary-pill-label">Filas leídas</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 stagger-item" style="--i:2">
+        <div class="summary-pill summary-pill-success">
+            <div class="summary-pill-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ importables }}">0</div>
+                <div class="summary-pill-label">Listos para importar</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 stagger-item" style="--i:3">
+        <div class="summary-pill summary-pill-warning">
+            <div class="summary-pill-icon"><i class="bi bi-arrow-repeat"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ duplicados }}">0</div>
+                <div class="summary-pill-label">Ya existen (se omitirán)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 stagger-item" style="--i:4">
+        <div class="summary-pill summary-pill-danger">
+            <div class="summary-pill-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="summary-pill-content">
+                <div class="summary-pill-num" data-counter="{{ con_errores }}">0</div>
+                <div class="summary-pill-label">Con errores (se ignorarán)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== BANNER DE ACCIÓN ===== #}
+{% if importables > 0 %}
+<div class="imp-action-banner imp-action-success stagger-item" style="--i:5">
+    <div class="imp-action-icon">
+        <i class="bi bi-rocket-takeoff-fill"></i>
+    </div>
+    <div class="imp-action-text">
+        <h6 class="mb-1">¡Todo listo para importar!</h6>
+        <p class="mb-0 text-muted">
+            Se crearán <strong>{{ importables }}</strong>
+            estudiante{{ '' if importables == 1 else 's' }} nuevo{{ '' if importables == 1 else 's' }}.
+            {% if duplicados > 0 %}
+            <span>{{ duplicados }} duplicado{{ '' if duplicados == 1 else 's' }} se omitirán.</span>
+            {% endif %}
+            {% if con_errores > 0 %}
+            <span>{{ con_errores }} con error no se importarán.</span>
+            {% endif %}
+        </p>
+    </div>
+    <form action="{{ url_for('students.importar_confirmar') }}" method="POST" class="no-track">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="payload" value='{{ payload_json|e }}'>
+        <button class="btn btn-success btn-lg" type="submit" id="btnConfirmar">
+            <i class="bi bi-cloud-upload-fill"></i>
+            Confirmar e importar
+        </button>
+    </form>
+</div>
+{% elif con_errores == total %}
+<div class="imp-action-banner imp-action-danger stagger-item" style="--i:5">
+    <div class="imp-action-icon">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <div class="imp-action-text">
+        <h6 class="mb-1">Todas las filas tienen errores</h6>
+        <p class="mb-0 text-muted">
+            Revisa la tabla abajo, corrige el archivo y vuelve a subirlo.
+        </p>
+    </div>
+</div>
+{% else %}
+<div class="imp-action-banner imp-action-warning stagger-item" style="--i:5">
+    <div class="imp-action-icon">
+        <i class="bi bi-info-circle-fill"></i>
+    </div>
+    <div class="imp-action-text">
+        <h6 class="mb-1">Nada nuevo para importar</h6>
+        <p class="mb-0 text-muted">
+            Todos los estudiantes del archivo ya existen en el sistema.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+{# ===== TABS Y TABLA ===== #}
+<div class="card shadow-sm stagger-item" style="--i:6">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3">
+        <ul class="nav nav-pills nav-pills-sm" id="filtroResultados">
+            <li class="nav-item">
+                <button class="nav-link active" data-filter="all">
+                    Todos <span class="badge bg-secondary-subtle text-secondary ms-1">{{ total }}</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-filter="ok">
+                    <i class="bi bi-check-circle text-success"></i>
+                    Listos <span class="badge bg-success-subtle text-success ms-1">{{ importables }}</span>
+                </button>
+            </li>
+            {% if duplicados > 0 %}
+            <li class="nav-item">
+                <button class="nav-link" data-filter="dup">
+                    <i class="bi bi-arrow-repeat text-warning"></i>
+                    Duplicados <span class="badge bg-warning-subtle text-warning ms-1">{{ duplicados }}</span>
+                </button>
+            </li>
+            {% endif %}
+            {% if con_errores > 0 %}
+            <li class="nav-item">
+                <button class="nav-link" data-filter="err">
+                    <i class="bi bi-x-circle text-danger"></i>
+                    Con error <span class="badge bg-danger-subtle text-danger ms-1">{{ con_errores }}</span>
+                </button>
+            </li>
+            {% endif %}
+        </ul>
+        <small class="text-muted d-none d-md-block">
+            <i class="bi bi-info-circle"></i>
+            Click en las pestañas para filtrar
+        </small>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 preview-table">
+            <thead>
+                <tr>
+                    <th style="width:50px;">Fila</th>
+                    <th style="width:100px;">Estado</th>
+                    <th>Estudiante</th>
+                    <th>Código</th>
+                    <th>Email</th>
+                    <th>Sección</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resultados %}
+                {% set tipo = 'err' if not r.valido else ('dup' if r.existe else 'ok') %}
+                <tr class="preview-row preview-row-{{ tipo }}" data-status="{{ tipo }}">
+                    <td class="text-muted small text-center">
+                        <span class="fila-num">{{ r.fila }}</span>
+                    </td>
+                    <td>
+                        {% if not r.valido %}
+                            <span class="status-pill status-error">
+                                <i class="bi bi-x-circle-fill"></i> Error
+                            </span>
+                        {% elif r.existe %}
+                            <span class="status-pill status-warning">
+                                <i class="bi bi-arrow-repeat"></i> Existe
+                            </span>
+                        {% else %}
+                            <span class="status-pill status-success">
+                                <i class="bi bi-check-circle-fill"></i> OK
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {% set nombre = r.datos.nombre or r.datos_raw.nombre or '?' %}
+                            <div class="avatar-sm" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">
+                                {{ nombre[0]|upper if nombre and nombre != '?' else '?' }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ r.datos.nombre or r.datos_raw.nombre or '—' }}
+                                    {{ r.datos.apellido or r.datos_raw.apellido or '' }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code>{{ r.datos.codigo or r.datos_raw.codigo or '—' }}</code></td>
+                    <td class="text-muted small">{{ r.datos.email or r.datos_raw.email or '—' }}</td>
+                    <td class="text-muted small">{{ r.datos.seccion or r.datos_raw.seccion or '—' }}</td>
+                    <td>
+                        {% if r.errores %}
+                            {% for err in r.errores %}
+                            <div class="detail-msg detail-error">
+                                <i class="bi bi-x-circle"></i> {{ err }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if r.advertencias %}
+                            {% for adv in r.advertencias %}
+                            <div class="detail-msg detail-warning">
+                                <i class="bi bi-exclamation-triangle"></i> {{ adv }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if not r.errores and not r.advertencias %}
+                            <span class="text-muted small">
+                                <i class="bi bi-check2"></i> Sin observaciones
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    // ===== Filtros de tabs =====
+    const filtros = document.querySelectorAll('#filtroResultados [data-filter]');
+    const filas = document.querySelectorAll('.preview-row');
+
+    filtros.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filtros.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+            filas.forEach(row => {
+                row.style.display = (filter === 'all' || row.dataset.status === filter)
+                    ? '' : 'none';
+            });
+        });
+    });
+
+    // ===== Counters animados son manejados por el script global en app.js =====
+
+    // ===== Indicador de carga al confirmar =====
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    if (btnConfirmar) {
+        btnConfirmar.form.addEventListener('submit', () => {
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Importando...';
+        });
+    }
+})();
+</script>
+{% endblock %}
