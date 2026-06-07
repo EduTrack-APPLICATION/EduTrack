@@ -1,469 +1,555 @@
-# 🎓 EduTrack — Sistema de Gestión Académica
+# EduTrack
 
-**EduTrack** es una aplicación web profesional para la gestión académica de instituciones educativas. Permite administrar estudiantes, profesores, materias, grupos, evaluaciones, notas y asistencias, con generación automática de reportes en PDF y Excel.
-
-Construido con **Python · Flask · PostgreSQL · Bootstrap 5**.
+Sistema de gestión académica web para colegios y escuelas. Permite gestionar estudiantes, profesores, materias, grupos, evaluaciones y asistencia, con generación automática de reportes y boletines.
 
 ---
 
-## ✨ Características principales
+## Tabla de contenidos
 
-### Autenticación y roles
-- Login con usuario **o** correo electrónico
-- Dos roles: **administrador** y **profesor** (cada uno con su propio panel)
-- Recuperación de contraseña vía token
-- Cambio de contraseña personal desde el menú de usuario
-- Protección CSRF en todos los formularios
-- Sesiones seguras con Flask-Login
-
-### Dashboard inteligente
-- Tarjetas con métricas clave (estudiantes, grupos, evaluaciones, promedio general)
-- Gráfico de **distribución de notas** (Chart.js)
-- Gráfico de **asistencia de los últimos 14 días**
-- Listado de **estudiantes en riesgo académico**
-- Actividad reciente y próximas evaluaciones
-
-### CRUDs completos
-- **Estudiantes**: con código, cédula, datos de contacto, encargado, estado académico (activo/inactivo/graduado/retirado), búsqueda y filtros
-- **Profesores**: con cuenta de usuario asociada, especialidad, título académico, asignación de materias
-- **Materias**: con créditos, horas semanales, activación/desactivación
-- **Grupos**: vinculan materia + profesor titular + estudiantes; matriculación/desmatriculación desde un modal
-- **Evaluaciones**: 7 tipos (examen, quiz, tarea, proyecto, exposición, práctica, participación), con puntaje máximo y peso porcentual
-
-### Sistema de notas (dos modos)
-- **Modo grupal**: tabla con toda la lista del grupo, una fila por estudiante, auto-guardado en cada cambio (AJAX)
-- **Modo individual**: edición uno a uno desde el detalle del estudiante
-- Navegación por teclado: <kbd>↓</kbd> / <kbd>Enter</kbd> avanza al siguiente, <kbd>↑</kbd> retrocede
-- Validación automática de rango (0 ≤ puntaje ≤ puntaje_máximo)
-- Indicador visual de estado por fila (guardando / guardado / error)
-- Cálculo automático de:
-  - **Nota final** ponderada por porcentaje de cada evaluación
-  - **Estado académico**: aprobado (≥70), recuperación (60-69), reprobado (<60)
-  - **Porcentaje del curso cubierto** por las evaluaciones ya hechas
-
-### Control de asistencia
-- Toma de asistencia día a día, grupo a grupo
-- Cuatro estados: **P**resente, **A**usente, **J**ustificado, **T**ardía
-- Botones de marcar masivo ("todos presentes", "todos ausentes")
-- Vista de historial en formato **matriz** (estudiantes × fechas)
-- Cálculo automático del porcentaje de asistencia por estudiante
-
-### Reportes (PDF y Excel)
-- **Boletín individual del estudiante** (PDF con notas, asistencia, observaciones)
-- **Reporte de grupo** (PDF con todos los estudiantes y su desempeño)
-- **Notas detalladas de grupo** (Excel con todas las evaluaciones y notas por estudiante)
-- **Asistencia de grupo** (Excel con matriz de asistencia y porcentajes)
-- Reportes generados con ReportLab + OpenPyXL, paleta de colores corporativa
-
-### Alertas automáticas
-- Estudiantes con nota promedio < 70
-- Estudiantes con asistencia < 80%
-- Alertas individuales mostradas en el detalle del estudiante
-
-### Interfaz moderna
-- Sidebar fijo de navegación con secciones temáticas
-- Header con buscador, alternador de tema y menú de usuario
-- **Modo claro y oscuro** (persistido en `localStorage`)
-- Responsive (sidebar colapsable en móvil)
-- Tipografía **Inter**, iconografía **Bootstrap Icons**
-- Gradientes y sombras sutiles, animaciones suaves
+- [Características](#características)
+- [Stack tecnológico](#stack-tecnológico)
+- [Instalación rápida](#instalación-rápida)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Configuración](#configuración)
+- [Uso](#uso)
+- [Roles y permisos](#roles-y-permisos)
+- [Seguridad](#seguridad)
+- [Base de datos](#base-de-datos)
+- [Email y reset de contraseña](#email-y-reset-de-contraseña)
+- [Tests](#tests)
+- [Despliegue en producción](#despliegue-en-producción)
+- [Solución a problemas comunes](#solución-a-problemas-comunes)
 
 ---
 
-## 🛠️ Stack técnico
+## Características
 
-| Capa | Tecnología |
-|------|------------|
-| **Backend** | Python 3.11+, Flask 3.0, Flask-SQLAlchemy 3.1, Flask-Login, Flask-WTF, Flask-Bcrypt, Flask-Migrate |
-| **Base de datos** | PostgreSQL (producción) / SQLite (desarrollo) |
-| **Frontend** | HTML5, CSS3, JavaScript (vanilla), Bootstrap 5.3, Bootstrap Icons, Chart.js |
-| **Reportes** | ReportLab (PDF), OpenPyXL (Excel), Pandas |
-| **Despliegue** | Gunicorn + Procfile (compatible con Heroku, Render, Railway) |
+### Gestión académica
+- **Estudiantes** con código único, datos personales y contactos del encargado
+- **Profesores** con asignación a materias específicas
+- **Materias** con código, créditos y descripción
+- **Grupos** que combinan materia + profesor + estudiantes matriculados
+- **Evaluaciones** de varios tipos (examen, tarea, proyecto, quiz, práctica) con peso configurable
+- **Asistencia** diaria con estados (presente, ausente, tarde, justificada)
+- **Notas** con cálculo automático del promedio ponderado
+- **Cuadro de honor** automático con generación de diplomas en PDF
+- **Importador de Excel** con preview antes de confirmar
+
+### Dashboard
+- KPIs con tendencias (promedio, estudiantes, aprobación, asistencia)
+- Sparklines SVG sin librerías pesadas
+- Lista de estudiantes en riesgo académico
+- Acciones rápidas contextuales
+- Calendario de evaluaciones con FullCalendar
+- Días feriados de Costa Rica marcados automáticamente
+
+### Reportes
+- Boletines individuales en PDF con diseño profesional
+- Listas de calificaciones en Excel
+- Reportes de asistencia
+- Diplomas para el cuadro de honor (oro/plata/bronce)
+- Generación masiva (próximamente)
+
+### Seguridad
+- Autenticación con bcrypt (12 rounds por defecto)
+- **2FA TOTP** con códigos de recuperación (Google Authenticator, Authy, etc.)
+- Reset de contraseña por email con tokens firmados y expiración
+- Rate limiting por IP (10 fallos/15 min)
+- Bloqueo automático de cuentas (5 fallos consecutivos → 15 min)
+- Auditoría completa de intentos de login
+- Política de contraseñas fuerte (8+ caracteres, mayús/minús/números, blocklist de comunes)
+- Forzar cambio de contraseña en primer login
+- CSRF protection (Flask-WTF)
+- HTTPS forzado en producción (Flask-Talisman)
+- Cookies HttpOnly + SameSite
+- Anti-enumeración de usuarios en reset de contraseña
+
+### UX
+- Modo oscuro completo con paleta cuidada
+- Diseño responsive con bottom navigation en mobile
+- Tour guiado para nuevos usuarios
+- Command Palette (Ctrl+K) para acciones rápidas
+- Atajos de teclado con cheatsheet (?)
+- Skeleton loading entre navegación
+- Tooltips informativos
+- Animaciones suaves entre tabs
+- Avatares con iniciales coloreadas
+
+### Mantenimiento
+- **Papelera de reciclaje** (soft delete con retención de 30 días)
+- **Panel del developer** para super_admins:
+  - Diagnóstico del sistema
+  - Estadísticas de BD por tabla
+  - Errores capturados en memoria
+  - Test de configuración SMTP
+- **Feature flags** activables sin reiniciar:
+  - Modo mantenimiento
+  - Permitir importación masiva
+  - Modo demo
+  - Forzar 2FA en admins
+- Acciones de mantenimiento (vaciar papelera, limpiar logs antiguos)
 
 ---
 
-## 📦 Instalación rápida (3 comandos)
+## Stack tecnológico
 
-EduTrack viene configurado para funcionar con **SQLite** sin necesidad de instalar nada extra.
+### Backend
+- **Flask 3.x** — framework web
+- **Flask-SQLAlchemy 3.x** — ORM
+- **Flask-Login** — manejo de sesiones
+- **Flask-Bcrypt** — hash de contraseñas
+- **Flask-WTF** — formularios + CSRF
+- **Flask-Migrate** — migraciones de BD
+- **Flask-Mail** — envío de emails
+- **Flask-Talisman** — headers de seguridad HTTP
+- **pyotp + qrcode** — 2FA TOTP
+
+### Frontend
+- **Bootstrap 5.3** — base CSS
+- **Bootstrap Icons** — iconografía
+- **FullCalendar 6** — calendario interactivo
+- **Inter font** — tipografía
+- **JavaScript vanilla** — sin frameworks pesados (~1000 líneas)
+- **SVG inline** para sparklines y empty states
+
+### Reportes
+- **ReportLab** — generación de PDFs
+- **OpenPyXL** — generación de Excel
+
+### Base de datos
+- **SQLite** por defecto (cero configuración)
+- **PostgreSQL** opcional (recomendado para producción)
+
+---
+
+## Instalación rápida
 
 ### Requisitos
-- **Python 3.10 o superior** ([descargar aquí](https://www.python.org/downloads/))
+- **Python 3.10+** (recomendado 3.12 o 3.13)
+- **pip** (viene con Python)
 
-### Instalación
-
-```powershell
-# 1. Instalar dependencias
-pip install -r requirements.txt
-
-# 2. Setup automático (crea .env, BD y datos de prueba)
-python setup.py
-
-# 3. Arrancar
-python run.py
-```
-
-Abre tu navegador en **http://127.0.0.1:5000** e inicia sesión:
-
-| Rol | Usuario | Contraseña |
-|-----|---------|------------|
-| Administrador | `admin` | `admin123` |
-| Profesor | `mrodriguez` | `profesor123` |
-
----
-
-### 📦 Instalación detallada (opcional)
-
-Si prefieres entender cada paso:
+### Setup en 4 pasos
 
 ```powershell
-# 1. Entorno virtual (opcional pero recomendado)
+# 1. Clonar o descargar el proyecto
+cd C:\ruta\donde\quieras\el\proyecto
+
+# 2. Crear y activar entorno virtual
 python -m venv .venv
-.venv\Scripts\activate          # En Linux/Mac: source .venv/bin/activate
+.venv\Scripts\Activate
 
-# 2. Dependencias
+# 3. Instalar dependencias
 pip install -r requirements.txt
 
-# 3. Configuración
-copy .env.example .env          # En Linux/Mac: cp .env.example .env
-
-# 4. Crear tablas + datos de prueba
+# 4. Configurar e inicializar
 python setup.py
+```
 
-# 5. Arrancar
+El script `setup.py` automatiza:
+- Verificación de Python 3.10+
+- Creación del archivo `.env` con SECRET_KEY aleatoria
+- Verificación de dependencias
+- Creación de la base de datos
+- Carga de datos demo (1 admin, 5 profesores, 30 estudiantes, evaluaciones, notas)
+
+### Arrancar el servidor
+
+```powershell
 python run.py
 ```
 
-### Cambiar a PostgreSQL (producción)
+Abre el navegador en **http://127.0.0.1:5000**
 
-Edita `.env`:
+### Credenciales de prueba
 
-```env
-DATABASE_URL=postgresql://usuario:password@localhost:5432/edutrack
-```
+| Usuario | Contraseña | Rol |
+|---------|------------|-----|
+| `developer` | `developer123` | Super Admin |
+| `admin` | `admin123` | Administrador |
+| `mrodriguez` | `profesor123` | Profesor |
 
-E instala el driver:
-
-```bash
-pip install psycopg2-binary
-```
-- Evaluaciones, notas y registros de asistencia ficticios
-
-### 6. Arrancar el servidor
-
-```bash
-flask --app run.py run --debug
-# o simplemente:
-python run.py
-```
-
-Visita 👉 **http://127.0.0.1:5000**
+> **Nota**: el sistema te forzará a cambiar la contraseña en el primer login por seguridad.
 
 ---
 
-## 🔑 Credenciales de prueba
-
-| Rol           | Usuario       | Contraseña    |
-|---------------|---------------|---------------|
-| Administrador | `admin`       | `admin123`    |
-| Profesor      | `mrodriguez`  | `profesor123` |
-| Profesor      | `jgomez`      | `profesor123` |
-| Profesor      | `avargas`     | `profesor123` |
-| Profesor      | `cmendez`     | `profesor123` |
-| Profesor      | `lcastro`     | `profesor123` |
-
-⚠️ **Cambia estas contraseñas antes de poner en producción.**
-
----
-
-## 🚀 Despliegue en producción
-
-### Con Gunicorn
-
-```bash
-gunicorn -w 4 -b 0.0.0.0:8000 "app:create_app('production')"
-```
-
-### En Heroku / Render / Railway
-
-El `Procfile` ya está configurado:
+## Estructura del proyecto
 
 ```
-web: gunicorn "app:create_app('production')"
-```
-
-Variables de entorno requeridas en el panel:
-
-- `SECRET_KEY` — clave generada con `secrets.token_hex(32)`
-- `DATABASE_URL` — URL de PostgreSQL (la mayoría de plataformas la proveen)
-- `FLASK_CONFIG=production`
-
-### Migraciones de base de datos
-
-Si modificas los modelos, usa Flask-Migrate:
-
-```bash
-flask --app run.py db migrate -m "descripción del cambio"
-flask --app run.py db upgrade
-```
-
----
-
-## 🔐 HTTPS y seguridad en producción
-
-EduTrack incluye **Flask-Talisman**, que activa automáticamente HTTPS y cabeceras de seguridad cuando la app corre con `FLASK_CONFIG=production`. **En desarrollo todo sigue funcionando con HTTP**, sin cambios.
-
-### Qué se activa automáticamente en producción
-
-| Cabecera | Valor | Para qué sirve |
-|----------|-------|----------------|
-| **Strict-Transport-Security** | `max-age=31536000; includeSubDomains` | Obliga al navegador a usar HTTPS por 1 año |
-| **Content-Security-Policy** | `default-src 'self'` + CDNs permitidos | Bloquea scripts maliciosos / XSS |
-| **X-Frame-Options** | `DENY` | Bloquea clickjacking (que tu sitio sea cargado en un `<iframe>`) |
-| **X-Content-Type-Options** | `nosniff` | Bloquea ataques de MIME confusion |
-| **Referrer-Policy** | `strict-origin-when-cross-origin` | Controla qué información del referrer se envía |
-
-Además, las cookies de sesión se marcan como `Secure` y `HttpOnly`.
-
-### Variable de entorno relevante
-
-En el `.env` de producción:
-
-```env
-FLASK_CONFIG=production
-FORCE_HTTPS=true       # opcional, por defecto true
-```
-
-Si tu plataforma de hosting (Heroku, Render, Cloudflare, etc.) ya termina HTTPS en el balanceador y la app recibe HTTP internamente, puedes desactivar el redirect con:
-
-```env
-FORCE_HTTPS=false
-```
-
-### Conseguir un certificado SSL real
-
-**Opción A — Plataforma cloud (más fácil):**
-Heroku, Render, Railway, Fly.io y Vercel proveen HTTPS automáticamente al asignar un dominio. **No necesitas configurar nada más.**
-
-**Opción B — Servidor propio (VPS) con Let's Encrypt:**
-
-```bash
-# 1. Instala Nginx como proxy reverso
-sudo apt install nginx certbot python3-certbot-nginx
-
-# 2. Configura un virtual host en Nginx que apunte a tu app (puerto 8000)
-sudo nano /etc/nginx/sites-available/edutrack
-```
-
-Contenido del virtual host:
-
-```nginx
-server {
-    listen 80;
-    server_name tu-dominio.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-```bash
-# 3. Activa el sitio y obtén el certificado
-sudo ln -s /etc/nginx/sites-available/edutrack /etc/nginx/sites-enabled/
-sudo certbot --nginx -d tu-dominio.com
-sudo systemctl reload nginx
-```
-
-Let's Encrypt te renovará el certificado automáticamente cada 90 días.
-
-### Probar HTTPS en local (autofirmado)
-
-Para verificar que las cabeceras funcionan **sin desplegar**, puedes correr la app con un certificado autofirmado:
-
-```bash
-pip install pyOpenSSL
-flask --app run.py run-https
-```
-
-Visita https://localhost:5000 — el navegador mostrará una advertencia (porque el cert es autofirmado), aceptas y verás la app con HTTPS real. Útil para confirmar que el CSP y demás no bloquean nada antes de subir a producción.
-
----
-
-## 🏆 Cuadro de Honor
-
-EduTrack genera automáticamente un **ranking de los mejores estudiantes** por promedio académico, con diplomas en PDF imprimibles.
-
-### Características
-
-- **Top N configurable** (3, 5, 10, 20, 50)
-- Filtros por **grupo**, **materia**, **periodo** o **año**
-- **Podio visual** para los primeros 3 lugares (oro, plata, bronce)
-- **Diploma individual** en PDF para cualquier estudiante
-- **Diplomas en lote** — un único PDF con todos los diplomas del top, listo para imprimir
-- Manejo correcto de **empates** (regla olímpica: dos estudiantes con el mismo promedio comparten posición)
-- **Permisos automáticos**: los profesores solo ven los estudiantes de sus propios grupos
-
-### Acceso
-
-Desde el sidebar → **Reportes** → **Cuadro de Honor**, o directamente en `/cuadro-honor/`.
-
-### Cálculo del promedio
-
-El promedio que aparece en el ranking se calcula así:
-
-```
-promedio_estudiante = Σ(nota_final_grupo) / total_grupos_evaluados
-```
-
-Donde `nota_final_grupo` es la nota ponderada del estudiante en cada uno de sus grupos (la misma fórmula que se usa para el estado académico).
-
-Los estudiantes **sin notas registradas son excluidos automáticamente** del ranking.
-
----
-
-## 📁 Estructura del proyecto
-
-```
-edutrack/
+EduTrack/
 ├── app/
-│   ├── __init__.py           # Application Factory (create_app)
+│   ├── __init__.py           # Factory de la aplicación
 │   ├── models/               # Modelos SQLAlchemy
-│   │   ├── usuario.py        # Usuario + autenticación
-│   │   ├── profesor.py       # Profesor + asignación de materias
+│   │   ├── usuario.py        # User + roles + 2FA
 │   │   ├── estudiante.py
+│   │   ├── profesor.py
 │   │   ├── materia.py
-│   │   ├── grupo.py          # Grupo + matriculación
-│   │   ├── evaluacion.py     # Evaluaciones + tipos
+│   │   ├── grupo.py
+│   │   ├── evaluacion.py
 │   │   ├── nota.py
-│   │   └── asistencia.py
-│   ├── routes/               # Blueprints (controladores)
-│   │   ├── auth.py           # Login, logout, recuperación
-│   │   ├── dashboard.py      # Dashboard + APIs de gráficos
+│   │   ├── asistencia.py
+│   │   ├── intento_login.py  # Audit log
+│   │   └── configuracion.py  # Feature flags
+│   ├── routes/               # Blueprints
+│   │   ├── auth.py           # Login, 2FA, reset password
+│   │   ├── dashboard.py
 │   │   ├── students.py
 │   │   ├── teachers.py
 │   │   ├── subjects.py
 │   │   ├── groups.py
-│   │   ├── evaluations.py
-│   │   ├── grades.py         # Calificación grupal + AJAX
+│   │   ├── evaluations.py    # Incluye calendario
+│   │   ├── grades.py
 │   │   ├── attendance.py
 │   │   ├── reports.py
-│   │   └── main.py
+│   │   ├── honor.py
+│   │   ├── dev.py            # Panel del developer
+│   │   └── main.py           # API global
 │   ├── services/             # Lógica de negocio
-│   │   ├── calculo_service.py    # Notas finales, estados, alertas
-│   │   └── reporte_service.py    # PDF (ReportLab) y Excel (OpenPyXL)
-│   ├── utils/
-│   │   ├── decorators.py     # @admin_required, @profesor_or_admin
-│   │   ├── filters.py        # Filtros Jinja personalizados
-│   │   ├── forms.py          # WTForms
-│   │   └── seed_data.py      # Datos de prueba
-│   ├── templates/            # Plantillas Jinja2
-│   │   ├── base.html
-│   │   ├── auth/
-│   │   ├── dashboard/
-│   │   ├── students/, teachers/, subjects/, groups/
-│   │   ├── evaluations/, grades/, attendance/
-│   │   ├── reports/
-│   │   └── errors/
-│   └── static/
-│       ├── css/style.css     # Design system completo
-│       └── js/app.js         # Tema, sidebar, AJAX, atajos teclado
-├── config.py                 # Configuración (dev/test/prod)
-├── run.py                    # Entry point + CLI commands
+│   │   ├── calculo_service.py
+│   │   ├── reporte_service.py
+│   │   ├── importador_service.py
+│   │   └── email_service.py
+│   ├── templates/            # Jinja2 templates
+│   ├── static/
+│   │   ├── css/style.css     # ~6000 líneas
+│   │   └── js/app.js         # ~1200 líneas
+│   └── utils/
+│       ├── decorators.py     # @admin_required, @super_admin_required
+│       ├── forms.py          # WTForms
+│       ├── validators.py     # Política de contraseñas
+│       ├── filters.py        # Filtros Jinja2
+│       └── seed_data.py      # Datos demo
+├── tests/                    # pytest
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_estudiantes.py
+│   ├── test_security_panel.py
+│   └── test_calendario.py
+├── migrations/               # Flask-Migrate
+├── config.py                 # Configuración por entorno
+├── run.py                    # Entry point
+├── setup.py                  # Instalador interactivo
+├── migrar.py                 # Migración SQLite → PostgreSQL
 ├── requirements.txt
-├── Procfile                  # Despliegue Heroku/Render
 ├── .env.example
-└── README.md
+├── POSTGRESQL.md             # Guía de PostgreSQL
+└── README.md                 # Este archivo
 ```
 
 ---
 
-## 🧮 Lógica de cálculo de notas
+## Configuración
 
-### Nota final (ponderada)
+### Variables de entorno (`.env`)
 
-Si un estudiante tiene varias evaluaciones, la **nota final** se calcula como:
+Copia `.env.example` a `.env` y edita los valores:
 
-```
-nota_final = Σ ( (puntaje / puntaje_máximo) × 100 × (porcentaje_evaluación / 100) )
-```
+```env
+# Aplicación
+FLASK_APP=run.py
+FLASK_ENV=development
+FLASK_CONFIG=development
+SECRET_KEY=tu-clave-secreta-larga-y-aleatoria
 
-Por ejemplo, con dos evaluaciones:
-- Examen (peso 60%): 80/100 → contribuye 48 puntos
-- Quiz (peso 40%): 70/100 → contribuye 28 puntos
-- **Nota final: 76**
+# Base de datos (SQLite por defecto si se omite)
+# DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/edutrack
 
-### Estado académico
+# Bcrypt (12 para producción, 4 para dev rápido)
+BCRYPT_LOG_ROUNDS=12
 
-| Nota final | Estado          | Color    |
-|------------|-----------------|----------|
-| ≥ 70       | Aprobado        | success  |
-| 60 – 69    | Recuperación    | warning  |
-| < 60       | Reprobado       | danger   |
-
-Si aún no se ha cubierto el 100% del peso evaluativo, los estados se marcan como *"en curso"*.
-
-Los umbrales se configuran en `config.py`:
-
-```python
-NOTA_MINIMA_APROBACION = 70
-NOTA_RECUPERACION      = 60
-ASISTENCIA_MINIMA      = 80
+# Email (opcional — si no se configura, los emails van a la consola)
+# MAIL_SERVER=smtp.gmail.com
+# MAIL_PORT=587
+# MAIL_USE_TLS=true
+# MAIL_USERNAME=tu-correo@gmail.com
+# MAIL_PASSWORD=tu-app-password
+# MAIL_DEFAULT_SENDER=tu-correo@gmail.com
 ```
 
 ---
 
-## 🎨 Personalización
+## Uso
 
-### Cambiar paleta de colores
+### Flujo típico de uso
 
-Edita `app/static/css/style.css`:
+1. **Login** con tu cuenta
+2. **Cambiar contraseña** (forzado la primera vez)
+3. **Activar 2FA** desde el menú de usuario (recomendado)
+4. **Navegar** por el dashboard
 
-```css
-:root {
-    --primary:   #3b82f6;   /* azul */
-    --secondary: #6366f1;   /* índigo */
-    --success:   #10b981;   /* verde */
-    --warning:   #f59e0b;   /* amarillo */
-    --danger:    #ef4444;   /* rojo */
-}
-```
+### Crear una evaluación
 
-### Cambiar el nombre/marca
+1. Sidebar → **Evaluaciones** → **Nueva evaluación**
+2. Completa: nombre, tipo, fecha, materia, grupo, porcentaje
+3. Guardar
 
-Reemplaza "EduTrack" en `app/templates/base.html` y `app/templates/auth/login.html`.
+### Calificar
+
+1. **Evaluaciones** → click en una evaluación → **Calificar**
+2. Ingresa la nota de cada estudiante
+3. Las notas se guardan automáticamente al cambiar de celda
+
+### Importar estudiantes desde Excel
+
+1. **Estudiantes** → **Importar Excel**
+2. Descarga la plantilla, llénala
+3. Sube el archivo → revisa el preview → confirma
+
+### Generar boletín
+
+1. **Reportes** → **Boletines**
+2. Selecciona estudiante y período
+3. Descarga el PDF
 
 ---
 
-## 🐛 Solución de problemas
+## Roles y permisos
 
-**`No module named 'psycopg2'`**
-Si usas PostgreSQL, instala:
+| Rol | Acceso |
+|-----|--------|
+| **Super Admin** | Todo lo de Admin + Panel del developer + Feature flags |
+| **Admin** | CRUD de profesores, configuración del sistema, todos los datos |
+| **Profesor** | Solo sus grupos asignados, notas y asistencias de sus alumnos |
+
+Los profesores que intentan acceder a recursos de otros profesores reciben **403 Forbidden**.
+
+Para crear un super_admin adicional, inserta directamente en BD:
+
+```sql
+UPDATE usuarios SET rol = 'super_admin' WHERE username = 'tu_usuario';
+```
+
+---
+
+## Seguridad
+
+EduTrack implementa múltiples capas de seguridad:
+
+### Autenticación
+- Bcrypt con 12 rounds (configurable)
+- 2FA TOTP opcional (códigos QR + recovery codes)
+- Política de contraseñas: 8+ caracteres, mayús/minús/números, sin contraseñas comunes
+- Bloqueo automático tras 5 intentos fallidos
+
+### Protección contra ataques
+- Rate limiting: 10 fallos por IP en 15 min
+- CSRF tokens en todos los formularios (Flask-WTF)
+- HTTPS forzado en producción (Flask-Talisman)
+- Cookies HttpOnly + SameSite=Lax
+- Anti-enumeración de usuarios en reset de contraseña
+
+### Auditoría
+- Todos los intentos de login quedan registrados con IP, user-agent, resultado
+- Vista para admin en **Sistema → Auditoría de accesos**
+- Detección de IPs sospechosas (>5 fallos/24h)
+
+### Lo que NO está implementado (intencional)
+- Acceso a contraseñas en texto plano (bcrypt es one-way)
+- Login como otro usuario (impersonation)
+- Ejecución de SQL arbitrario desde la UI
+
+---
+
+## Base de datos
+
+### SQLite (default)
+No requiere configuración. La BD se crea en `instance/edutrack.db` (o en la raíz como `edutrack.db`).
+
+**Cuándo usarla:**
+- Desarrollo
+- Proyectos académicos
+- < 20 usuarios simultáneos
+
+### PostgreSQL (producción)
+Ver [POSTGRESQL.md](./POSTGRESQL.md) para instrucciones completas.
+
+**Resumen:**
+
+1. Configura `DATABASE_URL` en `.env`:
+   ```env
+   DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/edutrack
+   ```
+2. Instala el driver: `pip install psycopg2-binary`
+3. Ejecuta: `python setup.py`
+
+**Migrar datos existentes de SQLite a PostgreSQL:**
+```powershell
+python migrar.py
+```
+
+### Papelera de reciclaje
+Los estudiantes eliminados quedan con `eliminado_en = <timestamp>` por 30 días. Acceso en **Sistema → Papelera** (admin).
+
+---
+
+## Email y reset de contraseña
+
+### Modo desarrollo (sin SMTP)
+Por defecto, los emails se **imprimen en la consola del servidor**. Útil para probar el flujo sin configurar nada.
+
+### Modo producción (con SMTP)
+
+Configura las variables `MAIL_*` en `.env`. Servicios recomendados con tier gratis:
+
+| Servicio | Cuota gratis | URL |
+|----------|---------------|-----|
+| **Brevo** (recomendado) | 300 emails/día | https://www.brevo.com/ |
+| **Resend** | 100 emails/día | https://resend.com/ |
+| **Mailtrap** (solo testing) | Bandeja virtual | https://mailtrap.io/ |
+
+Ejemplo con Brevo:
+```env
+MAIL_SERVER=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=tu-usuario-brevo
+MAIL_PASSWORD=tu-smtp-key
+MAIL_DEFAULT_SENDER=tu-correo@verificado.com
+```
+
+### Flujo de reset
+
+1. Usuario va a `/auth/recuperar`
+2. Ingresa su email
+3. Mensaje genérico (anti-enumeración): "Si el correo existe, recibirás un enlace..."
+4. Si el email existe, se envía un link firmado con expiración de 30 minutos
+5. Click en el link → formulario de nueva contraseña → login automático
+
+---
+
+## Tests
+
+EduTrack incluye **46 tests automatizados** con pytest.
+
+### Ejecutar todos los tests
+
+```powershell
+pytest
+```
+
+### Ejecutar tests específicos
+
+```powershell
+pytest tests/test_auth.py              # Solo autenticación
+pytest tests/test_calendario.py        # Solo calendario
+pytest -k "test_login"                 # Por nombre
+pytest -v                              # Verbose
+pytest --tb=short                      # Tracebacks cortos
+```
+
+### Cobertura
+
+```powershell
+pip install pytest-cov
+pytest --cov=app --cov-report=html
+# Abre htmlcov/index.html
+```
+
+### Suites incluidas
+
+- **test_auth.py** — Login, rate limiting, 2FA, recuperación
+- **test_estudiantes.py** — CRUD + papelera (soft delete)
+- **test_security_panel.py** — Roles, feature flags, modo mantenimiento
+- **test_calendario.py** — API de eventos, reprogramar, feriados
+
+Los tests usan SQLite en memoria + BCRYPT con 4 rounds → corren en ~20 segundos.
+
+---
+
+## Despliegue en producción
+
+### Render (recomendado, gratis)
+
+1. Push del proyecto a GitHub
+2. En Render: **New +** → **Web Service** → conecta el repo
+3. Configura:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn run:app`
+4. Variables de entorno en Render Dashboard:
+   - `FLASK_CONFIG=production`
+   - `SECRET_KEY=<genera-uno-aleatorio-largo>`
+   - `DATABASE_URL=<de tu PostgreSQL en Render o Neon>`
+   - `MAIL_*` si quieres email real
+5. Deploy
+
+### Railway
+
+Similar a Render. Conecta GitHub, agrega un servicio PostgreSQL, define variables, deploy.
+
+### VPS propio
+
 ```bash
+# En tu servidor Ubuntu/Debian
+sudo apt update && sudo apt install python3-pip python3-venv nginx
+git clone <tu-repo> /opt/edutrack
+cd /opt/edutrack
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt psycopg2-binary
+# Configura .env
+python setup.py
+# Corre con gunicorn
+gunicorn -w 4 -b 127.0.0.1:5000 run:app
+# Configura nginx como reverse proxy con SSL (Let's Encrypt)
+```
+
+---
+
+## Solución a problemas comunes
+
+### `pip: not recognized` en PowerShell
+El entorno virtual no está activado:
+```powershell
+.venv\Scripts\Activate
+```
+
+### Tour de bienvenida se queda pegado
+F12 → Console → ejecuta:
+```javascript
+localStorage.setItem('edutrack-tour-completed-v1', '1');
+location.reload();
+```
+
+### `password authentication failed` (PostgreSQL)
+Verifica usuario, contraseña y nombre de BD en `DATABASE_URL`. El usuario debe tener permisos:
+```sql
+GRANT ALL ON SCHEMA public TO tu_usuario;
+ALTER SCHEMA public OWNER TO tu_usuario;
+```
+
+### Setup se queda en "Cargando datos de prueba..."
+Bcrypt es lento. Reduce los rounds en `.env`:
+```env
+BCRYPT_LOG_ROUNDS=4
+```
+
+### `No module named 'psycopg2'`
+```powershell
 pip install psycopg2-binary
 ```
 
-**`Address already in use`**
-Otro proceso usa el puerto 5000:
-```bash
-flask --app run.py run --port 5001
-```
+### Email no llega
+- Modo dev: revisa la consola del servidor, ahí imprime el email completo
+- Modo producción: verifica las credenciales SMTP y que el remitente esté verificado en el servicio
 
-**Las tablas no se crean**
-Verifica que `DATABASE_URL` apunte a una base de datos existente, luego:
-```bash
-flask --app run.py init-db
+### Recuperar contraseña del developer
+Conéctate a la BD y resetea:
+```sql
+-- Bcrypt hash de "Developer2026!" (cambia después)
+UPDATE usuarios SET
+    password_hash = '$2b$12$tNvW8/Y7eP2qK0R6.G3eK.5fW0HsxRkP0vJqK0RfG3eK5fW0HsxRk',
+    forzar_cambio_password = true,
+    intentos_fallidos = 0,
+    bloqueado_hasta = NULL
+WHERE username = 'developer';
 ```
 
 ---
 
-## 📄 Licencia
+## Licencia
 
-Este proyecto fue creado como sistema base de gestión académica. Úsalo, modifícalo y distribúyelo libremente.
+Proyecto académico. Uso libre con atribución.
 
----
+## Créditos
 
-**EduTrack** · Sistema de Gestión Académica · Hecho con ❤️ usando Flask
+Construido con Flask, Bootstrap, FullCalendar y mucho café.
+
