@@ -60,8 +60,4 @@ def run_https():
 
 
 if __name__ == '__main__':
-    # En producción (Render), el puerto viene en la variable de entorno PORT
-    # En desarrollo local, usa 5000
-    port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_ENV', 'production') != 'production'
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    app.run(host='0.0.0.0', port=5000, debug=True)

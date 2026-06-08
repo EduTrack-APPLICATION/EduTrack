@@ -9,7 +9,6 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
-from sqlalchemy import inspect
 
 from config import config
 
@@ -168,19 +167,6 @@ def create_app(config_name='default'):
     # Filtros Jinja personalizados
     from app.utils.filters import register_filters
     register_filters(app)
-
-    # Si estamos en producción con SQLite y falta la tabla de intentos de login,
-    # inicializa las tablas automáticamente al arrancar la app.
-    sqlite_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
-    if not app.debug and not app.testing and sqlite_uri.startswith('sqlite:///'):
-        try:
-            with app.app_context():
-                inspector = inspect(db.engine)
-                if not inspector.has_table('intentos_login'):
-                    db.create_all()
-                    app.logger.info('SQLite DB inicializada automáticamente en producción.')
-        except Exception as exc:
-            app.logger.warning('No se pudo inicializar SQLite automáticamente: %s', exc)
 
     return app
 
