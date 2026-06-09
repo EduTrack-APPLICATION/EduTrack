@@ -41,9 +41,12 @@ def listar():
 def crear():
     form = ProfesorForm()
     if form.validate_on_submit():
+        # Si no se especificó username, usar la cédula
+        username = (form.username.data or '').strip() or form.cedula.data.strip()
+
         # Validar unicidad
-        if Usuario.query.filter_by(username=form.username.data).first():
-            flash('Ya existe un usuario con ese nombre.', 'danger')
+        if Usuario.query.filter_by(username=username).first():
+            flash(f'Ya existe un usuario con el nombre "{username}".', 'danger')
         elif Usuario.query.filter_by(email=form.email.data).first():
             flash('Ya existe un usuario con ese correo.', 'danger')
         elif Profesor.query.filter_by(cedula=form.cedula.data).first():
@@ -52,7 +55,7 @@ def crear():
             flash('Debes establecer una contraseña inicial.', 'danger')
         else:
             usuario = Usuario(
-                username=form.username.data,
+                username=username,
                 email=form.email.data,
                 nombre_completo=f'{form.nombre.data} {form.apellido.data}',
                 rol=RolEnum.PROFESOR.value,
@@ -75,7 +78,13 @@ def crear():
             )
             db.session.add(profesor)
             db.session.commit()
-            flash(f'Profesor {profesor.nombre_completo} creado correctamente.', 'success')
+            flash(
+                f'Profesor {profesor.nombre_completo} creado correctamente. '
+                f'Credenciales: usuario "{username}" · '
+                f'la contraseña inicial que definiste. '
+                f'Comparte estas credenciales con el profesor.',
+                'success'
+            )
             return redirect(url_for('teachers.detalle', id=profesor.id))
 
     return render_template('teachers/form.html', form=form, titulo='Nuevo profesor')

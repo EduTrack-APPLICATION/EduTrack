@@ -80,7 +80,27 @@ def crear():
             )
             db.session.add(est)
             db.session.commit()
-            flash(f'Estudiante {est.nombre_completo} creado correctamente.', 'success')
+
+            # Generar cuenta del portal automáticamente
+            try:
+                from app.utils.portal_helpers import generar_cuenta_estudiante
+                cuenta = generar_cuenta_estudiante(est)
+                if cuenta:
+                    flash(
+                        f'Estudiante {est.nombre_completo} creado. '
+                        f'Cuenta del portal: usuario "{cuenta["username"]}" · '
+                        f'contraseña temporal "{cuenta["password"]}" '
+                        f'(deberá cambiarla al primer login).',
+                        'success'
+                    )
+                else:
+                    flash(f'Estudiante {est.nombre_completo} creado correctamente.', 'success')
+            except Exception as e:
+                # Si falla la cuenta, no romper la creación del estudiante
+                flash(f'Estudiante {est.nombre_completo} creado, pero falló la generación '
+                      f'de su cuenta del portal. Puedes generarla desde el detalle. '
+                      f'({type(e).__name__})', 'warning')
+
             return redirect(url_for('students.detalle', id=est.id))
 
     return render_template('students/form.html', form=form, titulo='Nuevo estudiante')
@@ -106,11 +126,16 @@ def detalle(id):
 
     alertas = CalculoService.alertas_estudiante(estudiante.id)
 
+    # ¿Ya tiene cuenta del portal?
+    from app.utils.portal_helpers import tiene_cuenta_portal
+    tiene_cuenta = tiene_cuenta_portal(estudiante)
+
     return render_template(
         'students/detalle.html',
         estudiante=estudiante,
         grupos_info=grupos_info,
         alertas=alertas,
+        tiene_cuenta_portal=tiene_cuenta,
     )
 
 
@@ -360,7 +385,61 @@ def importar_confirmar():
         flash(f'Error al importar: {e}', 'danger')
         return redirect(url_for('students.importar'))
 
+    # Generar cuentas del portal para los recién importados
+    try:
+        from app.utils.portal_helpers import generar_cuenta_estudiante
+        ids_creados = resumen.get('ids_creados') if isinstance(resumen, dict) else None
+        if ids_creados:
+            creadas = 0
+            for est_id in ids_creados:
+                est = Estudiante.query.get(est_id)
+                if est and generar_cuenta_estudiante(est, commit=False):
+                    creadas += 1
+            db.session.commit()
+            if creadas:
+                flash(f'Se generaron {creadas} cuenta(s) del portal automáticamente. '
+                      f'Para ver las credenciales, ejecuta `python crear_cuentas_estudiantes.py --reset <id>` '
+                      f'o entra al detalle del estudiante.', 'info')
+    except Exception:
+        # Si falla, no romper el import
+        pass
+
     return render_template(
         'students/importar_resultado.html',
         resumen=resumen,
     )
+
+
+# ============================================================
+# Cuenta del portal del estudiante
+# ============================================================
+
+@students_bp.route('/<int:id>/cuenta-portal/generar', methods=['POST'])
+@login_required
+@admin_required
+def generar_cuenta_portal(id):
+    """Genera (o resetea) la cuenta del portal para el estudiante."""
+    from app.utils.portal_helpers import generar_cuenta_estudiante
+
+    est = Estudiante.query.get_or_404(id)
+    if est.eliminado_en:
+        flash('No se puede generar cuenta para un estudiante en la papelera.', 'warning')
+        return redirect(url_for('students.detalle', id=id))
+
+    # ¿Reset si ya existe?
+    reset = request.form.get('reset') == '1'
+
+    cuenta = generar_cuenta_estudiante(est, reset=reset)
+    if cuenta is None:
+        flash(f'{est.nombre_completo} ya tiene cuenta del portal. '
+              f'Usa "Resetear contraseña" si quieres generar una nueva.', 'info')
+    else:
+        accion = 'reseteada' if cuenta['reset'] else 'creada'
+        flash(
+            f'Cuenta del portal {accion} para {est.nombre_completo}. '
+            f'Usuario: "{cuenta["username"]}" · '
+            f'Contraseña temporal: "{cuenta["password"]}" '
+            f'(deberá cambiarla al primer login).',
+            'success'
+        )
+    return redirect(url_for('students.detalle', id=id))

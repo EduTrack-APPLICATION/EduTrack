@@ -29,7 +29,7 @@ def seed_database():
             rol=RolEnum.SUPER_ADMIN.value
         )
         super_admin.set_password('developer123')
-        super_admin.forzar_cambio_password = True
+        super_admin.forzar_cambio_password =False
         db.session.add(super_admin)
 
     admin = Usuario(

@@ -93,42 +93,7 @@ DATABASE_URL=sqlite:///edutrack.db
         sys.exit(1)
     ok('Todas las dependencias están instaladas')
 
-    # =========================================================
-    # PASO 4: Cargar la app y crear tablas
-    # =========================================================
-    paso(4, 'Creando base de datos SQLite...')
-
-    # Forzar carga del .env recién creado
-    from dotenv import load_dotenv
-    load_dotenv(override=True)
-
-    try:
-        from app import create_app, db
-        app = create_app('development')
-        with app.app_context():
-            db.create_all()
-        ok(f'Base de datos creada: {app.config["SQLALCHEMY_DATABASE_URI"]}')
-    except Exception as e:
-        error(f'No se pudo crear la BD: {e}')
-        sys.exit(1)
-
-    # =========================================================
-    # PASO 5: Cargar datos de prueba
-    # =========================================================
-    paso(5, 'Cargando datos de prueba...')
-    try:
-        from app.models import Usuario
-        with app.app_context():
-            if Usuario.query.count() > 0:
-                aviso('La BD ya tiene datos — saltando carga inicial')
-            else:
-                from app.utils.seed_data import seed_database
-                seed_database()
-                ok('Datos de prueba cargados')
-    except Exception as e:
-        error(f'No se pudieron cargar los datos: {e}')
-        sys.exit(1)
-
+  
     # =========================================================
     # ¡Listo!
     # =========================================================

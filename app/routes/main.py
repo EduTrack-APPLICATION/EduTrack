@@ -28,17 +28,30 @@ def buscar_global():
     if len(q) < 2:
         return jsonify({'resultados': [], 'total': 0})
 
+    # Estudiantes con rol ESTUDIANTE no deberían poder buscar a otros
+    if current_user.is_estudiante():
+        return jsonify({'resultados': [], 'total': 0})
+
     like = f'%{q}%'
     resultados = []
 
-    # --- Estudiantes ---
-    estudiantes = Estudiante.query.filter(or_(
+    # --- Estudiantes (excluir papelera) ---
+    estudiante_filters = [
         Estudiante.nombre.ilike(like),
         Estudiante.apellido.ilike(like),
         Estudiante.codigo.ilike(like),
-        Estudiante.cedula.ilike(like),
-        Estudiante.email.ilike(like),
-    )).limit(8).all()
+    ]
+    if hasattr(Estudiante, 'cedula'):
+        estudiante_filters.append(Estudiante.cedula.ilike(like))
+    if hasattr(Estudiante, 'email'):
+        estudiante_filters.append(Estudiante.email.ilike(like))
+
+    estudiantes = (
+        Estudiante.query
+        .filter(Estudiante.eliminado_en.is_(None))
+        .filter(or_(*estudiante_filters))
+        .limit(8).all()
+    )
     for e in estudiantes:
         resultados.append({
             'tipo': 'estudiante',
@@ -46,7 +59,7 @@ def buscar_global():
             'icono': 'bi-mortarboard',
             'color': 'primary',
             'titulo': e.nombre_completo,
-            'subtitulo': (e.codigo or '—') + (' · ' + e.email if e.email else ''),
+            'subtitulo': (e.codigo or '—') + ((' · ' + e.email) if getattr(e, 'email', None) else ''),
             'url': url_for('students.detalle', id=e.id),
             'id': e.id,
         })

@@ -7289,3 +7289,246 @@ kbd {
 .dev-action-row:last-child { border-bottom: none; }
 
 .dev-action-info { flex: 1; min-width: 0; }
+
+/* ============================================================
+   CALENDARIO (FullCalendar overrides)
+   ============================================================ */
+.cal-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-secondary);
+}
+
+.cal-legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* FullCalendar — paleta integrada */
+.fc {
+    --fc-border-color: var(--border);
+    --fc-page-bg-color: transparent;
+    --fc-neutral-bg-color: var(--bg-elevated);
+    --fc-list-event-hover-bg-color: var(--bg-elevated);
+    --fc-today-bg-color: var(--primary-soft);
+    --fc-button-bg-color: var(--bg-card);
+    --fc-button-border-color: var(--border-strong);
+    --fc-button-text-color: var(--text-primary);
+    --fc-button-hover-bg-color: var(--bg-elevated);
+    --fc-button-hover-border-color: var(--border-strong);
+    --fc-button-active-bg-color: var(--primary);
+    --fc-button-active-border-color: var(--primary);
+    font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    color: var(--text-primary);
+}
+
+.fc .fc-button {
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius);
+    box-shadow: none !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    color: #fff;
+}
+
+.fc .fc-col-header-cell {
+    background: var(--bg-elevated);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 0.5rem;
+    color: var(--text-muted);
+}
+
+.fc .fc-daygrid-day-number {
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.fc .fc-event {
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.fc .fc-event:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.15s ease;
+}
+
+.fc .fc-daygrid-event-dot { display: none; }
+
+.fc-event-dragging {
+    opacity: 0.6;
+    cursor: grabbing !important;
+}
+
+.fc-list-event-title a {
+    color: var(--text-primary);
+}
+
+.fc-list-day-cushion {
+    background: var(--bg-elevated);
+}
+
+/* Mobile fixes */
+@media (max-width: 576px) {
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    .fc .fc-toolbar-title {
+        text-align: center;
+        font-size: 1rem;
+    }
+    .fc .fc-button {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+/* ============================================================
+   Credentials Modal
+   ============================================================ */
+.creds-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.creds-modal.open {
+    display: flex;
+    animation: credsFadeIn 0.2s ease;
+}
+
+.creds-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.creds-modal-content {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 480px;
+    width: 100%;
+    animation: credsSlideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes credsFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes credsSlideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.creds-modal-head {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--divider);
+}
+
+.creds-modal-head i.bi-key-fill { font-size: 1.3rem; }
+
+.creds-modal-body {
+    padding: 1.25rem;
+}
+
+.creds-modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--divider);
+}
+
+.creds-field {
+    margin-bottom: 1rem;
+}
+
+.creds-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.creds-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.6rem;
+}
+
+.creds-value code {
+    flex: 1;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background: transparent;
+    padding: 0;
+    border: 0;
+    word-break: break-all;
+}
+
+.creds-alert {
+    background: var(--info-soft, rgba(14, 116, 144, 0.1));
+    color: var(--info, #0e7490);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}

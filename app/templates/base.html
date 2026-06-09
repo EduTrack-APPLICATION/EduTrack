@@ -80,10 +80,8 @@
            href="{{ url_for('evaluations.listar') }}">
             <i class="bi bi-clipboard-check"></i> <span>Evaluaciones</span>
         </a>
-        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('attendance') %}active{% endif %}"
-           href="{{ url_for('attendance.listar') }}">
-            <i class="bi bi-calendar-check"></i> <span>Asistencia</span>
-        </a>
+
+      
 
         <div class="nav-section">Reportes</div>
         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('honor') %}active{% endif %}"
@@ -171,6 +169,59 @@
 
     <!-- Toasts container (los flash() se convierten en toasts via JS) -->
     <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Modal de credenciales (aparece cuando el flash contiene contraseña) -->
+    <div class="creds-modal" id="credsModal" aria-hidden="true">
+        <div class="creds-modal-backdrop" data-creds-close></div>
+        <div class="creds-modal-content" role="dialog" aria-modal="true">
+            <div class="creds-modal-head">
+                <i class="bi bi-key-fill text-warning"></i>
+                <h5 class="mb-0">Credenciales generadas</h5>
+                <button type="button" class="btn-icon ms-auto" data-creds-close
+                        aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="creds-modal-body">
+                <p class="text-muted small mb-3" id="credsModalIntro">
+                    Guarda estas credenciales en un lugar seguro. No se volverán a mostrar.
+                </p>
+                <div class="creds-field">
+                    <label class="creds-label">Usuario</label>
+                    <div class="creds-value">
+                        <code id="credsUsuario">—</code>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-copy-target="credsUsuario">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="creds-field">
+                    <label class="creds-label">Contraseña temporal</label>
+                    <div class="creds-value">
+                        <code id="credsPassword">—</code>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-copy-target="credsPassword">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="creds-alert">
+                    <i class="bi bi-info-circle"></i>
+                    El usuario deberá cambiar la contraseña en su primer inicio de sesión.
+                </div>
+            </div>
+            <div class="creds-modal-foot">
+                <button type="button" class="btn btn-outline-secondary"
+                        data-copy-both>
+                    <i class="bi bi-clipboard-check"></i> Copiar ambas
+                </button>
+                <button type="button" class="btn btn-primary" data-creds-close>
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
 
     {% if current_user.is_authenticated %}
     <!-- Botón flotante de ayuda (?) -->

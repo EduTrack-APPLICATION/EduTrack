@@ -12,12 +12,14 @@ from app.models import (
     EstadoEstudianteEnum, EstadoAsistenciaEnum
 )
 from app.services.calculo_service import CalculoService
+from app.utils.cache import cached_view
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
 
 @dashboard_bp.route('/')
 @login_required
+@cached_view(seconds=45, by_user=True)
 def index():
     """Dashboard principal según rol."""
     # Filtro por profesor si es profesor

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Mi asistencia · EduTrack{% endblock %}
+{% block page_title %}Mi asistencia{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="{{ url_for('portal.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    <div>
+        <h4 class="mb-0">Asistencia · últimos 90 días</h4>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Presentes</div>
+                <div class="kpi-value text-success">
+                    {{ conteo.get(EstadoAsistenciaEnum.PRESENTE.value, 0) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Ausentes</div>
+                <div class="kpi-value text-danger">
+                    {{ conteo.get(EstadoAsistenciaEnum.AUSENTE.value, 0) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Tardes</div>
+                <div class="kpi-value text-warning">
+                    {{ conteo.get(EstadoAsistenciaEnum.TARDIA.value, 0) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Justificadas</div>
+                <div class="kpi-value text-info">
+                    {{ conteo.get(EstadoAsistenciaEnum.JUSTIFICADO.value, 0) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center">
+        <strong>Mapa de calor</strong>
+        <div class="ms-auto small">
+            <span class="heatmap-legend-item">
+                <span class="heatmap-cell heatmap-presente"></span> Presente
+            </span>
+            <span class="heatmap-legend-item">
+                <span class="heatmap-cell heatmap-ausente"></span> Ausente
+            </span>
+            <span class="heatmap-legend-item">
+                <span class="heatmap-cell heatmap-parcial"></span> Tarde/Justif.
+            </span>
+            <span class="heatmap-legend-item">
+                <span class="heatmap-cell heatmap-sin-registro"></span> Sin registro
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="heatmap-grid">
+            {% for d in dias_heatmap %}
+            <div class="heatmap-cell heatmap-{{ d.categoria }}"
+                 title="{{ d.fecha.strftime('%d/%m/%Y') }} - {{ d.categoria }}"
+                 data-bs-toggle="tooltip">
+            </div>
+            {% endfor %}
+        </div>
+        <div class="d-flex justify-content-between small text-muted mt-2">
+            <span>Hace 90 días</span>
+            <span>Hoy</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
+        gap: 3px;
+        max-width: 100%;
+    }
+    .heatmap-cell {
+        aspect-ratio: 1;
+        border-radius: 3px;
+        background: var(--bg-elevated);
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+    }
+    .heatmap-presente    { background: #22c55e; }
+    .heatmap-ausente     { background: #ef4444; }
+    .heatmap-parcial     { background: #f59e0b; }
+    .heatmap-sin-registro { background: var(--bg-elevated); border: 1px solid var(--border); }
+    .heatmap-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-left: 0.85rem;
+    }
+</style>
+{% endblock %}

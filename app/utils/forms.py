@@ -47,7 +47,8 @@ class CambiarPasswordForm(FlaskForm):
 
 
 class ProfesorForm(FlaskForm):
-    username = StringField('Usuario', validators=[DataRequired(), Length(min=3, max=80)])
+    username = StringField('Usuario (dejar vacío para usar la cédula)',
+                            validators=[Optional(), Length(min=3, max=80)])
     email = EmailField('Correo electrónico', validators=[DataRequired(), Email()])
     cedula = StringField('Cédula', validators=[DataRequired(), Length(max=30)])
     nombre = StringField('Nombre', validators=[DataRequired(), Length(max=80)])

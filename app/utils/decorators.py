@@ -41,3 +41,19 @@ def super_admin_required(f):
             abort(404)  # 404 en vez de 403: no revelar que el endpoint existe
         return f(*args, **kwargs)
     return decorated_function
+
+
+def estudiante_required(f):
+    """Solo accesible por estudiantes (rol ESTUDIANTE con estudiante_id vinculado)."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+        if not current_user.is_estudiante():
+            abort(403)
+        if not current_user.estudiante_id:
+            flash('Tu cuenta no está vinculada a un estudiante. Contacta al administrador.',
+                  'warning')
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function

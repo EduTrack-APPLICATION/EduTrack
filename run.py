@@ -28,20 +28,6 @@ def make_shell_context():
     }
 
 
-@app.cli.command('init-db')
-def init_db():
-    """Inicializa la base de datos creando todas las tablas."""
-    db.create_all()
-    print('✓ Base de datos inicializada.')
-
-
-@app.cli.command('seed-db')
-def seed_db():
-    """Carga datos de prueba en la base de datos."""
-    from app.utils.seed_data import seed_database
-    seed_database()
-    print('✓ Datos de prueba cargados exitosamente.')
-
 
 @app.cli.command('run-https')
 def run_https():

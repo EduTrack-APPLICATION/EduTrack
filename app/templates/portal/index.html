@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Mi panel · EduTrack{% endblock %}
+{% block page_title %}Mi panel{% endblock %}
+
+{% block content %}
+<div class="portal-header">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="avatar-lg" data-name="{{ estudiante.nombre_completo }}">
+            {{ estudiante.nombre[0]|upper }}{{ estudiante.apellido[0]|upper }}
+        </div>
+        <div>
+            <h3 class="mb-1">Hola, {{ estudiante.nombre }}</h3>
+            <div class="text-muted small">
+                <code>{{ estudiante.codigo }}</code>
+                {% if num_materias %} · {{ num_materias }} materia{{ '' if num_materias == 1 else 's' }}{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-2">
+    {# === KPIs === #}
+    <div class="col-md-4">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Promedio general</div>
+                <div class="kpi-value">{{ promedio_general or '—' }}</div>
+                {% if promedio_general >= 70 %}
+                    <span class="status-pill status-success">
+                        <i class="bi bi-check-circle"></i> Aprobando
+                    </span>
+                {% elif promedio_general >= 60 %}
+                    <span class="status-pill status-warning">
+                        <i class="bi bi-exclamation-triangle"></i> En recuperación
+                    </span>
+                {% elif promedio_general > 0 %}
+                    <span class="status-pill status-danger">
+                        <i class="bi bi-x-circle"></i> En riesgo
+                    </span>
+                {% else %}
+                    <span class="text-muted small">Sin notas registradas aún</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Asistencia</div>
+                <div class="kpi-value">{{ pct_asistencia }}<span style="font-size:1.2rem;opacity:0.6">%</span></div>
+                {% if pct_asistencia >= 80 %}
+                    <span class="status-pill status-success">Buena asistencia</span>
+                {% elif pct_asistencia >= 60 %}
+                    <span class="status-pill status-warning">Mejorable</span>
+                {% else %}
+                    <span class="status-pill status-danger">Crítica</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <div class="kpi-label">Materias</div>
+                <div class="kpi-value">{{ num_materias }}</div>
+                <span class="text-muted small">Cursando actualmente</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-2">
+    {# === Promedios por materia === #}
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <strong>Mis materias</strong>
+                <a href="{{ url_for('portal.notas') }}" class="ms-auto small text-decoration-none">
+                    Ver detalle <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if promedios %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Materia</th>
+                                <th>Profesor</th>
+                                <th class="text-center">Notas</th>
+                                <th class="text-end">Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in promedios %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ p.materia }}</div>
+                                    <div class="small text-muted"><code>{{ p.grupo_codigo }}</code></div>
+                                </td>
+                                <td class="small text-muted">{{ p.profesor }}</td>
+                                <td class="text-center small">{{ p.num_notas }}</td>
+                                <td class="text-end">
+                                    <span class="fw-bold {% if p.estado == 'aprobado' %}text-success
+                                          {% elif p.estado == 'recuperacion' %}text-warning
+                                          {% else %}text-danger{% endif %}">
+                                        {{ p.promedio }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-journal-text fs-1 text-muted"></i>
+                    <div class="empty-state-title">Aún no tienes notas</div>
+                    <div class="empty-state-text">
+                        Cuando tus profesores registren tus calificaciones, aparecerán aquí.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# === Próximas evaluaciones === #}
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <strong>Próximas evaluaciones</strong>
+            </div>
+            <div class="card-body p-0">
+                {% if proximas %}
+                <div class="list-group list-group-flush">
+                    {% for ev in proximas %}
+                    {% set dias = (ev.fecha - now.date()).days if now.date else 0 %}
+                    <div class="list-group-item d-flex align-items-center gap-3">
+                        <div class="text-center" style="min-width:50px;">
+                            <div class="fw-bold text-primary">{{ ev.fecha.day }}</div>
+                            <div class="small text-muted text-uppercase">
+                                {{ ev.fecha.strftime('%b') }}
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">{{ ev.nombre }}</div>
+                            <div class="small text-muted">
+                                {{ ev.materia.nombre if ev.materia else '—' }}
+                                · <span class="badge bg-light text-dark">{{ ev.tipo }}</span>
+                            </div>
+                        </div>
+                        <div class="small text-muted">
+                            {% if dias == 0 %}<span class="text-warning fw-bold">Hoy</span>
+                            {% elif dias == 1 %}Mañana
+                            {% else %}{{ dias }}d{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-calendar-check fs-1 text-muted"></i>
+                    <div class="empty-state-title">Sin evaluaciones próximas</div>
+                    <div class="empty-state-text">
+                        ¡Tómate un descanso!
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
