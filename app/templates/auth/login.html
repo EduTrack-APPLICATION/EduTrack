@@ -92,7 +92,7 @@
             <div class="login-aside-foot">
                 <span>© 2026 EduTrack</span>
                 <span class="login-dot">·</span>
-                <span>v1.0</span>
+                <span>v3.0</span>
             </div>
         </div>
     </aside>
@@ -182,27 +182,8 @@
                 </button>
             </form>
 
-            {# Credenciales demo (solo en dev) #}
-            {% if config.DEBUG %}
-            <details class="login-demo">
-                <summary>
-                    <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
-                        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    <span>Credenciales de prueba</span></summary>
-                <div class="login-demo-body">
-                    <div class="login-demo-row">
-                        <span class="login-demo-label">Admin</span>
-                        <code>admin / admin123</code>
-                    </div>
-                    <div class="login-demo-row">
-                        <span class="login-demo-label">Profesor</span>
-                        <code>mrodriguez / profesor123</code>
-                    </div>
-                </div>
-            </details>
-            {% endif %}
+            
+
         </div>
     </main>
 </div>

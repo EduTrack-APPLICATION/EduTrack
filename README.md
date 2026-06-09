@@ -142,7 +142,9 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # 4. Configurar e inicializar
+python iniciar postgre.py
 python setup.py
+python run.py
 ```
 
 El script `setup.py` automatiza:
@@ -552,4 +554,3 @@ Proyecto académico. Uso libre con atribución.
 ## Créditos
 
 Construido con Flask, Bootstrap, FullCalendar y mucho café.
-

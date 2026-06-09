@@ -21,13 +21,47 @@
             </div>
         </div>
         {% if current_user.is_admin() %}
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{{ url_for('students.editar', id=estudiante.id) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil"></i> Editar
             </a>
             <a href="#" class="btn btn-outline-secondary" onclick="window.print(); return false;">
                 <i class="bi bi-printer"></i> Imprimir
             </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-key"></i> Portal del estudiante
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% if not tiene_cuenta_portal %}
+                    <li>
+                        <form method="POST" action="{{ url_for('students.generar_cuenta_portal', id=estudiante.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="dropdown-item" type="submit">
+                                <i class="bi bi-person-plus text-success"></i> Generar cuenta del portal
+                            </button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li>
+                        <span class="dropdown-item-text text-muted small">
+                            <i class="bi bi-check-circle text-success"></i> Ya tiene cuenta del portal
+                        </span>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="POST" action="{{ url_for('students.generar_cuenta_portal', id=estudiante.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="reset" value="1">
+                            <button class="dropdown-item" type="submit"
+                                    data-confirm="Esto generará una contraseña nueva. ¿Continuar?">
+                                <i class="bi bi-arrow-repeat text-warning"></i> Resetear contraseña
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
         {% endif %}
     </div>

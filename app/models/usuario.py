@@ -14,6 +14,7 @@ class RolEnum(str, Enum):
     SUPER_ADMIN = 'super_admin'
     ADMIN = 'admin'
     PROFESOR = 'profesor'
+    ESTUDIANTE = 'estudiante'
 
 
 class Usuario(UserMixin, db.Model):
@@ -29,6 +30,10 @@ class Usuario(UserMixin, db.Model):
     ultimo_login = db.Column(db.DateTime)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # === Vínculo con Estudiante (para portal del estudiante) ===
+    estudiante_id = db.Column(db.Integer, db.ForeignKey('estudiantes.id', ondelete='SET NULL'),
+                              nullable=True, index=True)
 
     # === Seguridad: bloqueo por intentos fallidos ===
     intentos_fallidos = db.Column(db.Integer, default=0, nullable=False)
@@ -58,6 +63,9 @@ class Usuario(UserMixin, db.Model):
 
     def is_profesor(self):
         return self.rol == RolEnum.PROFESOR.value
+
+    def is_estudiante(self):
+        return self.rol == RolEnum.ESTUDIANTE.value
 
     # === Seguridad: bloqueo por intentos fallidos ===
     def esta_bloqueado(self):

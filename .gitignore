@@ -54,15 +54,3 @@ migrations/versions/__pycache__/
 # Archivos temporales de reportes
 *.tmp
 exports/
-
-# Python tooling
-.mypy_cache/
-.__pycache__/
-.python-version
-__pypackages__/
-pip-log.txt
-pip-delete-this-directory.txt
-coverage.xml
-*.cover
-*.py,cover
-nosetests.xml

@@ -28,20 +28,6 @@ def make_shell_context():
     }
 
 
-@app.cli.command('init-db')
-def init_db():
-    """Inicializa la base de datos creando todas las tablas."""
-    db.create_all()
-    print('✓ Base de datos inicializada.')
-
-
-@app.cli.command('seed-db')
-def seed_db():
-    """Carga datos de prueba en la base de datos."""
-    from app.utils.seed_data import seed_database
-    seed_database()
-    print('✓ Datos de prueba cargados exitosamente.')
-
 
 @app.cli.command('run-https')
 def run_https():
@@ -60,8 +46,4 @@ def run_https():
 
 
 if __name__ == '__main__':
-    # En producción (Render), el puerto viene en la variable de entorno PORT
-    # En desarrollo local, usa 5000
-    port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_ENV', 'production') != 'production'
-    app.run(host='0.0.0.0', port=port, debug=debug_mode)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -131,3 +131,5 @@ def eliminar(id):
     db.session.commit()
     flash(f'Evaluación "{nombre}" eliminada.', 'success')
     return redirect(url_for('evaluations.listar'))
+
+

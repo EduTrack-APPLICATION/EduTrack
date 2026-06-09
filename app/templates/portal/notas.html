@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Mis notas · EduTrack{% endblock %}
+{% block page_title %}Mis notas{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="{{ url_for('portal.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+    <div>
+        <h4 class="mb-0">Detalle de notas</h4>
+        <small class="text-muted">Todas tus calificaciones por materia</small>
+    </div>
+</div>
+
+{% for d in detalle %}
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center">
+        <div>
+            <strong>{{ d.materia.nombre if d.materia else d.grupo.nombre }}</strong>
+            <div class="small text-muted">
+                <code>{{ d.grupo.codigo }}</code>
+                {% if d.grupo.profesor %} · {{ d.grupo.profesor.nombre_completo }}{% endif %}
+            </div>
+        </div>
+        {% if d.promedio is not none %}
+        <div class="ms-auto text-end">
+            <div class="small text-muted">Promedio</div>
+            <div class="h5 mb-0
+                {% if d.promedio >= 70 %}text-success
+                {% elif d.promedio >= 60 %}text-warning
+                {% else %}text-danger{% endif %}">
+                {{ d.promedio }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if d.filas %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Evaluación</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
+                    <th class="text-end">Peso</th>
+                    <th class="text-end">Nota</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in d.filas %}
+                <tr>
+                    <td>{{ fila.evaluacion.nombre }}</td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ fila.evaluacion.tipo }}</span>
+                    </td>
+                    <td class="small text-muted">{{ fila.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td class="text-end small">{{ fila.evaluacion.porcentaje }}%</td>
+                    <td class="text-end">
+                        {% if fila.tiene_nota %}
+                            <span class="fw-semibold">
+                                {{ fila.nota_obtenida }} / {{ fila.evaluacion.puntaje_maximo }}
+                            </span>
+                            <div class="small {% if fila.porcentaje_obtenido >= 70 %}text-success
+                                              {% elif fila.porcentaje_obtenido >= 60 %}text-warning
+                                              {% else %}text-danger{% endif %}">
+                                {{ fila.porcentaje_obtenido }}%
+                            </div>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-muted">Pendiente</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body text-center text-muted py-3 small">
+        Sin evaluaciones registradas en esta materia.
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <i class="bi bi-journal-x fs-1 text-muted"></i>
+        <div class="empty-state-title">Sin materias asignadas</div>
+        <div class="empty-state-text">
+            Aún no estás matriculado en ningún grupo. Contacta al administrador.
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

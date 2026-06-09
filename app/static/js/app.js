@@ -410,7 +410,15 @@
     // Procesar flash messages pendientes del backend
     if (window.__pendingToasts && Array.isArray(window.__pendingToasts)) {
         window.__pendingToasts.forEach((t, i) => {
-            setTimeout(() => show(t.message, { category: t.category }), i * 150);
+            // Detectar mensajes con credenciales — duración muy larga (60s)
+            const msg = (t.message || '').toLowerCase();
+            const hasCredentials = msg.includes('contraseña') &&
+                                    (msg.includes('usuario') || msg.includes('temporal'));
+            const opts = { category: t.category };
+            if (hasCredentials) {
+                opts.duration = 60000;  // 1 minuto, debe darle tiempo de copiarlas
+            }
+            setTimeout(() => show(t.message, opts), i * 150);
         });
         window.__pendingToasts = [];
     }
@@ -1313,4 +1321,131 @@
             }, 100);
         }
     });
+})();
+
+
+/* ============================================================
+   Credentials Modal — detecta flashes con credenciales y los muestra
+   en un modal persistente con botones de copiar
+   ============================================================ */
+(function () {
+    'use strict';
+
+    const modal = document.getElementById('credsModal');
+    if (!modal) return;
+
+    const usuarioEl = document.getElementById('credsUsuario');
+    const passEl    = document.getElementById('credsPassword');
+    const introEl   = document.getElementById('credsModalIntro');
+
+    function open(username, password, intro) {
+        usuarioEl.textContent = username || '—';
+        passEl.textContent    = password || '—';
+        if (intro) introEl.textContent = intro;
+        modal.classList.add('open');
+    }
+
+    function close() {
+        modal.classList.remove('open');
+    }
+
+    // Cerrar
+    modal.querySelectorAll('[data-creds-close]').forEach(el => {
+        el.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    });
+
+    // Copiar individual
+    modal.querySelectorAll('[data-copy-target]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const target = document.getElementById(btn.dataset.copyTarget);
+            if (!target) return;
+            try {
+                await navigator.clipboard.writeText(target.textContent.trim());
+                const i = btn.querySelector('i');
+                const original = i.className;
+                i.className = 'bi bi-check2';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-secondary');
+                setTimeout(() => {
+                    i.className = original;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 1500);
+            } catch {}
+        });
+    });
+
+    // Copiar ambas
+    const copyBothBtn = modal.querySelector('[data-copy-both]');
+    if (copyBothBtn) {
+        copyBothBtn.addEventListener('click', async () => {
+            const text = `Usuario: ${usuarioEl.textContent.trim()}\nContraseña: ${passEl.textContent.trim()}`;
+            try {
+                await navigator.clipboard.writeText(text);
+                const original = copyBothBtn.innerHTML;
+                copyBothBtn.innerHTML = '<i class="bi bi-check2"></i> Copiado';
+                setTimeout(() => { copyBothBtn.innerHTML = original; }, 1500);
+            } catch {}
+        });
+    }
+
+    // === Detectar flashes con credenciales y abrir modal ===
+    // Patrones tolerantes a varios formatos:
+    //   - 'usuario "X" ... contraseña ... "Y"'
+    //   - 'usuario: X ... contraseña: Y'
+    //   - 'Usuario X · Contraseña Y'
+    function parsearCredenciales(mensaje) {
+        if (!mensaje) return null;
+        const lower = mensaje.toLowerCase();
+        if (!lower.includes('contraseña') ||
+            !(lower.includes('usuario') || lower.includes('temporal'))) {
+            return null;
+        }
+
+        // Match: usuario "X" ... contraseña ... "Y"
+        const matchQuoted = mensaje.match(
+            /usuario[^"]*"([^"]+)"[^"]*contraseña[^"]*"([^"]+)"/i
+        );
+        if (matchQuoted) {
+            return { username: matchQuoted[1], password: matchQuoted[2] };
+        }
+
+        // Match sin comillas pero con dos puntos
+        const matchColon = mensaje.match(
+            /usuario:\s*([^\s,·]+)[\s\S]*contraseña[^:]*:\s*([^\s,·]+)/i
+        );
+        if (matchColon) {
+            return { username: matchColon[1], password: matchColon[2] };
+        }
+
+        return null;
+    }
+
+    // Reemplazar el procesamiento original: si detecta creds, abre modal
+    // en vez de mostrar toast. El toast original ya muestra el mensaje breve.
+    const originalToasts = window.__pendingToasts;
+    if (originalToasts && Array.isArray(originalToasts)) {
+        // Limpiar (ya fueron procesados por toast)
+        // Pero buscar credenciales para abrir modal además
+        let credsToShow = null;
+        for (const t of originalToasts) {
+            const creds = parsearCredenciales(t.message);
+            if (creds) {
+                credsToShow = creds;
+                break;  // mostrar solo el primero
+            }
+        }
+        if (credsToShow) {
+            // Pequeño delay para que el toast aparezca antes
+            setTimeout(() => {
+                open(credsToShow.username, credsToShow.password);
+            }, 400);
+        }
+    }
+
+    // API global para abrirlo manualmente
+    window.CredsModal = { open, close };
 })();
