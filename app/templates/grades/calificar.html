@@ -147,7 +147,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce() }}">
 (function () {
     const evaluacionId = {{ evaluacion.id }};
     const puntajeMax = {{ evaluacion.puntaje_maximo }};

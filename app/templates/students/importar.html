@@ -204,7 +204,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce() }}">
 (function () {
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('archivo');

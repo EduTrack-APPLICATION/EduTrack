@@ -121,7 +121,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce() }}">
 function marcarTodos(estado) {
     document.querySelectorAll('input[type="radio"][value="' + estado + '"]').forEach(function (r) {
         r.checked = true;
