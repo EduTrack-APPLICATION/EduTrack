@@ -237,7 +237,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce() }}">
 (function () {
     // ===== Filtros de tabs =====
     const filtros = document.querySelectorAll('#filtroResultados [data-filter]');

@@ -109,7 +109,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
+<script nonce="{{ csp_nonce() }}">
 (function () {
     // Auto-formato del código
     const input = document.querySelector('input[name="codigo"]');
