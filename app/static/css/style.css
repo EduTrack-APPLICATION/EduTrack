@@ -7544,15 +7544,20 @@ kbd {
 .auth-page input[type="password"],
 .auth-page .input-group-text,
 .auth-page .btn {
-    border-radius: 10px;
+    border-radius: 999px;
 }
 
-/* input-group: redondear ambos extremos */
 .auth-page .input-group > :first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 999px;
+    padding-left: 18px;
 }
 .auth-page .input-group > :last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-top-right-radius: 999px;
+    border-bottom-right-radius: 999px;
+    padding-right: 18px;
+}
+
+.auth-page .form-control {
+    padding: 12px 18px;
 }
