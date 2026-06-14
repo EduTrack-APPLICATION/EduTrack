@@ -3,7 +3,67 @@ Filtros Jinja personalizados y context processors.
 """
 from datetime import datetime, date
 from markupsafe import Markup
+from app.utils.timezone import utc_to_c
 
+"""Filtros personalizados de Jinja para EduTrack."""
+from app.utils.timezone import utc_to_cr
+
+
+def init_filters(app):
+    """Registra los filtros personalizados en la app Flask."""
+
+    @app.template_filter('fecha_cr')
+    def fecha_cr_filter(dt, formato='%d/%m/%Y'):
+        """Convierte datetime UTC a hora CR y formatea como fecha."""
+        if dt is None:
+            return '—'
+        cr = utc_to_cr(dt)
+        return cr.strftime(formato)
+
+    @app.template_filter('fecha_hora_cr')
+    def fecha_hora_cr_filter(dt, formato='%d/%m/%Y %H:%M'):
+        """Convierte datetime UTC a hora CR y formatea como fecha y hora."""
+        if dt is None:
+            return '—'
+        cr = utc_to_cr(dt)
+        return cr.strftime(formato)
+
+    @app.template_filter('hora_cr')
+    def hora_cr_filter(dt, formato='%H:%M'):
+        """Convierte datetime UTC a hora CR y formatea solo la hora."""
+        if dt is None:
+            return '—'
+        cr = utc_to_cr(dt)
+        return cr.strftime(formato)
+
+    @app.template_filter('relativo_cr')
+    def relativo_cr_filter(dt):
+        """Retorna tiempo relativo: 'hace 5 minutos', 'ayer', etc."""
+        if dt is None:
+            return '—'
+        from datetime import datetime, timezone
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        ahora = datetime.now(timezone.utc)
+        diff = ahora - dt
+        seg = diff.total_seconds()
+
+        if seg < 60:
+            return 'hace un momento'
+        elif seg < 3600:
+            min = int(seg / 60)
+            return f'hace {min} min'
+        elif seg < 86400:
+            hrs = int(seg / 3600)
+            return f'hace {hrs} h'
+        elif seg < 172800:
+            return 'ayer'
+        elif seg < 604800:
+            dias = int(seg / 86400)
+            return f'hace {dias} días'
+        else:
+            return utc_to_cr(dt).strftime('%d/%m/%Y')
+            
 
 def register_filters(app):
     @app.template_filter('fecha')
