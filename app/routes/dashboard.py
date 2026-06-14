@@ -71,14 +71,19 @@ def index():
     proximas = proximas.order_by(Evaluacion.fecha).limit(5).all()
 
     # === Saludo contextual dinámico ===
-    from datetime import datetime
-    hora = datetime.now().hour
+  from app.utils.timezone import now_cr
+
+@dashboard_bp.route('/')
+@login_required
+def index():
+    hora = now_cr().hour            # ← hora de Costa Rica
     if hora < 12:
-        saludo, saludo_emoji = 'Buenos días', ''
+        saludo = "Buenos días"
     elif hora < 19:
-        saludo, saludo_emoji = 'Buenas tardes', ''
+        saludo = "Buenas tardes"
     else:
-        saludo, saludo_emoji = 'Buenas noches', ''
+        saludo = "Buenas noches"
+    
 
     # Día de la semana en español
     dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
