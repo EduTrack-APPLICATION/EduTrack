@@ -76,21 +76,63 @@ def index():
 @dashboard_bp.route('/')
 @login_required
 def index():
-    hora = now_cr().hour            # ← hora de Costa Rica
-    if hora < 12:
-        saludo = "Buenos días"
-    elif hora < 19:
-        saludo = "Buenas tardes"
-    else:
-        saludo = "Buenas noches"
-    
+    # Hora actual en zona horaria de Costa Rica
+    ahora_cr = now_cr()
+    hoy = ahora_cr.date()
+    hora = ahora_cr.hour
 
-    # Día de la semana en español
-    dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
-    meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-             'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
-    hoy = date.today()
-    fecha_legible = f"{dias[hoy.weekday()]} {hoy.day} de {meses[hoy.month - 1]}"
+    # Saludo según hora del día
+    if 5 <= hora < 12:
+        saludo = "Buenos días"
+    elif 12 <= hora < 19:
+        saludo = "Buenas tardes"
+    elif 19 <= hora < 23:
+        saludo = "Buenas noches"
+    else:
+        saludo = "Trabajando hasta tarde"
+
+    # Fecha legible — siempre en español
+    MESES_ES = {
+        1: 'enero', 2: 'febrero', 3: 'marzo', 4: 'abril',
+        5: 'mayo', 6: 'junio', 7: 'julio', 8: 'agosto',
+        9: 'septiembre', 10: 'octubre', 11: 'noviembre', 12: 'diciembre',
+    }
+    DIAS_ES = {
+        0: 'lunes', 1: 'martes', 2: 'miércoles', 3: 'jueves',
+        4: 'viernes', 5: 'sábado', 6: 'domingo',
+    }
+    dia_semana = DIAS_ES[hoy.weekday()]
+    mes = MESES_ES[hoy.month]
+    fecha_legible = f"{dia_semana} {hoy.day} de {mes}"
+    # Ejemplo: "lunes 14 de junio"
+
+    # Mensaje extra contextual
+    mensajes_por_hora = {
+        'manana':  "Que tengas un excelente día.",
+        'tarde':   "Espero que tu día vaya bien.",
+        'noche':   "Termina con todo lo pendiente.",
+        'tarde_noche': "No te quedes hasta muy tarde 🌙",
+    }
+    if 5 <= hora < 12:
+        mensaje_extra = mensajes_por_hora['manana']
+    elif 12 <= hora < 19:
+        mensaje_extra = mensajes_por_hora['tarde']
+    elif 19 <= hora < 23:
+        mensaje_extra = mensajes_por_hora['noche']
+    else:
+        mensaje_extra = mensajes_por_hora['tarde_noche']
+
+    # ... resto de tu lógica del dashboard (KPIs, queries, etc.)
+
+    return render_template('dashboard/index.html',
+        hoy=hoy,
+        saludo=saludo,
+        fecha_legible=fecha_legible,
+        mensaje_extra=mensaje_extra,
+        # ... resto de variables
+    )
+
+
 
     # Tareas pendientes contextuales (lo que el usuario podría querer hacer)
     tareas = []
