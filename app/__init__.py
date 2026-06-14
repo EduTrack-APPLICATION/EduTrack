@@ -2,6 +2,8 @@
 Application Factory para EduTrack.
 Inicializa extensiones, registra blueprints y configura la app.
 """
+import os
+
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
@@ -30,6 +32,10 @@ login_manager.session_protection = 'strong'
 def create_app(config_name='default'):
     """Fábrica de la aplicación Flask."""
     app = Flask(__name__)
+
+    print('=' * 50)
+    print('DATABASE_URL:', os.getenv('DATABASE_URL'))
+    print('=' * 50)
 
     if config_name == 'default' and not os.getenv('FLASK_ENV') and os.getenv('DATABASE_URL'):
         config_name = 'production'
