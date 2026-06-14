@@ -41,7 +41,7 @@ class IntentoLogin(db.Model):
             db.session.rollback()
 
     @staticmethod
-    def intentos_fallidos_recientes(ip, minutos=0):
+    def intentos_fallidos_recientes(ip, minutos=15):
         """Cuántos intentos fallidos hay desde una IP en los últimos N minutos."""
         from datetime import timedelta
         desde = datetime.utcnow() - timedelta(minutes=minutos)
