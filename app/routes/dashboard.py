@@ -1,7 +1,7 @@
 """
 Dashboard principal con estadísticas y gráficos.
 """
-from datetime import date, timedelta
+from datetime import datetime, timezone, timedelta
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, desc
@@ -13,6 +13,11 @@ from app.models import (
 )
 from app.services.calculo_service import CalculoService
 from app.utils.cache import cached_view
+
+
+def _ahora_cr():
+    """Hora actual de Costa Rica (UTC-6)."""
+    return datetime.now(timezone(timedelta(hours=-6)))
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
