@@ -11,7 +11,7 @@
         <div class="dash2-date">
             <span class="dash2-date-day">{{ hoy.day }}</span>
             <div class="dash2-date-meta">
-                <div class="dash2-date-month">{{ fecha_legible.split(' ')[2]|capitalize }}</div>
+                <div class="dash2-date-month">{{ hoy|mes_es|capitalize }}</div>
                 <div class="dash2-date-year">{{ hoy.year }}</div>
             </div>
         </div>
@@ -21,6 +21,7 @@
             <div class="dash2-greeting-sub">{{ mensaje_extra }}</div>
         </div>
     </div>
+</header>
 
     <div class="dash2-header-right">
         {% if tareas_pendientes %}
