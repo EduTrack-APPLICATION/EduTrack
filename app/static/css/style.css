@@ -7648,31 +7648,7 @@ kbd {
 }
 
 
-// ============================================================
-// Detección de error en login → activa animación shake
-// ============================================================
-(function() {
-    const card = document.querySelector('.login-card');
-    if (!card) return;
 
-    // 1. ¿Hay mensajes de error visibles?
-    const errorElement = document.querySelector(
-        '.alert-danger, .invalid-feedback, .login-error, [data-category="danger"], .is-invalid'
-    );
-
-    // 2. ¿La URL tiene ?error=...?
-    const urlError = new URLSearchParams(window.location.search).has('error');
-
-    // 3. ¿El username ya estaba prellenado? (señal de re-render tras fallo)
-    const username = document.querySelector('input[name="username"]');
-    const hadAttempt = username && username.value.trim().length > 0;
-
-    if (errorElement || urlError || hadAttempt) {
-        card.classList.add('has-error');
-        // Quita la clase después de la animación para que pueda re-dispararse
-        setTimeout(() => card.classList.remove('has-error'), 500);
-    }
-})();
 
 
 
