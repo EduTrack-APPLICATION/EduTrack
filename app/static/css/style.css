@@ -7628,4 +7628,22 @@ kbd {
     left: 100%;
 }
 
+/* ============================================================
+   Login — animación de entrada de la card
+   ============================================================ */
+.login-card {
+    animation: loginCardEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+@keyframes loginCardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
