@@ -208,12 +208,7 @@ def create_app(config_name='default'):
     # Filtros Jinja personalizados
     from app.utils.filters import register_filters
     register_filters(app)
-    # Registrar filtros de Jinja
-    from app.utils.filters import init_filters
-    init_filters(app)
-
-    return app
-
+   
     return app
 
 
