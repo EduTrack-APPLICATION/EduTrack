@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, desc
+from app.utils.timezone import now_cr
 
 from app import db
 from app.models import (
@@ -75,8 +76,7 @@ def index():
         proximas = proximas.filter(Evaluacion.profesor_id == profesor_id)
     proximas = proximas.order_by(Evaluacion.fecha).limit(5).all()
 
-    # === Saludo contextual dinámico ===
-  from app.utils.timezone import now_cr
+    
 
 @dashboard_bp.route('/')
 @login_required
