@@ -1445,7 +1445,12 @@
             }, 400);
         }
     }
+    // Si hay flash message con error, agrega la clase
+if (document.querySelector('.alert-danger, [data-category="danger"]')) {
+    document.querySelector('.login-card')?.classList.add('has-error');
+}
 
     // API global para abrirlo manualmente
     window.CredsModal = { open, close };
+    
 })();
