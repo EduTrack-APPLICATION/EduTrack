@@ -1,7 +1,7 @@
 """
 Dashboard principal con estadísticas y gráficos.
 """
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, desc
@@ -21,61 +21,6 @@ def _ahora_cr():
     return datetime.now(timezone(timedelta(hours=-6)))
 
 dashboard_bp = Blueprint('dashboard', __name__)
-
-
-@dashboard_bp.route('/')
-@login_required
-@cached_view(seconds=45, by_user=True)
-def index():
-    """Dashboard principal según rol."""
-    # Filtro por profesor si es profesor
-    profesor_id = None
-    if current_user.is_profesor() and current_user.profesor:
-        profesor_id = current_user.profesor.id
-
-    # Estadísticas
-    if profesor_id:
-        # Profesor ve solo sus grupos
-        grupos_qs = Grupo.query.filter_by(profesor_id=profesor_id, activo=True)
-        total_grupos = grupos_qs.count()
-        grupos_ids = [g.id for g in grupos_qs.all()]
-        if grupos_ids:
-            from app.models.grupo import EstudianteGrupo
-            total_estudiantes = db.session.query(
-                func.count(func.distinct(EstudianteGrupo.estudiante_id))
-            ).filter(EstudianteGrupo.grupo_id.in_(grupos_ids)).scalar() or 0
-        else:
-            total_estudiantes = 0
-        total_evaluaciones = Evaluacion.query.filter_by(profesor_id=profesor_id).count()
-    else:
-        # Admin ve todo
-        total_grupos = Grupo.query.filter_by(activo=True).count()
-        total_estudiantes = Estudiante.query.filter_by(
-            estado=EstadoEstudianteEnum.ACTIVO.value).count()
-        total_evaluaciones = Evaluacion.query.count()
-
-    total_profesores = Profesor.query.filter_by(activo=True).count() if not profesor_id else None
-    total_materias = Materia.query.filter_by(activa=True).count()
-
-    # Promedio general
-    promedio_general = CalculoService.promedio_general(profesor_id=profesor_id)
-
-    # Estudiantes en riesgo
-    en_riesgo = CalculoService.estudiantes_en_riesgo(profesor_id=profesor_id)
-    total_riesgo = len(en_riesgo)
-
-    # Actividad reciente
-    actividad_reciente = Evaluacion.query
-    if profesor_id:
-        actividad_reciente = actividad_reciente.filter_by(profesor_id=profesor_id)
-    actividad_reciente = actividad_reciente.order_by(desc(Evaluacion.fecha_creacion)).limit(8).all()
-
-    # Próximas evaluaciones
-    proximas = Evaluacion.query.filter(Evaluacion.fecha >= date.today())
-    if profesor_id:
-        proximas = proximas.filter(Evaluacion.profesor_id == profesor_id)
-    proximas = proximas.order_by(Evaluacion.fecha).limit(5).all()
-
     
 
 @dashboard_bp.route('/')
@@ -120,24 +65,33 @@ def index():
     }
     if 5 <= hora < 12:
         mensaje_extra = mensajes_por_hora['manana']
+        saludo_emoji = '☀️'
     elif 12 <= hora < 19:
         mensaje_extra = mensajes_por_hora['tarde']
+        saludo_emoji = '🌤️'
     elif 19 <= hora < 23:
         mensaje_extra = mensajes_por_hora['noche']
+        saludo_emoji = '🌙'
     else:
         mensaje_extra = mensajes_por_hora['tarde_noche']
+        saludo_emoji = '🌃'
 
-    # ... resto de tu lógica del dashboard (KPIs, queries, etc.)
+    profesor_id = current_user.profesor.id if current_user.is_profesor() and current_user.profesor else None
 
-    return render_template('dashboard/index.html',
-        hoy=hoy,
-        saludo=saludo,
-        fecha_legible=fecha_legible,
-        mensaje_extra=mensaje_extra,
-        # ... resto de variables
-    )
-
-
+    total_estudiantes = Estudiante.query.count()
+    total_profesores = Profesor.query.count()
+    total_grupos = Grupo.query.count()
+    total_materias = Materia.query.count()
+    total_evaluaciones = Evaluacion.query.count()
+    promedio_general = CalculoService.promedio_general(profesor_id)
+    en_riesgo = CalculoService.estudiantes_en_riesgo(profesor_id)
+    total_riesgo = len(en_riesgo)
+    actividad_reciente = []
+    proximas = Evaluacion.query.filter(Evaluacion.fecha >= hoy).order_by(Evaluacion.fecha.asc()).limit(5).all()
+    meses = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ]
 
     # Tareas pendientes contextuales (lo que el usuario podría querer hacer)
     tareas = []
