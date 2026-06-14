@@ -30,7 +30,28 @@ login_manager.session_protection = 'strong'
 def create_app(config_name='default'):
     """Fábrica de la aplicación Flask."""
     app = Flask(__name__)
+
+    if config_name == 'default' and not os.getenv('FLASK_ENV') and os.getenv('DATABASE_URL'):
+        config_name = 'production'
+
     app.config.from_object(config[config_name])
+
+    # Inicializar configuración adicional de entorno, si existe
+    config_class = config.get(config_name)
+    if config_class and hasattr(config_class, 'init_app'):
+        config_class.init_app(app)
+
+    # Loguear una versión segura de la URI de la base de datos
+    db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if db_url:
+        safe_url = db_url
+        if '://' in safe_url and '@' in safe_url:
+            prefix, rest = safe_url.split('://', 1)
+            if ':' in rest.split('@')[0]:
+                user_part, host_part = rest.split('@', 1)
+                user, _ = user_part.split(':', 1)
+                safe_url = f'{prefix}://{user}:***@{host_part}'
+        app.logger.info('Base de datos configurada en SQLALCHEMY_DATABASE_URI: %s', safe_url)
 
     # Inicializar extensiones
     db.init_app(app)
@@ -73,8 +94,6 @@ def create_app(config_name='default'):
                     'https://fonts.googleapis.com',
                     'https://fonts.gstatic.com',
                 ],
-                # Permitir fuentes externas (Google Fonts)
-                'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
                 'frame-ancestors': "'none'",
                 'base-uri': "'self'",
                 'form-action': "'self'",

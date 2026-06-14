@@ -9,7 +9,10 @@ from app.models import (
     Evaluacion, Nota, Asistencia, ProfesorMateria, EstudianteGrupo
 )
 
-app = create_app(os.getenv('FLASK_ENV') or 'default')
+flask_env = os.getenv('FLASK_ENV')
+if not flask_env and os.getenv('DATABASE_URL'):
+    flask_env = 'production'
+app = create_app(flask_env or 'default')
 
 
 @app.shell_context_processor
