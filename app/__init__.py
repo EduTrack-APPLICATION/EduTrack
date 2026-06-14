@@ -66,7 +66,15 @@ def create_app(config_name='default'):
                     'data:',
                 ],
                 'img-src': ["'self'", 'data:', 'https:'],
-                'connect-src': "'self'",
+                # Permitir conexiones al CDN para sourcemaps y recursos relacionados
+                'connect-src': [
+                    "'self'",
+                    'https://cdn.jsdelivr.net',
+                    'https://fonts.googleapis.com',
+                    'https://fonts.gstatic.com',
+                ],
+                # Permitir fuentes externas (Google Fonts)
+                'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
                 'frame-ancestors': "'none'",
                 'base-uri': "'self'",
                 'form-action': "'self'",
