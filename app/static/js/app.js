@@ -1454,3 +1454,20 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     window.CredsModal = { open, close };
     
 })();
+(function() {
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const btn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!btn || btn.disabled) return;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
+            // Restaurar tras 8s por si algo falla
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }, 8000);
+        });
+    });
+})();
+
