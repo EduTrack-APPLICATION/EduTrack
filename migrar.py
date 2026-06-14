@@ -6,8 +6,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PG_URL = os.environ['DATABASE_URL']
+
+def _normalize_database_url(url):
+    """Limpia y normaliza la URL de PostgreSQL para SQLAlchemy."""
+    if not url:
+        return url
+    url = url.strip()
+    # Eliminar prefijos de shell como `psql `
+    if url.startswith('psql '):
+        url = url[len('psql '):].strip()
+    if url.startswith("'") and url.endswith("'"):
+        url = url[1:-1]
+    if url.startswith('postgres://'):
+        url = 'postgresql://' + url[len('postgres://'):]
+    return url
+
+pg_env = os.environ.get('DATABASE_URL')
+if not pg_env:
+    raise RuntimeError('No se encontró DATABASE_URL en el entorno. Define DATABASE_URL en .env.')
+
+PG_URL = _normalize_database_url(pg_env)
 SQLITE_URL = 'sqlite:///edutrack.db'
+
+print(f'Usando PostgreSQL destino: {PG_URL[:60]}...')
 
 # 1. Crear tablas en PostgreSQL
 from app import create_app, db
