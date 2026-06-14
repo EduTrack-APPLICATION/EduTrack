@@ -7538,26 +7538,27 @@ kbd {
 /* ============================================================
    Login — inputs más redondeados
    ============================================================ */
-.auth-page .form-control,
-.auth-page input[type="text"],
-.auth-page input[type="email"],
-.auth-page input[type="password"],
-.auth-page .input-group-text,
-.auth-page .btn {
+.login-input-wrap {
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.login-input,
+.login-input-wrap input {
+    border-radius: 999px;
+    padding-left: 44px;    /* más espacio porque el icono queda más adentro */
+    padding-right: 44px;
+}
+
+.login-submit,
+.login-form button[type="submit"] {
     border-radius: 999px;
 }
 
-.auth-page .input-group > :first-child {
-    border-top-left-radius: 999px;
-    border-bottom-left-radius: 999px;
-    padding-left: 18px;
+/* Ajustar la posición de los iconos para que no toquen el borde curvo */
+.login-input-ico {
+    left: 16px;
 }
-.auth-page .input-group > :last-child {
-    border-top-right-radius: 999px;
-    border-bottom-right-radius: 999px;
-    padding-right: 18px;
-}
-
-.auth-page .form-control {
-    padding: 12px 18px;
+.login-input-action {
+    right: 12px;
 }
