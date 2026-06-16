@@ -17,11 +17,6 @@ from app.utils.cache import cached_view
 
 
 from app.utils.cache import cached_view
-
-@dashboard_bp.route('/')
-@login_required
-@cached_view(seconds=45, by_user=True)
-def index():
     
 
 
