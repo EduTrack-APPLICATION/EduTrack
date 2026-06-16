@@ -15,10 +15,6 @@ from app.models import (
 from app.services.calculo_service import CalculoService
 from app.utils.cache import cached_view
 
-@dashboard_bp.route('/')
-@login_required
-@cached_view(seconds=45, by_user=True)   
-
     
 
 
