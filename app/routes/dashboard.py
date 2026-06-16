@@ -16,6 +16,15 @@ from app.services.calculo_service import CalculoService
 from app.utils.cache import cached_view
 
 
+from app.utils.cache import cached_view
+
+@dashboard_bp.route('/')
+@login_required
+@cached_view(seconds=45, by_user=True)
+def index():
+    
+
+
 def _ahora_cr():
     """Hora actual de Costa Rica (UTC-6)."""
     return datetime.now(timezone(timedelta(hours=-6)))
