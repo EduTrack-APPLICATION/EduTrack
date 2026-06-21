@@ -1471,3 +1471,24 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     });
 })();
 
+
+
+/* ============================================================
+   Navbar scroll effect — intensifica el blur al hacer scroll
+   ============================================================ */
+(function() {
+    const navbar = document.querySelector('.navbar, header.navbar, .app-navbar');
+    if (!navbar) return;
+    
+    function onScroll() {
+        if (window.scrollY > 8) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    }
+    
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();  // estado inicial
+})();
+
