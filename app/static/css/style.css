@@ -8929,6 +8929,16 @@ tr.row-match,
     100% { background: rgba(251, 191, 36, 0.08); }
 }
 
+/* ============================================================
+   3D Tilt cards
+   ============================================================ */
+.card-3d,
+.kpi-card,
+.dash2-card {
+    transform-style: preserve-3d;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
 
 
 
