@@ -8247,6 +8247,213 @@ kbd {
 
 
 
+/* ============================================================
+   LIQUID GLASS — Detalles puntuales (navbar, modales, dropdowns)
+   ============================================================ */
+
+/* ============================================================
+   1. NAVBAR con sticky blur
+   ============================================================ */
+
+.navbar,
+header.navbar,
+.app-navbar,
+nav.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(231, 229, 228, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Cuando hay scroll, intensifica el efecto */
+.navbar.scrolled,
+.app-navbar.scrolled {
+    background: rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.04);
+    border-bottom-color: rgba(231, 229, 228, 0.7);
+}
+
+[data-theme="dark"] .navbar,
+.dark .navbar,
+[data-theme="dark"] header.navbar,
+.dark header.navbar {
+    background: rgba(12, 10, 9, 0.72) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .navbar.scrolled,
+.dark .navbar.scrolled {
+    background: rgba(12, 10, 9, 0.88) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   2. MODALES con backdrop blur
+   ============================================================ */
+
+/* Bootstrap modal backdrop */
+.modal-backdrop.show,
+.modal-backdrop {
+    background: rgba(12, 10, 9, 0.4) !important;
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    opacity: 1 !important;
+}
+
+/* Contenido del modal con sutil glass */
+.modal-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .modal-content,
+.dark .modal-content {
+    background: rgba(28, 25, 23, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* Modal de credenciales (creds-modal custom) */
+.creds-modal-backdrop {
+    background: rgba(12, 10, 9, 0.4) !important;
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+}
+
+.creds-modal-content {
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .creds-modal-content,
+.dark .creds-modal-content {
+    background: rgba(28, 25, 23, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   3. DROPDOWNS con glass
+   ============================================================ */
+
+.dropdown-menu {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(231, 229, 228, 0.6);
+    border-radius: 12px !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 8px 24px -4px rgba(0, 0, 0, 0.12),
+        0 4px 12px -2px rgba(0, 0, 0, 0.06);
+    padding: 6px;
+}
+
+.dropdown-item {
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(37, 99, 235, 0.08) !important;
+}
+
+[data-theme="dark"] .dropdown-menu,
+.dark .dropdown-menu {
+    background: rgba(28, 25, 23, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 8px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .dropdown-item,
+.dark .dropdown-item {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .dropdown-item:hover,
+.dark .dropdown-item:hover {
+    background: rgba(96, 165, 250, 0.15) !important;
+    color: #fff;
+}
+
+/* ============================================================
+   4. TOASTS con glass (bonus, opcional pero queda bien)
+   ============================================================ */
+
+.toast-notification,
+.toast {
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(231, 229, 228, 0.5) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 8px 24px -4px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .toast-notification,
+.dark .toast-notification,
+[data-theme="dark"] .toast,
+.dark .toast {
+    background: rgba(28, 25, 23, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* ============================================================
+   5. SIDEBAR con glass sutil (opcional)
+   ============================================================ */
+
+.sidebar,
+aside.sidebar,
+.app-sidebar {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid rgba(231, 229, 228, 0.5);
+}
+
+[data-theme="dark"] .sidebar,
+.dark .sidebar,
+[data-theme="dark"] aside.sidebar,
+.dark aside.sidebar {
+    background: rgba(12, 10, 9, 0.7) !important;
+    border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   Respeta usuarios con reducir movimiento o reducir transparencia
+   ============================================================ */
+
+@media (prefers-reduced-transparency: reduce) {
+    .navbar, .modal-backdrop, .modal-content,
+    .creds-modal-backdrop, .creds-modal-content,
+    .dropdown-menu, .toast-notification, .toast,
+    .sidebar {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .navbar { background: #fff !important; }
+    .modal-content { background: #fff !important; }
+    .dropdown-menu { background: #fff !important; }
+}
+
+
+
+
 
 
 
