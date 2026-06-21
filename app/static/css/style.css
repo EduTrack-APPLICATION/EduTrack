@@ -8764,6 +8764,107 @@ aside.sidebar,
     border-right-color: rgba(28, 25, 23, 0.92) !important;
 }
 
+/* ============================================================
+   Badges con glass — efecto premium
+   ============================================================ */
+.badge,
+.status-pill,
+span[class*="badge"] {
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.4) inset,
+        0 1px 3px rgba(0, 0, 0, 0.05);
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+}
+
+/* Glow sutil en hover para badges interactivos */
+.badge:hover,
+.status-pill:hover {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .badge,
+.dark .badge,
+[data-theme="dark"] .status-pill,
+.dark .status-pill {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ============================================================
+   Checkbox y radio premium
+   ============================================================ */
+input[type="checkbox"],
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(231, 229, 228, 0.8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+input[type="checkbox"] { border-radius: 5px; }
+input[type="radio"]    { border-radius: 50%; }
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+    border-color: var(--primary, #2563EB);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background: linear-gradient(135deg,
+        var(--primary, #2563EB),
+        var(--primary-dark, #1D4ED8)) !important;
+    border-color: var(--primary, #2563EB);
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.15),
+        0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    animation: checkPop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: #fff;
+    border-radius: 50%;
+    animation: checkPop 0.2s ease;
+}
+
+@keyframes checkPop {
+    from { transform: rotate(45deg) scale(0); }
+    to   { transform: rotate(45deg) scale(1); }
+}
+
 
 
 
