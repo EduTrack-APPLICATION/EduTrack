@@ -8579,4 +8579,167 @@ aside.sidebar,
     border-color: var(--primary-light, #60A5FA) !important;
 }
 
+/* ============================================================
+   Avatar con anillo glass
+   ============================================================ */
+.avatar-wrap,
+.user-avatar {
+    position: relative;
+    padding: 2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,
+        rgba(37, 99, 235, 0.3),
+        rgba(96, 165, 250, 0.2));
+    backdrop-filter: blur(10px);
+}
+
+.avatar-wrap::before,
+.user-avatar::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,
+        rgba(37, 99, 235, 0.5),
+        rgba(96, 165, 250, 0));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.avatar-wrap:hover::before,
+.user-avatar:hover::before {
+    opacity: 1;
+}
+
+/* El avatar dentro */
+.avatar,
+.user-avatar img,
+.user-avatar > div {
+    background: rgba(37, 99, 235, 0.9);
+    color: #fff;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Indicador online (verde con glow) */
+.avatar-status,
+.user-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid var(--bg-card, #fff);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+
+
+/* ============================================================
+   Bottom Navigation móvil — Liquid Glass
+   ============================================================ */
+.bottom-nav,
+.mobile-nav,
+.bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-top: 1px solid rgba(231, 229, 228, 0.5);
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.bottom-nav::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent);
+}
+
+.bottom-nav a,
+.bottom-nav .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 12px;
+    color: rgba(68, 64, 60, 0.6);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.bottom-nav a i,
+.bottom-nav .nav-item i {
+    font-size: 22px;
+}
+
+.bottom-nav a:hover {
+    color: var(--primary, #2563EB);
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.bottom-nav a.active,
+.bottom-nav .nav-item.active {
+    color: var(--primary, #2563EB);
+    font-weight: 600;
+}
+
+.bottom-nav a.active i {
+    transform: scale(1.1);
+}
+
+/* Dot indicator del activo */
+.bottom-nav a.active::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    width: 4px;
+    height: 4px;
+    background: var(--primary, #2563EB);
+    border-radius: 50%;
+}
+
+[data-theme="dark"] .bottom-nav,
+.dark .bottom-nav {
+    background: rgba(12, 10, 9, 0.8) !important;
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .bottom-nav a,
+.dark .bottom-nav a {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .bottom-nav a:hover,
+.dark .bottom-nav a:hover {
+    color: var(--primary-light, #60A5FA);
+    background: rgba(96, 165, 250, 0.08);
+}
+
+
+
+
 
