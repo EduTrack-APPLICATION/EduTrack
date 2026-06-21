@@ -1492,3 +1492,126 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     onScroll();  // estado inicial
 })();
 
+/* ============================================================
+   Sidebar Collapsible — con persistencia en localStorage
+   ============================================================ */
+(function() {
+    const sidebar = document.querySelector('.sidebar, aside.sidebar, .app-sidebar');
+    if (!sidebar) return;
+
+    // === Crear el botón de toggle si no existe ===
+    let toggleBtn = sidebar.querySelector('.sidebar-toggle');
+    if (!toggleBtn) {
+        toggleBtn = document.createElement('button');
+        toggleBtn.className = 'sidebar-toggle';
+        toggleBtn.type = 'button';
+        toggleBtn.setAttribute('aria-label', 'Colapsar menú');
+        toggleBtn.innerHTML = `
+            <svg viewBox="0 0 12 12" fill="none">
+                <path d="M7.5 3 L4.5 6 L7.5 9" stroke="currentColor"
+                      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        `;
+        sidebar.appendChild(toggleBtn);
+    }
+
+    // === Agregar tooltips automáticos a los links ===
+    sidebar.querySelectorAll('a, .nav-link').forEach(link => {
+        if (!link.dataset.tooltip) {
+            const text = link.textContent.trim();
+            if (text) link.dataset.tooltip = text;
+        }
+    });
+
+    // === Estado: leer de localStorage ===
+    const STORAGE_KEY = 'edutrack:sidebar:collapsed';
+    const isMobile = () => window.innerWidth <= 768;
+
+    function isCollapsed() {
+        if (isMobile()) return false; // en móvil siempre es por overlay
+        return localStorage.getItem(STORAGE_KEY) === '1';
+    }
+
+    function setCollapsed(collapsed) {
+        if (isMobile()) return;
+        if (collapsed) {
+            sidebar.classList.add('is-collapsed');
+            localStorage.setItem(STORAGE_KEY, '1');
+            toggleBtn.setAttribute('aria-label', 'Expandir menú');
+        } else {
+            sidebar.classList.remove('is-collapsed');
+            localStorage.setItem(STORAGE_KEY, '0');
+            toggleBtn.setAttribute('aria-label', 'Colapsar menú');
+        }
+    }
+
+    // === Aplicar estado inicial ===
+    if (isCollapsed()) {
+        sidebar.classList.add('is-collapsed');
+    }
+
+    // === Toggle al click ===
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setCollapsed(!sidebar.classList.contains('is-collapsed'));
+    });
+
+    // === Atajo de teclado: Cmd/Ctrl + B ===
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+            e.preventDefault();
+            setCollapsed(!sidebar.classList.contains('is-collapsed'));
+        }
+    });
+
+    // === Mobile: overlay para cerrar al hacer click fuera ===
+    if (isMobile()) {
+        // Crear overlay si no existe
+        let overlay = document.querySelector('.sidebar-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            sidebar.parentNode.insertBefore(overlay, sidebar.nextSibling);
+        }
+
+        // Botón hamburguesa en navbar (si tienes)
+        const mobileMenuBtn = document.querySelector(
+            '.navbar-toggler, .mobile-menu-btn, [data-toggle="sidebar"]'
+        );
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('is-mobile-open');
+                overlay.classList.toggle('is-active');
+            });
+        }
+
+        // Click en overlay cierra
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('is-mobile-open');
+            overlay.classList.remove('is-active');
+        });
+
+        // Click en un link del sidebar cierra
+        sidebar.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                sidebar.classList.remove('is-mobile-open');
+                overlay.classList.remove('is-active');
+            });
+        });
+    }
+
+    // === Re-evaluar al cambiar tamaño de ventana ===
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (isMobile()) {
+                // En móvil, quitar el estado de colapso desktop
+                sidebar.classList.remove('is-collapsed');
+            } else if (isCollapsed()) {
+                sidebar.classList.add('is-collapsed');
+            }
+        }, 150);
+    });
+})();
+
