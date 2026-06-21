@@ -1545,6 +1545,24 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     });
 })();
 
+(function() {
+    document.querySelectorAll('.card, .kpi-card').forEach(card => {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const ratio = entry.intersectionRatio;
+                    card.style.boxShadow = `
+                        0 ${4 * ratio}px ${16 * ratio}px -${2 * ratio}px rgba(0, 0, 0, ${0.1 * ratio}),
+                        0 ${2 * ratio}px ${8 * ratio}px -${1 * ratio}px rgba(0, 0, 0, ${0.05 * ratio})
+                    `;
+                }
+            });
+        }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+        observer.observe(card);
+    });
+})();
+
+
 
 
 
