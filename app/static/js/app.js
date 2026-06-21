@@ -1492,3 +1492,28 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     onScroll();  // estado inicial
 })();
 
+(function() {
+    document.querySelectorAll('.card-3d, .kpi-card, .dash2-card').forEach(card => {
+        const MAX_TILT = 6; // grados
+        
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            
+            const tiltX = ((y - cy) / cy) * -MAX_TILT;
+            const tiltY = ((x - cx) / cx) * MAX_TILT;
+            
+            card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+})();
+
+
+
