@@ -1515,5 +1515,36 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     });
 })();
 
+(function() {
+    const toggle = document.querySelector('.theme-toggle, #themeToggle');
+    if (!toggle) return;
+    
+    toggle.addEventListener('click', (e) => {
+        if (!document.startViewTransition) {
+            // Fallback sin animación
+            document.documentElement.classList.toggle('dark');
+            return;
+        }
+        
+        const x = e.clientX;
+        const y = e.clientY;
+        const distMax = Math.max(
+            Math.hypot(x, y),
+            Math.hypot(window.innerWidth - x, y),
+            Math.hypot(x, window.innerHeight - y),
+            Math.hypot(window.innerWidth - x, window.innerHeight - y)
+        );
+        
+        document.documentElement.style.setProperty('--x', `${x}px`);
+        document.documentElement.style.setProperty('--y', `${y}px`);
+        document.documentElement.style.setProperty('--r', `${distMax}px`);
+        
+        document.startViewTransition(() => {
+            document.documentElement.classList.toggle('dark');
+        });
+    });
+})();
+
+
 
 
