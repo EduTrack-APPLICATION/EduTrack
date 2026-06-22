@@ -13471,4 +13471,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-content {
         0 8px 24px -4px rgba(37, 99, 235, 0.12),
         0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
 }
+.search-modal-backdrop {
+    background: rgba(0, 0, 0, 0.85) !important;  /* más opaco */
+}
 
