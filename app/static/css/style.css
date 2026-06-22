@@ -12911,3 +12911,88 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
 .dropdown-menu[data-bs-popper] {
     overflow: visible !important;
 }
+
+
+/* ============================================================
+   Observación del profesor en portal del estudiante
+   ============================================================ */
+.portal-obs-row {
+    background: transparent !important;
+}
+
+.portal-obs-row:hover {
+    background: transparent !important;
+}
+
+.portal-obs-cell {
+    padding: 0 16px 14px !important;
+    border-top: none !important;
+}
+
+.portal-nota-observacion {
+    padding: 12px 14px;
+    background: rgba(37, 99, 235, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 12px;
+    border-left: 3px solid var(--primary, #2563EB);
+    transition: all 0.2s ease;
+    animation: obsAppear 0.4s ease;
+}
+
+@keyframes obsAppear {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.portal-nota-observacion:hover {
+    background: rgba(37, 99, 235, 0.1);
+}
+
+.portal-nota-observacion-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary, #2563EB);
+    margin-bottom: 6px;
+}
+
+.portal-nota-observacion-header i {
+    font-size: 13px;
+}
+
+.portal-nota-observacion-text {
+    font-size: 14px;
+    color: var(--text-primary, #1c1917);
+    line-height: 1.5;
+    font-style: italic;
+    word-wrap: break-word;
+}
+
+/* === Modo oscuro === */
+[data-theme="dark"] .portal-nota-observacion,
+.dark .portal-nota-observacion {
+    background: rgba(96, 165, 250, 0.08);
+    border-color: rgba(96, 165, 250, 0.2);
+    border-left-color: var(--primary-light, #60A5FA);
+}
+
+[data-theme="dark"] .portal-nota-observacion:hover,
+.dark .portal-nota-observacion:hover {
+    background: rgba(96, 165, 250, 0.12);
+}
+
+[data-theme="dark"] .portal-nota-observacion-header,
+.dark .portal-nota-observacion-header {
+    color: var(--primary-light, #60A5FA);
+}
+
+[data-theme="dark"] .portal-nota-observacion-text,
+.dark .portal-nota-observacion-text {
+    color: rgba(255, 255, 255, 0.9);
+}
