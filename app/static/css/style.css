@@ -9024,3 +9024,99 @@ tr.row-match,
 }
 
 
+/* ============================================================
+   Tablas con glass header + hover ripple
+   ============================================================ */
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(231, 229, 228, 0.6) !important;
+    color: var(--text-secondary, #57534e);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 14px 16px !important;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.table tbody tr {
+    transition: background 0.2s ease, transform 0.2s ease;
+    position: relative;
+}
+
+.table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.03) !important;
+    transform: translateX(2px);
+}
+
+.table tbody td {
+    border-bottom: 1px solid rgba(231, 229, 228, 0.4);
+    padding: 14px 16px !important;
+    vertical-align: middle;
+}
+
+/* Líneas alternadas sutiles */
+.table-striped tbody tr:nth-of-type(even) {
+    background: rgba(245, 245, 244, 0.3);
+}
+
+/* Card que contiene la tabla — sutil glass */
+.card:has(.table) {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(231, 229, 228, 0.5) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .table thead th,
+.dark .table thead th {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .table tbody tr:hover,
+.dark .table tbody tr:hover {
+    background: rgba(96, 165, 250, 0.06) !important;
+}
+
+[data-theme="dark"] .table tbody td,
+.dark .table tbody td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+
+
+/* ============================================================
+   Mesh gradient background — más sofisticado que orbes
+   ============================================================ */
+.lg-auth {
+    background:
+        radial-gradient(circle at 20% 25%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 90% 70%, rgba(251, 146, 60, 0.08) 0%, transparent 40%),
+        #fafaf9;
+    background-attachment: fixed;
+}
+
+[data-theme="dark"] .lg-auth,
+.dark .lg-auth {
+    background:
+        radial-gradient(circle at 20% 25%, rgba(37, 99, 235, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 90% 70%, rgba(251, 146, 60, 0.08) 0%, transparent 40%),
+        #0a0a0a;
+}
+
