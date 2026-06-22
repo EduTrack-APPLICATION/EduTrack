@@ -38,7 +38,6 @@ def index():
     """Dashboard del estudiante: resumen + KPIs."""
     estudiante = _get_mi_estudiante()
 
-    # Grupos del estudiante (carga eficiente con joinedload)
     mis_grupos = (
         db.session.query(Grupo)
         .join(EstudianteGrupo, EstudianteGrupo.grupo_id == Grupo.id)
@@ -50,7 +49,6 @@ def index():
         .all()
     )
 
-    # Promedios por materia
     promedios = []
     suma_total = 0
     count_total = 0
@@ -63,12 +61,10 @@ def index():
             .all()
         )
         if notas:
-            # Promedio ponderado por porcentaje
             suma_p = 0
             peso_total = 0
             for n in notas:
                 if n.evaluacion and n.puntaje is not None:
-                    # Normalizar a 0-100
                     pct = (n.puntaje / n.evaluacion.puntaje_maximo) * 100
                     peso = n.evaluacion.porcentaje or 10
                     suma_p += pct * peso
@@ -89,7 +85,6 @@ def index():
 
     promedio_general = round(suma_total / count_total, 1) if count_total else 0
 
-    # Asistencia general (% de días presentes)
     total_asistencias = Asistencia.query.filter_by(estudiante_id=estudiante.id).count()
     presentes = Asistencia.query.filter_by(
         estudiante_id=estudiante.id,
@@ -97,7 +92,6 @@ def index():
     ).count()
     pct_asistencia = round((presentes / total_asistencias) * 100, 1) if total_asistencias else 0
 
-    # Próximas evaluaciones (de sus grupos)
     grupo_ids = [g.id for g in mis_grupos]
     proximas = []
     if grupo_ids:
@@ -142,7 +136,6 @@ def notas():
         .all()
     )
 
-    # Estructura: lista de { grupo, materia, notas: [...], promedio }
     detalle = []
     for grupo in mis_grupos:
         evaluaciones = (
@@ -159,27 +152,27 @@ def notas():
                 estudiante_id=estudiante.id,
                 evaluacion_id=ev.id,
             ).first()
-           if nota and nota.puntaje is not None:
-    pct = round((nota.puntaje / ev.puntaje_maximo) * 100, 1)
-    suma_p += pct * (ev.porcentaje or 10)
-    peso_total += (ev.porcentaje or 10)
-    items.append({
-        'evaluacion': ev,
-        'nota_obtenida': nota.puntaje,
-        'porcentaje_obtenido': pct,
-        'fecha': ev.fecha,
-        'tiene_nota': True,
-        
-    })
-else:
-    items.append({
-        'evaluacion': ev,
-        'nota_obtenida': None,
-        'porcentaje_obtenido': None,
-        'fecha': ev.fecha,
-        'tiene_nota': False,
-        
-    })
+            if nota and nota.puntaje is not None:
+                pct = round((nota.puntaje / ev.puntaje_maximo) * 100, 1)
+                suma_p += pct * (ev.porcentaje or 10)
+                peso_total += (ev.porcentaje or 10)
+                items.append({
+                    'evaluacion': ev,
+                    'nota_obtenida': nota.puntaje,
+                    'porcentaje_obtenido': pct,
+                    'fecha': ev.fecha,
+                    'tiene_nota': True,
+                    'observaciones': nota.observaciones,
+                })
+            else:
+                items.append({
+                    'evaluacion': ev,
+                    'nota_obtenida': None,
+                    'porcentaje_obtenido': None,
+                    'fecha': ev.fecha,
+                    'tiene_nota': False,
+                    'observaciones': None,
+                })
 
         promedio = round(suma_p / peso_total, 1) if peso_total > 0 else None
         detalle.append({
@@ -200,7 +193,6 @@ def asistencia():
     """Vista de asistencia con heatmap mensual."""
     estudiante = _get_mi_estudiante()
 
-    # Asistencias últimos 90 días
     desde = date.today() - timedelta(days=90)
     registros = (
         Asistencia.query
@@ -212,18 +204,15 @@ def asistencia():
         .all()
     )
 
-    # Agrupar por fecha (puede haber varios grupos el mismo día)
     por_dia = defaultdict(list)
     for r in registros:
         por_dia[r.fecha.isoformat()].append(r.estado)
 
-    # Resumen por estado
     conteo = defaultdict(int)
     for r in registros:
         conteo[r.estado] += 1
     total = len(registros)
 
-    # Días del heatmap (últimos 90)
     dias_heatmap = []
     for i in range(89, -1, -1):
         d = date.today() - timedelta(days=i)
@@ -233,9 +222,9 @@ def asistencia():
         elif all(e == EstadoAsistenciaEnum.PRESENTE.value for e in estados_dia):
             categoria = 'presente'
         elif any(e == EstadoAsistenciaEnum.AUSENTE.value for e in estados_dia):
-            categoria = 'ausente'
+            categoria = 'parcial'
         else:
-            categoria = 'parcial'  # tarde o justificada
+            categoria = 'parcial'
         dias_heatmap.append({
             'fecha': d,
             'categoria': categoria,
@@ -252,16 +241,10 @@ def asistencia():
     )
 
 
-# ============================================================
-# Redirección automática: si un estudiante intenta entrar al
-# dashboard normal, lo mandamos al portal.
-# Esta función se llama desde main.py / dashboard.py vía blueprint.before_request.
-# ============================================================
 def redirect_if_estudiante():
     """Llamado como before_request global."""
     if current_user.is_authenticated and current_user.is_estudiante():
         from flask import request
-        # Permitir solo portal, auth, static
         path = request.path
         if (path.startswith('/portal') or path.startswith('/auth') or
             path.startswith('/static')):
