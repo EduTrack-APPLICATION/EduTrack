@@ -1,119 +1,166 @@
+
 {% extends "base.html" %}
-{% block title %}Configuración 2FA{% endblock %}
-{% block page_title %}Verificación en dos pasos{% endblock %}
+{% block title %}Verificación 2FA · EduTrack{% endblock %}
 
-{% block content %}
-<div class="d-flex align-items-center gap-3 mb-3">
-    <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Volver
-    </a>
-    <div>
-        <h4 class="mb-0"><i class="bi bi-shield-lock-fill text-primary"></i> Verificación en dos pasos</h4>
-        <small class="text-muted">Una capa extra de seguridad para tu cuenta</small>
+{% block auth_content %}
+<div class="lg-recover">
+
+    <div class="lg-recover-bg" aria-hidden="true">
+        <div class="lg-recover-orb lg-2fa-orb-1"></div>
+        <div class="lg-recover-orb lg-2fa-orb-2"></div>
+        <div class="lg-recover-orb lg-2fa-orb-3"></div>
+        <div class="lg-recover-noise"></div>
     </div>
-</div>
 
-<div class="row g-3">
-    <div class="col-lg-7">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                {% if current_user.totp_habilitado %}
-                <div class="mfa-status mfa-status-on">
-                    <div class="mfa-status-icon"><i class="bi bi-shield-check"></i></div>
-                    <div class="mfa-status-body">
-                        <h5 class="mb-1">2FA está activado</h5>
-                        <p class="text-muted mb-0">
-                            Tu cuenta está protegida con verificación en dos pasos.
-                            Cada vez que inicies sesión te pediremos un código de tu app de autenticación.
-                        </p>
+    <div class="lg-recover-card">
+
+        <header class="lg-recover-head">
+            <div class="lg-recover-icon lg-2fa-icon">
+                <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+                    <path d="M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z"
+                          stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+                    <path d="M17 24 L22 29 L31 19" stroke="currentColor" stroke-width="2.4"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="lg-recover-mark">Verificación de seguridad</div>
+        </header>
+
+        <div class="lg-recover-body">
+
+            <div class="lg-recover-heading">
+                <h1>Verifica tu identidad</h1>
+                <p>Ingresa el código de 6 dígitos de tu app autenticadora (Google Authenticator, Authy, etc.)</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="lg-recover-alert lg-recover-alert-{{ 'danger' if category == 'error' else category }}">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ message }}</span>
                     </div>
-                </div>
-
-                <hr class="my-4">
-
-                <h6 class="mb-2">Códigos de recuperación</h6>
-                <p class="text-muted small">
-                    Te quedan <strong class="text-primary">{{ recovery_restantes }}</strong>
-                    código{{ '' if recovery_restantes == 1 else 's' }} de recuperación.
-                    Estos te permiten entrar si pierdes acceso a tu app.
-                </p>
-
-                <form method="POST" action="{{ url_for('auth.regenerar_recovery_codes') }}"
-                      class="mb-4">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="input-group" style="max-width:420px;">
-                        <input type="password" name="password" class="form-control"
-                               placeholder="Tu contraseña actual" required>
-                        <button class="btn btn-outline-warning" type="submit"
-                                data-confirm="Generar nuevos códigos. Los anteriores dejarán de funcionar. ¿Continuar?">
-                            <i class="bi bi-arrow-clockwise"></i> Regenerar códigos
-                        </button>
-                    </div>
-                </form>
-
-                <h6 class="mb-2 text-danger">Zona peligrosa</h6>
-                <form method="POST" action="{{ url_for('auth.deshabilitar_2fa') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="input-group" style="max-width:420px;">
-                        <input type="password" name="password" class="form-control"
-                               placeholder="Tu contraseña actual" required>
-                        <button class="btn btn-outline-danger" type="submit"
-                                data-confirm="¿Seguro que quieres deshabilitar el 2FA? Tu cuenta quedará menos protegida.">
-                            <i class="bi bi-shield-x"></i> Deshabilitar 2FA
-                        </button>
-                    </div>
-                </form>
-
-                {% else %}
-                <div class="mfa-status mfa-status-off">
-                    <div class="mfa-status-icon"><i class="bi bi-shield-exclamation"></i></div>
-                    <div class="mfa-status-body">
-                        <h5 class="mb-1">2FA no está activado</h5>
-                        <p class="text-muted mb-3">
-                            Activa la verificación en dos pasos para añadir una capa
-                            extra de seguridad. Toma menos de 2 minutos.
-                        </p>
-                        <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary">
-                            <i class="bi bi-shield-lock"></i> Activar 2FA ahora
-                        </a>
-                    </div>
-                </div>
+                    {% endfor %}
                 {% endif %}
+            {% endwith %}
+
+            <form method="POST" novalidate class="lg-recover-form" id="totpForm" data-skip-transition>
+                {% if form %}{{ form.hidden_tag() }}{% endif %}
+
+                <div class="lg-recover-field">
+                    <label for="codigo">Código de verificación</label>
+                    <div class="lg-2fa-code-wrap">
+                        <input type="text" name="codigo" id="codigo" required
+                               class="lg-2fa-code-input"
+                               placeholder="000000"
+                               maxlength="6"
+                               inputmode="numeric"
+                               pattern="[0-9]{6}"
+                               autocomplete="one-time-code"
+                               autofocus>
+                    </div>
+                    <div class="lg-2fa-hint">
+                        <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>El código cambia cada 30 segundos</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="lg-recover-submit lg-2fa-submit" id="btn2fa">
+                    <span class="lg-recover-submit-text">Verificar y continuar</span>
+                    <svg class="lg-recover-submit-arrow" viewBox="0 0 20 20" fill="none" width="18" height="18">
+                        <path d="M5 10l3 3 7-7" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+
+                {% if recovery_url %}
+                <a href="{{ recovery_url }}" class="lg-2fa-recovery-link">
+                    ¿Perdiste tu dispositivo? Usar código de recuperación
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('auth.logout') }}" class="lg-recover-back">
+                    <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                        <path d="M16 10H4m0 0l4-4m-4 4l4 4" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Cancelar inicio de sesión</span>
+                </a>
+            </form>
+
+            <div class="lg-recover-features">
+                <div class="lg-recover-feat">
+                    <div class="lg-recover-feat-ico lg-2fa-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                            <path d="M10 2l3 3v5a8 8 0 11-6 0V5l3-3z" stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                    </div>
+                    <span>Tu cuenta está protegida con 2FA</span>
+                </div>
+                <div class="lg-recover-feat">
+                    <div class="lg-recover-feat-ico lg-2fa-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Encriptado de extremo a extremo</span>
+                </div>
             </div>
+
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="mb-3 d-flex align-items-center gap-2">
-                    <span class="card-title-icon card-title-icon-info">
-                        <i class="bi bi-info-circle"></i>
-                    </span>
-                    ¿Qué es el 2FA?
-                </h6>
-                <p class="small text-muted">
-                    Es una capa adicional de seguridad que requiere, además de tu contraseña,
-                    un código temporal de 6 dígitos que genera una app en tu celular.
-                </p>
-                <p class="small text-muted">
-                    Aunque alguien obtenga tu contraseña, no podrá entrar a tu cuenta sin
-                    también tener acceso a tu celular.
-                </p>
-
-                <h6 class="mt-4 mb-2 d-flex align-items-center gap-2">
-                    <span class="card-title-icon card-title-icon-warning">
-                        <i class="bi bi-key"></i>
-                    </span>
-                    Códigos de recuperación
-                </h6>
-                <p class="small text-muted mb-0">
-                    Al activar el 2FA, recibirás 10 códigos de un solo uso. Guárdalos en
-                    un lugar seguro (gestor de contraseñas, papel guardado). Te servirán
-                    si pierdes acceso a tu celular.
-                </p>
-            </div>
-        </div>
-    </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const codeInput = document.getElementById('codigo');
+    const form = document.getElementById('totpForm');
+    const btn = document.getElementById('btn2fa');
+
+    // Auto-format: solo números
+    if (codeInput) {
+        codeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+
+            // Auto-submit cuando llega a 6 dígitos
+            if (e.target.value.length === 6 && form) {
+                setTimeout(() => form.requestSubmit(), 100);
+            }
+        });
+    }
+
+    // Spinner al enviar
+    if (form && btn) {
+        form.addEventListener('submit', () => {
+            btn.disabled = true;
+            btn.classList.add('is-loading');
+            const txt = btn.querySelector('.lg-recover-submit-text');
+            if (txt) txt.textContent = 'Verificando…';
+        });
+    }
+
+    // Shake si hay error
+    const card = document.querySelector('.lg-recover-card');
+    const hasError = document.querySelector('.lg-recover-alert-danger');
+    if (card && hasError) {
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 500);
+        // Limpiar el input para reintentar
+        if (codeInput) {
+            codeInput.value = '';
+            codeInput.focus();
+        }
+    }
+})();
+</script>
 {% endblock %}
