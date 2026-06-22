@@ -1562,7 +1562,64 @@ if (document.querySelector('.alert-danger, [data-category="danger"]')) {
     });
 })();
 
+/* ============================================================
+   FIX agresivo — re-bind listeners y matar bfcache
+   ============================================================ */
+(function() {
 
+    /* === 1. Forzar reload completo al volver con bfcache === */
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) {
+            // Edge restauró desde bfcache — recargar para revivir JS
+            console.log('🔄 bfcache detectado, recargando...');
+            window.location.reload();
+        }
+    });
+
+    /* === 2. Header anti-bfcache (solo si tu server lo permite) === */
+    // (esto se hace en Flask, no aquí — ver abajo)
+
+    /* === 3. Re-bind de event listeners de Bootstrap dropdowns === */
+    function rebindDropdowns() {
+        if (typeof bootstrap === 'undefined') return;
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(el => {
+            if (!bootstrap.Dropdown.getInstance(el)) {
+                new bootstrap.Dropdown(el);
+            }
+        });
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(el => {
+            const target = el.getAttribute('data-bs-target');
+            if (target) {
+                const modal = document.querySelector(target);
+                if (modal && !bootstrap.Modal.getInstance(modal)) {
+                    new bootstrap.Modal(modal);
+                }
+            }
+        });
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            if (!bootstrap.Tooltip.getInstance(el)) {
+                new bootstrap.Tooltip(el);
+            }
+        });
+    }
+
+    if (document.readyState === 'complete') {
+        rebindDropdowns();
+    } else {
+        window.addEventListener('load', rebindDropdowns);
+    }
+
+    /* === 4. Desregistrar service workers viejos si existen === */
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+            regs.forEach(r => {
+                console.log('Desregistrando SW viejo:', r.scope);
+                r.unregister();
+            });
+        }).catch(() => {});
+    }
+
+})();
 
 
 
