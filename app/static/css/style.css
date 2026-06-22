@@ -9120,3 +9120,70 @@ tr.row-match,
         #0a0a0a;
 }
 
+
+/* ============================================================
+   Outline buttons con glass
+   ============================================================ */
+.btn-outline-primary,
+.btn-outline-secondary {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    border: 1px solid rgba(37, 99, 235, 0.3) !important;
+    color: var(--primary, #2563EB) !important;
+    transition: all 0.2s ease;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(37, 99, 235, 0.1) !important;
+    border-color: var(--primary, #2563EB) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-outline-secondary {
+    border-color: rgba(120, 113, 108, 0.4) !important;
+    color: var(--text-secondary, #57534e) !important;
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(120, 113, 108, 0.1) !important;
+    color: var(--text-primary, #1c1917) !important;
+    border-color: rgba(120, 113, 108, 0.6) !important;
+}
+
+[data-theme="dark"] .btn-outline-primary,
+.dark .btn-outline-primary {
+    background: rgba(96, 165, 250, 0.08) !important;
+    border-color: rgba(96, 165, 250, 0.3) !important;
+    color: var(--primary-light, #60A5FA) !important;
+}
+
+
+.card-special {
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.card-special::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg,
+        #2563EB, #a855f7, #ec4899, #f59e0b, #2563EB);
+    background-size: 300% 300%;
+    border-radius: 18px;
+    z-index: -1;
+    animation: gradientBorder 4s linear infinite;
+}
+
+@keyframes gradientBorder {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
