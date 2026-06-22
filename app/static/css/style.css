@@ -12871,3 +12871,43 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     -webkit-backdrop-filter: none !important;
 }
 
+/* ============================================================
+   FIX dropdowns que se cortan — Portal del estudiante
+   ============================================================ */
+
+/* Los contenedores padres no deben recortar el dropdown */
+.card,
+.card-body,
+.card-header,
+.table-responsive,
+.detail-header,
+.entity-header,
+.dropdown,
+.btn-group,
+.action-bar,
+.toolbar {
+    overflow: visible !important;
+}
+
+/* Dropdown menu debe estar por encima de todo */
+.dropdown-menu,
+.dropdown-menu.show {
+    z-index: 1080 !important;
+    overflow: visible !important;
+    min-width: 240px;
+    max-width: 360px;
+    white-space: normal;
+}
+
+/* Items del dropdown sin cortar texto */
+.dropdown-menu .dropdown-item {
+    white-space: normal !important;
+    word-break: normal;
+    padding: 10px 14px !important;
+    line-height: 1.4;
+}
+
+/* Si Bootstrap usa data-bs-popper, asegurar que se muestre completo */
+.dropdown-menu[data-bs-popper] {
+    overflow: visible !important;
+}
