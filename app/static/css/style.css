@@ -9164,3 +9164,329 @@ tr.row-match,
 
 
 
+/* ============================================================
+   FIX MODO OSCURO — Tablas y filtros con glass
+   ============================================================ */
+
+/* === Tabla en dark mode === */
+[data-theme="dark"] .table,
+.dark .table,
+[data-theme="dark"] .card .table,
+.dark .card .table {
+    color: rgba(255, 255, 255, 0.85) !important;
+    --bs-table-bg: transparent !important;
+    --bs-table-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Header de tabla en dark mode */
+[data-theme="dark"] .table thead th,
+.dark .table thead th,
+[data-theme="dark"] .table > thead > tr > th,
+.dark .table > thead > tr > th {
+    background: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+}
+
+/* Filas en dark mode */
+[data-theme="dark"] .table tbody tr,
+.dark .table tbody tr,
+[data-theme="dark"] .table > tbody > tr,
+.dark .table > tbody > tr {
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="dark"] .table tbody td,
+.dark .table tbody td,
+[data-theme="dark"] .table > tbody > tr > td,
+.dark .table > tbody > tr > td {
+    background: transparent !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Hover de filas en dark mode */
+[data-theme="dark"] .table tbody tr:hover,
+.dark .table tbody tr:hover,
+[data-theme="dark"] .table > tbody > tr:hover,
+.dark .table > tbody > tr:hover {
+    background: rgba(96, 165, 250, 0.06) !important;
+}
+
+/* Bootstrap table-hover en dark */
+[data-theme="dark"] .table-hover > tbody > tr:hover > *,
+.dark .table-hover > tbody > tr:hover > * {
+    background: rgba(96, 165, 250, 0.06) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    --bs-table-hover-bg: rgba(96, 165, 250, 0.06) !important;
+    --bs-table-hover-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Striped en dark mode (líneas alternadas) */
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > *,
+.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background: rgba(255, 255, 255, 0.02) !important;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02) !important;
+    --bs-table-striped-color: inherit !important;
+}
+
+/* === Card que contiene la tabla en dark === */
+[data-theme="dark"] .card:has(.table),
+.dark .card:has(.table) {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* === Filter card en dark mode === */
+[data-theme="dark"] .filter-card,
+.dark .filter-card,
+[data-theme="dark"] .filtros-card,
+.dark .filtros-card,
+[data-theme="dark"] .card-filters,
+.dark .card-filters {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 4px 16px -4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Inputs dentro del filter card en dark */
+[data-theme="dark"] .filter-card .form-control,
+.dark .filter-card .form-control,
+[data-theme="dark"] .filter-card .form-select,
+.dark .filter-card .form-select,
+[data-theme="dark"] .filtros-card .form-control,
+.dark .filtros-card .form-control,
+[data-theme="dark"] .filtros-card .form-select,
+.dark .filtros-card .form-select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .filter-card .form-control:focus,
+.dark .filter-card .form-control:focus,
+[data-theme="dark"] .filter-card .form-select:focus,
+.dark .filter-card .form-select:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-light, #60A5FA) !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .input-group-text,
+.dark .input-group-text {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* === Cards generales en dark mode === */
+[data-theme="dark"] .card,
+.dark .card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] .card-body,
+.dark .card-body,
+[data-theme="dark"] .card-header,
+.dark .card-header,
+[data-theme="dark"] .card-footer,
+.dark .card-footer {
+    background: transparent !important;
+    color: inherit !important;
+}
+
+[data-theme="dark"] .card-header,
+.dark .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] .card-footer,
+.dark .card-footer {
+    border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* === Forms generales en dark === */
+[data-theme="dark"] .form-control,
+.dark .form-control,
+[data-theme="dark"] .form-select,
+.dark .form-select,
+[data-theme="dark"] textarea,
+.dark textarea {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+.dark .form-control:focus,
+[data-theme="dark"] .form-select:focus,
+.dark .form-select:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-light, #60A5FA) !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .form-control::placeholder,
+.dark .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] .form-label,
+.dark .form-label {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* === Badges en dark mode === */
+[data-theme="dark"] .badge.bg-success-subtle,
+.dark .badge.bg-success-subtle {
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: #4ade80 !important;
+    border-color: rgba(34, 197, 94, 0.25) !important;
+}
+
+[data-theme="dark"] .badge.bg-warning-subtle,
+.dark .badge.bg-warning-subtle {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+[data-theme="dark"] .badge.bg-danger-subtle,
+.dark .badge.bg-danger-subtle {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+[data-theme="dark"] .badge.bg-info-subtle,
+.dark .badge.bg-info-subtle {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+[data-theme="dark"] .badge.bg-primary-subtle,
+.dark .badge.bg-primary-subtle {
+    background: rgba(37, 99, 235, 0.2) !important;
+    color: #93c5fd !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary-subtle,
+.dark .badge.bg-secondary-subtle {
+    background: rgba(120, 113, 108, 0.2) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* === Botones outline en dark mode === */
+[data-theme="dark"] .btn-outline-secondary,
+.dark .btn-outline-secondary {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover,
+.dark .btn-outline-secondary:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-outline-danger,
+.dark .btn-outline-danger {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+}
+
+[data-theme="dark"] .btn-outline-danger:hover,
+.dark .btn-outline-danger:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #fff !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+/* === Texto en general === */
+[data-theme="dark"] .text-muted,
+.dark .text-muted {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="dark"] small,
+.dark small {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* === Pagination en dark === */
+[data-theme="dark"] .pagination,
+.dark .pagination {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .pagination .page-link,
+.dark .pagination .page-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    background: transparent !important;
+}
+
+[data-theme="dark"] .pagination .page-link:hover,
+.dark .pagination .page-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .pagination .page-item.disabled .page-link,
+.dark .pagination .page-item.disabled .page-link {
+    color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* === Alerts en dark mode === */
+[data-theme="dark"] .alert,
+.dark .alert {
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .alert-info,
+.dark .alert-info {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #93c5fd !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+[data-theme="dark"] .alert-success,
+.dark .alert-success {
+    background: rgba(34, 197, 94, 0.1) !important;
+    color: #86efac !important;
+    border-color: rgba(34, 197, 94, 0.25) !important;
+}
+
+[data-theme="dark"] .alert-warning,
+.dark .alert-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #fde68a !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+[data-theme="dark"] .alert-danger,
+.dark .alert-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
