@@ -169,7 +169,7 @@ def notas():
         'porcentaje_obtenido': pct,
         'fecha': ev.fecha,
         'tiene_nota': True,
-        'observaciones': nota.observaciones,  # ← AGREGADO
+        'observaciones': getattr(nota, 'observaciones', None) or getattr(nota, 'observacion', None),
     })
 else:
     items.append({
@@ -178,7 +178,7 @@ else:
         'porcentaje_obtenido': None,
         'fecha': ev.fecha,
         'tiene_nota': False,
-        'observaciones': None,  # ← AGREGADO
+        'observaciones': None,
     })
 
     return render_template('portal/notas.html',
