@@ -12912,7 +12912,6 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     overflow: visible !important;
 }
 
-
 /* ============================================================
    Observación del profesor en portal del estudiante
    ============================================================ */
@@ -12927,6 +12926,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
 .portal-obs-cell {
     padding: 0 16px 14px !important;
     border-top: none !important;
+    background: transparent !important;
 }
 
 .portal-nota-observacion {
@@ -12936,7 +12936,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(37, 99, 235, 0.15);
     border-radius: 12px;
-    border-left: 3px solid var(--primary, #2563EB);
+    border-left: 3px solid #2563EB;
     transition: all 0.2s ease;
     animation: obsAppear 0.4s ease;
 }
@@ -12958,7 +12958,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--primary, #2563EB);
+    color: #2563EB;
     margin-bottom: 6px;
 }
 
@@ -12974,12 +12974,12 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     word-wrap: break-word;
 }
 
-/* === Modo oscuro === */
+/* Modo oscuro */
 [data-theme="dark"] .portal-nota-observacion,
 .dark .portal-nota-observacion {
     background: rgba(96, 165, 250, 0.08);
     border-color: rgba(96, 165, 250, 0.2);
-    border-left-color: var(--primary-light, #60A5FA);
+    border-left-color: #60A5FA;
 }
 
 [data-theme="dark"] .portal-nota-observacion:hover,
@@ -12989,7 +12989,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
 
 [data-theme="dark"] .portal-nota-observacion-header,
 .dark .portal-nota-observacion-header {
-    color: var(--primary-light, #60A5FA);
+    color: #60A5FA;
 }
 
 [data-theme="dark"] .portal-nota-observacion-text,
