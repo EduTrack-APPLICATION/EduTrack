@@ -11,7 +11,6 @@
         <small class="text-muted">Todas tus calificaciones por materia</small>
     </div>
 </div>
-
 {% for d in detalle %}
 <div class="card mb-3">
     <div class="card-header d-flex align-items-center">
@@ -34,7 +33,6 @@
         </div>
         {% endif %}
     </div>
-
     {% if d.filas %}
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
@@ -71,22 +69,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                {# ↓↓↓ NUEVA FILA con observación del profesor ↓↓↓ #}
-                {% if fila.tiene_nota and fila.observaciones %}
-                <tr class="portal-obs-row">
-                    <td colspan="5" class="portal-obs-cell">
-                        <div class="portal-nota-observacion">
-                            <div class="portal-nota-observacion-header">
-                                <i class="bi bi-chat-left-quote-fill"></i>
-                                <span>Comentario del profesor</span>
-                            </div>
-                            <div class="portal-nota-observacion-text">
-                                {{ fila.observaciones }}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
