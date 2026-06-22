@@ -12072,4 +12072,782 @@ form[action*="recuperar"] .alert-info {
     }
 }
 
+/* ============================================================
+   MODAL DE CREDENCIALES — Liquid Glass premium
+   ============================================================ */
 
+/* El modal de credenciales (cuando se crea un estudiante) */
+.creds-modal-backdrop {
+    background: rgba(12, 10, 9, 0.5) !important;
+    backdrop-filter: blur(12px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+    animation: credsBackdropIn 0.3s ease;
+}
+
+@keyframes credsBackdropIn {
+    from { opacity: 0; backdrop-filter: blur(0); }
+    to   { opacity: 1; backdrop-filter: blur(12px); }
+}
+
+.creds-modal-content {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 24px 64px -12px rgba(0, 0, 0, 0.25) !important;
+    overflow: hidden;
+    position: relative;
+    animation: credsModalIn 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes credsModalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+        filter: blur(6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Brillo superior */
+.creds-modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.9),
+        transparent);
+    pointer-events: none;
+}
+
+/* Header con ícono celebratorio */
+.creds-modal-header,
+.creds-modal-content .modal-header {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.1)) !important;
+    border-bottom: 1px solid rgba(231, 229, 228, 0.4) !important;
+    padding: 24px 28px !important;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.creds-modal-header-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3) inset,
+        0 8px 20px rgba(34, 197, 94, 0.4);
+    animation: credsIconPop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.2s backwards;
+}
+
+@keyframes credsIconPop {
+    from { transform: scale(0); }
+    50%  { transform: scale(1.15); }
+    to   { transform: scale(1); }
+}
+
+.creds-modal-header h5,
+.creds-modal-header .modal-title {
+    color: var(--text-primary, #1c1917) !important;
+    font-weight: 700 !important;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    margin: 0 !important;
+}
+
+/* Cuerpo del modal */
+.creds-modal-body,
+.creds-modal-content .modal-body {
+    padding: 24px 28px !important;
+}
+
+.creds-modal-intro {
+    color: rgba(68, 64, 60, 0.75);
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* Campos de credenciales (usuario + contraseña) */
+.creds-field {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.creds-field:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+.creds-field-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(120, 113, 108, 0.65);
+    margin-bottom: 4px;
+}
+
+.creds-field-value {
+    font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #1c1917);
+    letter-spacing: 0.02em;
+    word-break: break-all;
+}
+
+.creds-field-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Botón de copiar */
+.creds-copy-btn {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(231, 229, 228, 0.6) !important;
+    border-radius: 10px !important;
+    padding: 8px 14px !important;
+    color: var(--primary, #2563EB) !important;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.creds-copy-btn:hover {
+    background: rgba(37, 99, 235, 0.1) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.creds-copy-btn.is-copied {
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: #15803d !important;
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    animation: credsCopyPop 0.4s ease;
+}
+
+@keyframes credsCopyPop {
+    0%   { transform: scale(0.95); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+/* Alert de advertencia */
+.creds-modal-warning,
+.creds-modal-body .alert-warning,
+.creds-modal-body .alert {
+    background: rgba(254, 243, 199, 0.7) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    color: #854d0e !important;
+    font-size: 13px;
+    margin-top: 16px !important;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Footer del modal */
+.creds-modal-footer,
+.creds-modal-content .modal-footer {
+    background: linear-gradient(0deg,
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.1)) !important;
+    border-top: 1px solid rgba(231, 229, 228, 0.4) !important;
+    padding: 16px 28px !important;
+}
+
+.creds-modal-footer .btn-primary,
+.creds-modal-footer button[type="submit"] {
+    background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 10px 24px !important;
+    font-weight: 600;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 6px 16px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s ease;
+}
+
+.creds-modal-footer .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 8px 20px rgba(37, 99, 235, 0.45);
+}
+
+/* === MODO OSCURO === */
+[data-theme="dark"] .creds-modal-content,
+.dark .creds-modal-content {
+    background: rgba(28, 25, 23, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 24px 64px -12px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .creds-modal-content::before,
+.dark .creds-modal-content::before {
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent);
+}
+
+[data-theme="dark"] .creds-modal-header,
+.dark .creds-modal-header {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.06),
+        rgba(255, 255, 255, 0.02)) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .creds-modal-header h5,
+.dark .creds-modal-header h5 {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .creds-modal-intro,
+.dark .creds-modal-intro {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .creds-field,
+.dark .creds-field {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .creds-field:hover,
+.dark .creds-field:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+[data-theme="dark"] .creds-field-label,
+.dark .creds-field-label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .creds-field-value,
+.dark .creds-field-value {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .creds-copy-btn,
+.dark .creds-copy-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--primary-light, #60A5FA) !important;
+}
+
+[data-theme="dark"] .creds-copy-btn:hover,
+.dark .creds-copy-btn:hover {
+    background: rgba(96, 165, 250, 0.15) !important;
+}
+
+[data-theme="dark"] .creds-modal-warning,
+.dark .creds-modal-warning,
+[data-theme="dark"] .creds-modal-body .alert,
+.dark .creds-modal-body .alert {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #FDE68A !important;
+}
+
+[data-theme="dark"] .creds-modal-footer,
+.dark .creds-modal-footer {
+    background: linear-gradient(0deg,
+        rgba(255, 255, 255, 0.06),
+        rgba(255, 255, 255, 0.02)) !important;
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+
+/* ============================================================
+   ACTIVAR CUENTA — Liquid Glass (variante celeste)
+   ============================================================ */
+
+/* Reutiliza la estructura .lg-recover pero con paleta celeste */
+.lg-activar {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    background: #f5f3f0;
+}
+
+.lg-activar-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.lg-activar-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    will-change: transform;
+}
+
+.lg-activar-orb-1 {
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle at 30% 30%, #06B6D4, #0891B2 60%, transparent);
+    top: -150px;
+    left: -100px;
+    opacity: 0.4;
+    animation: activarOrbFloat1 24s ease-in-out infinite;
+}
+
+.lg-activar-orb-2 {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle at 60% 40%, #22D3EE, #06B6D4 60%, transparent);
+    bottom: -120px;
+    right: -100px;
+    opacity: 0.4;
+    animation: activarOrbFloat2 28s ease-in-out infinite;
+}
+
+.lg-activar-orb-3 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle at 50% 50%, #67E8F9, #22D3EE 60%, transparent);
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.3;
+    animation: activarOrbFloat3 32s ease-in-out infinite;
+}
+
+@keyframes activarOrbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(80px, 60px) scale(1.08); }
+    66%      { transform: translate(-40px, 100px) scale(0.95); }
+}
+
+@keyframes activarOrbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(-60px, -80px) scale(1.05); }
+    66%      { transform: translate(40px, -40px) scale(0.96); }
+}
+
+@keyframes activarOrbFloat3 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%      { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* Card */
+.lg-activar-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 28px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 20px 60px -10px rgba(6, 182, 212, 0.15),
+        0 8px 30px -5px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: activarCardIn 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+}
+
+@keyframes activarCardIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lg-activar-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.85),
+        transparent);
+    pointer-events: none;
+}
+
+/* Header con icono de bienvenida */
+.lg-activar-head {
+    padding: 28px 28px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.lg-activar-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg,
+        rgba(6, 182, 212, 0.25),
+        rgba(34, 211, 238, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0891B2;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 8px 24px rgba(6, 182, 212, 0.25);
+    position: relative;
+    animation: activarIconPop 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) 0.2s backwards;
+}
+
+@keyframes activarIconPop {
+    from { transform: scale(0); }
+    60%  { transform: scale(1.15); }
+    to   { transform: scale(1); }
+}
+
+.lg-activar-icon::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 30px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.3), transparent 60%);
+    z-index: -1;
+    animation: activarGlow 3s ease-in-out infinite;
+}
+
+@keyframes activarGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%      { opacity: 0.9; transform: scale(1.18); }
+}
+
+/* Body */
+.lg-activar-body {
+    padding: 24px 32px 32px;
+}
+
+.lg-activar-heading {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.lg-activar-welcome-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(6, 182, 212, 0.1);
+    color: #0E7490;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.lg-activar-heading h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1c1917;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    line-height: 1.2;
+}
+
+.lg-activar-heading p {
+    color: rgba(68, 64, 60, 0.7);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.lg-activar-username-info {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+}
+
+.lg-activar-username-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(120, 113, 108, 0.65);
+    margin-bottom: 4px;
+}
+
+.lg-activar-username-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0E7490;
+    letter-spacing: 0.02em;
+}
+
+/* Form */
+.lg-activar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lg-activar-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(68, 64, 60, 0.8);
+    margin-bottom: 6px;
+}
+
+.lg-activar-input-wrap {
+    position: relative;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.lg-activar-input-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: #06B6D4;
+    box-shadow:
+        0 0 0 4px rgba(6, 182, 212, 0.15),
+        0 4px 12px rgba(6, 182, 212, 0.08);
+}
+
+.lg-activar-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #1c1917;
+    outline: none;
+    border-radius: 12px;
+}
+
+.lg-activar-input::placeholder {
+    color: rgba(68, 64, 60, 0.4);
+}
+
+/* Indicador de fortaleza (opcional) */
+.lg-activar-strength {
+    margin-top: 8px;
+    height: 4px;
+    background: rgba(231, 229, 228, 0.5);
+    border-radius: 999px;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+}
+
+.lg-activar-strength-bar {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.lg-activar-strength-bar.weak   { background: #ef4444; width: 33%; }
+.lg-activar-strength-bar.medium { background: #f59e0b; width: 66%; }
+.lg-activar-strength-bar.strong { background: #22c55e; width: 100%; }
+
+/* Botón activar */
+.lg-activar-submit {
+    width: 100%;
+    background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px 24px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.25s ease;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 8px 20px rgba(6, 182, 212, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lg-activar-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.lg-activar-submit:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 12px 28px rgba(6, 182, 212, 0.55);
+}
+
+.lg-activar-submit:hover::before {
+    left: 100%;
+}
+
+/* === MODO OSCURO === */
+[data-theme="dark"] .lg-activar,
+.dark .lg-activar {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .lg-activar-card,
+.dark .lg-activar-card {
+    background: rgba(28, 25, 23, 0.55);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 20px 60px -10px rgba(6, 182, 212, 0.2),
+        0 8px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .lg-activar-orb-1,
+.dark .lg-activar-orb-1 { opacity: 0.5; }
+
+[data-theme="dark"] .lg-activar-orb-2,
+.dark .lg-activar-orb-2 { opacity: 0.45; }
+
+[data-theme="dark"] .lg-activar-orb-3,
+.dark .lg-activar-orb-3 { opacity: 0.35; }
+
+[data-theme="dark"] .lg-activar-icon,
+.dark .lg-activar-icon {
+    background: linear-gradient(135deg,
+        rgba(6, 182, 212, 0.3),
+        rgba(34, 211, 238, 0.18));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #67E8F9;
+}
+
+[data-theme="dark"] .lg-activar-welcome-line,
+.dark .lg-activar-welcome-line {
+    background: rgba(6, 182, 212, 0.15);
+    color: #67E8F9;
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+[data-theme="dark"] .lg-activar-heading h1,
+.dark .lg-activar-heading h1 {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .lg-activar-heading p,
+.dark .lg-activar-heading p {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .lg-activar-username-info,
+.dark .lg-activar-username-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .lg-activar-username-value,
+.dark .lg-activar-username-value {
+    color: #67E8F9;
+}
+
+[data-theme="dark"] .lg-activar-field label,
+.dark .lg-activar-field label {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .lg-activar-input-wrap,
+.dark .lg-activar-input-wrap {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .lg-activar-input-wrap:focus-within,
+.dark .lg-activar-input-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #22D3EE;
+    box-shadow:
+        0 0 0 4px rgba(6, 182, 212, 0.2),
+        0 4px 12px rgba(6, 182, 212, 0.15);
+}
+
+[data-theme="dark"] .lg-activar-input,
+.dark .lg-activar-input {
+    color: #fff;
+}
+
+[data-theme="dark"] .lg-activar-input::placeholder,
+.dark .lg-activar-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+    .lg-activar-card { max-width: 100%; border-radius: 24px; }
+    .lg-activar-body { padding: 20px 22px 24px; }
+}
