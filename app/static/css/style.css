@@ -11205,3 +11205,659 @@ form[action*="recuperar"] .alert-info {
         padding: 28px !important;
     }
 }
+
+
+/* ============================================================
+   RECUPERAR CONTRASEÑA — Liquid Glass
+   ============================================================ */
+
+.lg-recover {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    background: #f5f3f0;
+}
+
+/* === Backdrop con orbes === */
+.lg-recover-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.lg-recover-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    will-change: transform;
+}
+
+.lg-recover-orb-1 {
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle at 30% 30%, #6366F1, #4F46E5 60%, transparent);
+    top: -150px;
+    left: -100px;
+    opacity: 0.4;
+    animation: recoverOrbFloat1 24s ease-in-out infinite;
+}
+
+.lg-recover-orb-2 {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle at 60% 40%, #60A5FA, #2563EB 60%, transparent);
+    bottom: -120px;
+    right: -100px;
+    opacity: 0.4;
+    animation: recoverOrbFloat2 28s ease-in-out infinite;
+}
+
+.lg-recover-orb-3 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle at 50% 50%, #A78BFA, #8B5CF6 60%, transparent);
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.28;
+    animation: recoverOrbFloat3 32s ease-in-out infinite;
+}
+
+@keyframes recoverOrbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(80px, 60px) scale(1.08); }
+    66%      { transform: translate(-40px, 100px) scale(0.95); }
+}
+
+@keyframes recoverOrbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(-60px, -80px) scale(1.05); }
+    66%      { transform: translate(40px, -40px) scale(0.96); }
+}
+
+@keyframes recoverOrbFloat3 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%      { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.lg-recover-noise {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* === Card de vidrio === */
+.lg-recover-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 440px;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 28px;
+
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.12),
+        0 8px 30px -5px rgba(0, 0, 0, 0.08);
+
+    overflow: hidden;
+    animation: recoverCardIn 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+}
+
+@keyframes recoverCardIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lg-recover-card.shake {
+    animation: recoverShake 0.4s ease;
+}
+
+@keyframes recoverShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+}
+
+/* Brillo en borde superior */
+.lg-recover-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent);
+    pointer-events: none;
+}
+
+/* === Head === */
+.lg-recover-head {
+    padding: 28px 28px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.lg-recover-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.18),
+        rgba(96, 165, 250, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4F46E5;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 8px 24px rgba(99, 102, 241, 0.2);
+    position: relative;
+}
+
+.lg-recover-icon::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 26px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 60%);
+    z-index: -1;
+    animation: recoverLockGlow 3s ease-in-out infinite;
+}
+
+@keyframes recoverLockGlow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 0.8; transform: scale(1.15); }
+}
+
+.lg-recover-mark {
+    color: rgba(28, 25, 23, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* === Body === */
+.lg-recover-body {
+    padding: 24px 28px 28px;
+}
+
+.lg-recover-heading {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.lg-recover-heading h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1c1917;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    line-height: 1.2;
+}
+
+.lg-recover-heading p {
+    color: rgba(68, 64, 60, 0.7);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* === Alerts === */
+.lg-recover-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    color: #1c1917;
+}
+
+.lg-recover-alert svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.lg-recover-alert-danger {
+    background: rgba(254, 226, 226, 0.7);
+    border-color: rgba(252, 165, 165, 0.5);
+    color: #991b1b;
+}
+
+.lg-recover-alert-success {
+    background: rgba(220, 252, 231, 0.7);
+    border-color: rgba(134, 239, 172, 0.5);
+    color: #166534;
+}
+
+.lg-recover-alert-info,
+.lg-recover-alert-warning {
+    background: rgba(254, 243, 199, 0.7);
+    border-color: rgba(253, 224, 71, 0.5);
+    color: #854d0e;
+}
+
+/* === Form === */
+.lg-recover-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lg-recover-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(68, 64, 60, 0.75);
+    margin-bottom: 6px;
+    letter-spacing: 0.01em;
+}
+
+.lg-recover-input-wrap {
+    position: relative;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+}
+
+.lg-recover-input-wrap:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.lg-recover-input-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: #4F46E5;
+    box-shadow:
+        0 0 0 4px rgba(99, 102, 241, 0.15),
+        0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+.lg-recover-input-ico {
+    position: absolute;
+    left: 14px;
+    color: rgba(68, 64, 60, 0.4);
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.lg-recover-input-wrap:focus-within .lg-recover-input-ico {
+    color: #4F46E5;
+}
+
+.lg-recover-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 13px 16px 13px 42px;
+    font-size: 15px;
+    color: #1c1917;
+    outline: none;
+    border-radius: 12px;
+    font-family: inherit;
+}
+
+.lg-recover-input::placeholder {
+    color: rgba(68, 64, 60, 0.4);
+}
+
+/* === Botón submit === */
+.lg-recover-submit {
+    width: 100%;
+    background: linear-gradient(135deg, #4F46E5 0%, #2563EB 100%);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all 0.25s ease;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 8px 20px rgba(79, 70, 229, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lg-recover-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.lg-recover-submit:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 12px 28px rgba(79, 70, 229, 0.5);
+}
+
+.lg-recover-submit:hover::before {
+    left: 100%;
+}
+
+.lg-recover-submit:active {
+    transform: translateY(0);
+}
+
+.lg-recover-submit:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    transform: none;
+}
+
+.lg-recover-submit-arrow {
+    transition: transform 0.25s ease;
+}
+
+.lg-recover-submit:hover .lg-recover-submit-arrow {
+    transform: translateX(4px);
+}
+
+.lg-recover-submit.is-loading .lg-recover-submit-arrow {
+    display: none;
+}
+
+.lg-recover-submit.is-loading::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: recoverSpin 0.7s linear infinite;
+}
+
+@keyframes recoverSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* === Link "Volver al inicio de sesión" === */
+.lg-recover-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(68, 64, 60, 0.6);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    margin: 12px auto 0;
+    padding: 8px 14px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.lg-recover-back:hover {
+    color: #4F46E5;
+    background: rgba(79, 70, 229, 0.08);
+    transform: translateX(-2px);
+}
+
+.lg-recover-back svg {
+    transition: transform 0.2s ease;
+}
+
+.lg-recover-back:hover svg {
+    transform: translateX(-2px);
+}
+
+/* === Features (los 3 pills de seguridad) === */
+.lg-recover-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(231, 229, 228, 0.5);
+}
+
+.lg-recover-feat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(28, 25, 23, 0.75);
+    transition: all 0.2s ease;
+}
+
+.lg-recover-feat:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateX(3px);
+}
+
+.lg-recover-feat-ico {
+    width: 22px;
+    height: 22px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   MODO OSCURO
+   ============================================================ */
+
+[data-theme="dark"] .lg-recover,
+.dark .lg-recover {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .lg-recover-card,
+.dark .lg-recover-card {
+    background: rgba(28, 25, 23, 0.55);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.5),
+        0 8px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .lg-recover-card::before,
+.dark .lg-recover-card::before {
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+}
+
+[data-theme="dark"] .lg-recover-orb-1,
+.dark .lg-recover-orb-1 { opacity: 0.5; }
+
+[data-theme="dark"] .lg-recover-orb-2,
+.dark .lg-recover-orb-2 { opacity: 0.45; }
+
+[data-theme="dark"] .lg-recover-orb-3,
+.dark .lg-recover-orb-3 { opacity: 0.35; }
+
+[data-theme="dark"] .lg-recover-icon,
+.dark .lg-recover-icon {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.25),
+        rgba(96, 165, 250, 0.15));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #A5B4FC;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .lg-recover-mark,
+.dark .lg-recover-mark {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .lg-recover-heading h1,
+.dark .lg-recover-heading h1 {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .lg-recover-heading p,
+.dark .lg-recover-heading p {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="dark"] .lg-recover-field label,
+.dark .lg-recover-field label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .lg-recover-input-wrap,
+.dark .lg-recover-input-wrap {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .lg-recover-input-wrap:hover,
+.dark .lg-recover-input-wrap:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .lg-recover-input-wrap:focus-within,
+.dark .lg-recover-input-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #818CF8;
+    box-shadow:
+        0 0 0 4px rgba(99, 102, 241, 0.18),
+        0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="dark"] .lg-recover-input-ico,
+.dark .lg-recover-input-ico {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme="dark"] .lg-recover-input-wrap:focus-within .lg-recover-input-ico,
+.dark .lg-recover-input-wrap:focus-within .lg-recover-input-ico {
+    color: #A5B4FC;
+}
+
+[data-theme="dark"] .lg-recover-input,
+.dark .lg-recover-input {
+    color: #fff;
+}
+
+[data-theme="dark"] .lg-recover-input::placeholder,
+.dark .lg-recover-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .lg-recover-back,
+.dark .lg-recover-back {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .lg-recover-back:hover,
+.dark .lg-recover-back:hover {
+    color: #A5B4FC;
+    background: rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="dark"] .lg-recover-features,
+.dark .lg-recover-features {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .lg-recover-feat,
+.dark .lg-recover-feat {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .lg-recover-feat:hover,
+.dark .lg-recover-feat:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="dark"] .lg-recover-feat-ico,
+.dark .lg-recover-feat-ico {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+}
+
+[data-theme="dark"] .lg-recover-alert,
+.dark .lg-recover-alert {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* === Reduce motion === */
+@media (prefers-reduced-motion: reduce) {
+    .lg-recover-orb,
+    .lg-recover-card,
+    .lg-recover-icon::before {
+        animation: none !important;
+    }
+}
+
+/* === Mobile === */
+@media (max-width: 480px) {
+    .lg-recover-card {
+        max-width: 100%;
+        border-radius: 24px;
+    }
+
+    .lg-recover-body {
+        padding: 20px 22px 22px;
+    }
+
+    .lg-recover-heading h1 {
+        font-size: 22px;
+    }
+}
