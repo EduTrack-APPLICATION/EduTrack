@@ -13451,3 +13451,24 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
 html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     background: rgba(28, 25, 23, 0.45) !important;
 }
+
+/* ============================================================
+   FIX FINAL — sombra del modal demasiado grande
+   ============================================================ */
+
+.search-modal-content {
+    /* Sombra mucho más pequeña, sin halo gris */
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 8px 24px -4px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* En modo claro: sombra suave azulada */
+:root:not(.dark):not([data-theme="dark"]) .search-modal-content,
+html:not(.dark):not([data-theme="dark"]) .search-modal-content {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 8px 24px -4px rgba(37, 99, 235, 0.12),
+        0 4px 12px -2px rgba(0, 0, 0, 0.08) !important;
+}
+
