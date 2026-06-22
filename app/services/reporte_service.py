@@ -771,10 +771,15 @@ class ReporteService:
 
         # Texto del cuerpo
         elementos.append(Paragraph(
-            'por su destacado desempeño académico, demostrando dedicación,<br/>'
-            'esfuerzo y excelencia durante sus estudios.',
-            estilo_texto
-        ))
+    'Por su destacado desempeño académico, demostrando dedicación,<br/>'
+    'esfuerzo y excelencia durante sus estudios.<br/><br/>'
+    'Que este reconocimiento sea un recordatorio de que el esfuerzo, la disciplina '
+    'y la perseverancia son el camino hacia grandes metas. El Colegio, la Junta '
+    'Administrativa y el equipo de desarrollo de <b>EduTrack</b> expresan su más '
+    'sincera felicitación por este destacado mérito académico y le animan a '
+    'continuar alcanzando nuevas metas con la misma excelencia que hoy le distingue.',
+    estilo_texto
+))
 
         elementos.append(Spacer(1, 0.25 * cm))
 
