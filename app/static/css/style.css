@@ -13417,26 +13417,26 @@ form[action*="recuperar"] .alert-info {
 html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     background: rgba(28, 25, 23, 0.35) !important;
 }
-
 /* ============================================================
-   FIX backdrop completo 
+   FIX FINAL backdrop — width/height puros
    ============================================================ */
 
 .search-modal-backdrop {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
+
+    /* Eliminar right/bottom porque rompe con width/height */
+    right: auto !important;
+    bottom: auto !important;
+
     width: 100vw !important;
     height: 100vh !important;
-    width: 100dvw !important;
-    height: 100dvh !important;
 
     margin: 0 !important;
     padding: 0 !important;
-    border: 0 !important;
-    outline: 0 !important;
+    border: none !important;
+    outline: none !important;
     box-sizing: border-box !important;
 
     background: rgba(0, 0, 0, 0.6) !important;
@@ -13446,7 +13446,7 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     z-index: 9998 !important;
 }
 
-/* Modo claro */
+/* Modo claro: backdrop más sutil */
 :root:not(.dark):not([data-theme="dark"]) .search-modal-backdrop,
 html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     background: rgba(28, 25, 23, 0.45) !important;
