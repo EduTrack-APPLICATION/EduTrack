@@ -13401,6 +13401,21 @@ form[action*="recuperar"] .alert-info {
 
 
 
+/* ============================================================
+   FIX Search modal backdrop 
+   ============================================================ */
 
+/* Backdrop más oscuro y con blur visible */
+.search-modal-backdrop {
+    background: rgba(0, 0, 0, 0.55) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* En modo claro: backdrop más suave */
+:root:not(.dark):not([data-theme="dark"]) .search-modal-backdrop,
+html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
+    background: rgba(28, 25, 23, 0.35) !important;
+}
 
 
