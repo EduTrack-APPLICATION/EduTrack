@@ -10567,6 +10567,24 @@ body[class*="portal"] .card {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+.lg-link,
+a[href*="recuperar"],
+.login-link-small {
+    position: relative !important;
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
 
+/* Asegurar que los orbes no bloqueen clicks */
+.lg-backdrop,
+.lg-orb,
+.lg-orb-1,
+.lg-orb-2,
+.lg-orb-3,
+.lg-noise {
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
 
 
