@@ -10587,4 +10587,621 @@ a[href*="recuperar"],
     z-index: 0 !important;
 }
 
+/* ============================================================
+   PÁGINA RESTABLECER CONTRASEÑA — Liquid Glass
+   ============================================================ */
 
+/* === Estructura split (igual al login) === */
+body:has(.auth-recover),
+body.recuperar-page,
+.auth-recover-shell {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Fondo con orbes animados — más sutiles para reset */
+.auth-recover-shell::before,
+body:has(.auth-recover)::before,
+body.recuperar-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(251, 146, 60, 0.08) 0%, transparent 40%),
+        #fafaf9;
+    background-attachment: fixed;
+    animation: bgFloat 30s ease-in-out infinite;
+}
+
+@keyframes bgFloat {
+    0%, 100% { background-position: 0% 0%, 100% 0%, 50% 100%, 100% 100%, 0% 0%; }
+    50%      { background-position: 5% 5%, 95% 5%, 55% 95%, 95% 95%, 0% 0%; }
+}
+
+/* === Panel izquierdo (info + features) === */
+.auth-recover-info,
+.auth-info-panel,
+.auth-recover [class*="info"]:first-child {
+    background: transparent !important;
+    position: relative;
+    padding: 48px !important;
+}
+
+/* Logo / brand */
+.auth-recover-brand,
+.recover-brand,
+.brand-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 14px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    margin-bottom: 32px;
+}
+
+/* Heading del panel izquierdo */
+.auth-recover h1,
+.auth-recover-title,
+[class*="recover"] h1 {
+    font-size: 48px !important;
+    line-height: 1.1 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+    background: linear-gradient(135deg,
+        #1c1917 0%,
+        #2563EB 50%,
+        #1c1917 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleShine 6s ease-in-out infinite;
+    margin-bottom: 20px !important;
+}
+
+@keyframes titleShine {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+/* Subtítulo del panel izquierdo */
+.auth-recover-subtitle,
+.auth-recover p {
+    color: rgba(68, 64, 60, 0.7) !important;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 380px;
+}
+
+/* === Feature list (los checks abajo a la izquierda) === */
+.auth-recover-features,
+.recover-features {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.auth-recover-feature,
+.recover-feature,
+.auth-recover-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    color: var(--text-primary, #1c1917);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+    width: fit-content;
+}
+
+.auth-recover-feature:hover,
+.recover-feature:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateX(4px);
+}
+
+/* Icono check de cada feature */
+.auth-recover-feature .check-icon,
+.recover-feature i.bi-check-circle-fill,
+.auth-recover-features li i,
+.auth-recover-features li svg {
+    color: #22c55e !important;
+    filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.5));
+    flex-shrink: 0;
+}
+
+/* === Panel derecho (formulario) === */
+.auth-recover-form,
+.recover-form-panel,
+.auth-recover [class*="form"]:last-child {
+    background: transparent !important;
+    position: relative;
+    padding: 48px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card del formulario */
+.recover-form-card,
+.auth-recover-form > div,
+.auth-recover form,
+form[action*="recuperar"] {
+    background: rgba(255, 255, 255, 0.55) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 24px !important;
+    padding: 36px !important;
+    width: 100%;
+    max-width: 440px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.15),
+        0 8px 30px -5px rgba(0, 0, 0, 0.08) !important;
+    position: relative;
+    overflow: hidden;
+    animation: formIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) backwards;
+}
+
+@keyframes formIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Brillo superior */
+form[action*="recuperar"]::before,
+.recover-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent);
+}
+
+/* Heading del form */
+.recover-form-title,
+form[action*="recuperar"] h1,
+form[action*="recuperar"] h2,
+form[action*="recuperar"] h3 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: var(--text-primary, #1c1917);
+    letter-spacing: -0.025em;
+    margin-bottom: 8px !important;
+}
+
+.recover-form-subtitle,
+form[action*="recuperar"] p {
+    color: rgba(68, 64, 60, 0.7) !important;
+    font-size: 14px;
+    margin-bottom: 24px !important;
+    line-height: 1.5;
+}
+
+/* === Label === */
+form[action*="recuperar"] label,
+.recover-form-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(68, 64, 60, 0.85) !important;
+    margin-bottom: 8px;
+}
+
+/* === Input con icono === */
+.recover-input-wrap,
+form[action*="recuperar"] .input-group {
+    position: relative;
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 14px !important;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.recover-input-wrap:focus-within,
+form[action*="recuperar"] .input-group:focus-within {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: var(--primary, #2563EB) !important;
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.12),
+        0 4px 16px rgba(37, 99, 235, 0.1);
+}
+
+/* Icono del email */
+.recover-input-wrap .input-icon,
+form[action*="recuperar"] .input-group-text {
+    background: transparent !important;
+    border: none !important;
+    color: rgba(120, 113, 108, 0.6) !important;
+    padding: 0 12px 0 16px !important;
+    transition: color 0.2s;
+}
+
+.recover-input-wrap:focus-within .input-icon,
+form[action*="recuperar"] .input-group:focus-within .input-group-text {
+    color: var(--primary, #2563EB) !important;
+}
+
+/* Input field */
+form[action*="recuperar"] .form-control,
+form[action*="recuperar"] input[type="email"],
+.recover-input-wrap input {
+    background: transparent !important;
+    border: none !important;
+    padding: 14px 16px 14px 0 !important;
+    font-size: 15px;
+    color: var(--text-primary, #1c1917) !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+form[action*="recuperar"] .form-control:focus,
+form[action*="recuperar"] input[type="email"]:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--text-primary, #1c1917) !important;
+}
+
+form[action*="recuperar"] .form-control::placeholder,
+form[action*="recuperar"] input::placeholder {
+    color: rgba(120, 113, 108, 0.45) !important;
+}
+
+/* === Botón Enviar enlace === */
+form[action*="recuperar"] button[type="submit"],
+form[action*="recuperar"] .btn-primary,
+.btn-enviar-enlace {
+    background: linear-gradient(135deg,
+        #2563EB 0%,
+        #1D4ED8 100%) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 14px !important;
+    padding: 14px 24px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    width: 100%;
+    margin-top: 8px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 8px 20px rgba(37, 99, 235, 0.35) !important;
+    transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer al hover */
+form[action*="recuperar"] button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.25),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+form[action*="recuperar"] button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 12px 28px rgba(37, 99, 235, 0.45) !important;
+}
+
+form[action*="recuperar"] button[type="submit"]:hover::before {
+    left: 100%;
+}
+
+form[action*="recuperar"] button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Flecha del botón */
+form[action*="recuperar"] button[type="submit"] svg,
+form[action*="recuperar"] button[type="submit"] i.bi-arrow-right {
+    transition: transform 0.3s ease;
+}
+
+form[action*="recuperar"] button[type="submit"]:hover svg,
+form[action*="recuperar"] button[type="submit"]:hover i.bi-arrow-right {
+    transform: translateX(4px);
+}
+
+/* === Link "Volver al inicio de sesión" === */
+form[action*="recuperar"] ~ a,
+.recover-back-link,
+a[href*="login"]:not(.btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(68, 64, 60, 0.65) !important;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none !important;
+    margin-top: 20px;
+    transition: all 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+form[action*="recuperar"] ~ a:hover,
+.recover-back-link:hover,
+a[href*="login"]:not(.btn):hover {
+    color: var(--primary, #2563EB) !important;
+    background: rgba(37, 99, 235, 0.08);
+    transform: translateX(-2px);
+}
+
+/* === Footer del panel izquierdo === */
+.auth-recover-footer,
+.recover-footer {
+    position: absolute;
+    bottom: 24px;
+    left: 48px;
+    color: rgba(120, 113, 108, 0.5);
+    font-size: 12px;
+}
+
+/* === Alerts dentro del form === */
+form[action*="recuperar"] .alert,
+.recover-form-card .alert {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    font-size: 13px;
+    margin-bottom: 16px !important;
+}
+
+form[action*="recuperar"] .alert-success {
+    background: rgba(220, 252, 231, 0.6) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #166534 !important;
+}
+
+form[action*="recuperar"] .alert-danger {
+    background: rgba(254, 226, 226, 0.6) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #991b1b !important;
+}
+
+form[action*="recuperar"] .alert-info {
+    background: rgba(219, 234, 254, 0.6) !important;
+    border-color: rgba(96, 165, 250, 0.3) !important;
+    color: #1e40af !important;
+}
+
+/* ============================================================
+   MODO OSCURO
+   ============================================================ */
+
+[data-theme="dark"] body:has(.auth-recover)::before,
+.dark body:has(.auth-recover)::before,
+[data-theme="dark"] body.recuperar-page::before,
+.dark body.recuperar-page::before,
+[data-theme="dark"] .auth-recover-shell::before,
+.dark .auth-recover-shell::before {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.2) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(34, 197, 94, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(251, 146, 60, 0.1) 0%, transparent 40%),
+        #0a0a0a !important;
+}
+
+[data-theme="dark"] .auth-recover h1,
+.dark .auth-recover h1,
+[data-theme="dark"] .auth-recover-title,
+.dark .auth-recover-title {
+    background: linear-gradient(135deg,
+        #fff 0%,
+        #60A5FA 50%,
+        #fff 100%) !important;
+    background-size: 200% 200% !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="dark"] .auth-recover-subtitle,
+.dark .auth-recover-subtitle,
+[data-theme="dark"] .auth-recover p,
+.dark .auth-recover p {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="dark"] .auth-recover-brand,
+.dark .auth-recover-brand,
+[data-theme="dark"] .recover-brand,
+.dark .recover-brand {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .auth-recover-feature,
+.dark .auth-recover-feature,
+[data-theme="dark"] .recover-feature,
+.dark .recover-feature {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="dark"] .auth-recover-feature:hover,
+.dark .auth-recover-feature:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"],
+.dark form[action*="recuperar"],
+[data-theme="dark"] .recover-form-card,
+.dark .recover-form-card {
+    background: rgba(28, 25, 23, 0.55) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 20px 60px -10px rgba(0, 0, 0, 0.5),
+        0 8px 30px -5px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"]::before,
+.dark form[action*="recuperar"]::before {
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] h1,
+.dark form[action*="recuperar"] h1,
+[data-theme="dark"] form[action*="recuperar"] h2,
+.dark form[action*="recuperar"] h2 {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] p,
+.dark form[action*="recuperar"] p {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] label,
+.dark form[action*="recuperar"] label {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .form-control,
+.dark form[action*="recuperar"] .form-control,
+[data-theme="dark"] form[action*="recuperar"] input,
+.dark form[action*="recuperar"] input {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .form-control::placeholder,
+.dark form[action*="recuperar"] .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .input-group,
+.dark form[action*="recuperar"] .input-group,
+[data-theme="dark"] .recover-input-wrap,
+.dark .recover-input-wrap {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .input-group:focus-within,
+.dark form[action*="recuperar"] .input-group:focus-within,
+[data-theme="dark"] .recover-input-wrap:focus-within,
+.dark .recover-input-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-light, #60A5FA) !important;
+    box-shadow:
+        0 0 0 4px rgba(96, 165, 250, 0.15),
+        0 4px 16px rgba(96, 165, 250, 0.1) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .input-group-text,
+.dark form[action*="recuperar"] .input-group-text {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .input-group:focus-within .input-group-text,
+.dark form[action*="recuperar"] .input-group:focus-within .input-group-text {
+    color: var(--primary-light, #60A5FA) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] ~ a,
+.dark form[action*="recuperar"] ~ a,
+[data-theme="dark"] .recover-back-link,
+.dark .recover-back-link {
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] ~ a:hover,
+.dark form[action*="recuperar"] ~ a:hover,
+[data-theme="dark"] .recover-back-link:hover,
+.dark .recover-back-link:hover {
+    color: var(--primary-light, #60A5FA) !important;
+    background: rgba(96, 165, 250, 0.1) !important;
+}
+
+[data-theme="dark"] .auth-recover-footer,
+.dark .auth-recover-footer,
+[data-theme="dark"] .recover-footer,
+.dark .recover-footer {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] form[action*="recuperar"] .alert,
+.dark form[action*="recuperar"] .alert {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 980px) {
+    body:has(.auth-recover),
+    body.recuperar-page,
+    .auth-recover-shell {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .auth-recover h1,
+    .auth-recover-title {
+        font-size: 32px !important;
+    }
+
+    .auth-recover-info {
+        padding: 32px 24px !important;
+    }
+
+    .auth-recover-form {
+        padding: 24px !important;
+    }
+
+    form[action*="recuperar"] {
+        padding: 28px !important;
+    }
+}
