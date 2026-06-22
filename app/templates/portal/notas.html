@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Mis notas · EduTrack{% endblock %}
 {% block page_title %}Mis notas{% endblock %}
-
 {% block content %}
 <div class="d-flex align-items-center gap-3 mb-3">
     <a href="{{ url_for('portal.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -72,6 +71,22 @@
                         {% endif %}
                     </td>
                 </tr>
+                {# ↓↓↓ NUEVA FILA con observación del profesor ↓↓↓ #}
+                {% if fila.tiene_nota and fila.observaciones %}
+                <tr class="portal-obs-row">
+                    <td colspan="5" class="portal-obs-cell">
+                        <div class="portal-nota-observacion">
+                            <div class="portal-nota-observacion-header">
+                                <i class="bi bi-chat-left-quote-fill"></i>
+                                <span>Comentario del profesor</span>
+                            </div>
+                            <div class="portal-nota-observacion-text">
+                                {{ fila.observaciones }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
