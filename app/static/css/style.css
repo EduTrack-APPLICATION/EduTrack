@@ -12853,3 +12853,21 @@ form[action*="recuperar"] .alert-info {
 }
 
 
+/* ============================================================
+   FIX FINAL definitivo — backdrop oscuro real
+   ============================================================ */
+
+.search-modal-backdrop {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Modo claro: oscuro pero menos */
+:root:not(.dark):not([data-theme="dark"]) .search-modal-backdrop,
+html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
+    background: rgba(0, 0, 0, 0.55) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
