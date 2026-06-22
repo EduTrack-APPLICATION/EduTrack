@@ -169,7 +169,7 @@ def notas():
         'porcentaje_obtenido': pct,
         'fecha': ev.fecha,
         'tiene_nota': True,
-        'observaciones': nota.observaciones,
+        
     })
 else:
     items.append({
@@ -178,7 +178,7 @@ else:
         'porcentaje_obtenido': None,
         'fecha': ev.fecha,
         'tiene_nota': False,
-        'observaciones': None,
+        
     })
 
         promedio = round(suma_p / peso_total, 1) if peso_total > 0 else None
