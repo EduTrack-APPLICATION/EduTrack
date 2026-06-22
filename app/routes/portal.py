@@ -159,33 +159,27 @@ def notas():
                 estudiante_id=estudiante.id,
                 evaluacion_id=ev.id,
             ).first()
-            if nota and nota.puntaje is not None:
-                pct = round((nota.puntaje / ev.puntaje_maximo) * 100, 1)
-                suma_p += pct * (ev.porcentaje or 10)
-                peso_total += (ev.porcentaje or 10)
-                items.append({
-                    'evaluacion': ev,
-                    'nota_obtenida': nota.puntaje,
-                    'porcentaje_obtenido': pct,
-                    'fecha': ev.fecha,
-                    'tiene_nota': True,
-                })
-            else:
-                items.append({
-                    'evaluacion': ev,
-                    'nota_obtenida': None,
-                    'porcentaje_obtenido': None,
-                    'fecha': ev.fecha,
-                    'tiene_nota': False,
-                })
-
-        promedio = round(suma_p / peso_total, 1) if peso_total > 0 else None
-        detalle.append({
-            'grupo': grupo,
-            'materia': grupo.materia,
-            'filas': items,
-            'promedio': promedio,
-        })
+      if nota and nota.puntaje is not None:
+    pct = round((nota.puntaje / ev.puntaje_maximo) * 100, 1)
+    suma_p += pct * (ev.porcentaje or 10)
+    peso_total += (ev.porcentaje or 10)
+    items.append({
+        'evaluacion': ev,
+        'nota_obtenida': nota.puntaje,
+        'porcentaje_obtenido': pct,
+        'fecha': ev.fecha,
+        'tiene_nota': True,
+        'observaciones': nota.observaciones,  # ← AGREGADO
+    })
+else:
+    items.append({
+        'evaluacion': ev,
+        'nota_obtenida': None,
+        'porcentaje_obtenido': None,
+        'fecha': ev.fecha,
+        'tiene_nota': False,
+        'observaciones': None,  # ← AGREGADO
+    })
 
     return render_template('portal/notas.html',
                             estudiante=estudiante, detalle=detalle)
