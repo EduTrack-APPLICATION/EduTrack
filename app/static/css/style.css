@@ -13418,4 +13418,36 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
     background: rgba(28, 25, 23, 0.35) !important;
 }
 
+/* ============================================================
+   FIX backdrop completo 
+   ============================================================ */
 
+.search-modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    width: 100dvw !important;
+    height: 100dvh !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-sizing: border-box !important;
+
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+
+    z-index: 9998 !important;
+}
+
+/* Modo claro */
+:root:not(.dark):not([data-theme="dark"]) .search-modal-backdrop,
+html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
+    background: rgba(28, 25, 23, 0.45) !important;
+}
