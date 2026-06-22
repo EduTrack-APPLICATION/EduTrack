@@ -9838,6 +9838,73 @@ body::before {
 
 
 
+/* ============================================================
+   Switch de tema sol/luna animado
+   ============================================================ */
+.theme-switch {
+    width: 56px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(231, 229, 228, 0.6);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
+.theme-switch::before {
+    content: '☀️';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow:
+        0 2px 6px rgba(245, 158, 11, 0.4),
+        0 0 12px rgba(251, 191, 36, 0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-switch::after {
+    content: '🌙';
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    font-size: 11px;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+[data-theme="dark"] .theme-switch,
+.dark .theme-switch {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .theme-switch::before,
+.dark .theme-switch::before {
+    content: '🌙';
+    left: 30px;
+    background: linear-gradient(135deg, #94a3b8, #475569);
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.5),
+        0 0 12px rgba(148, 163, 184, 0.4);
+}
+
+[data-theme="dark"] .theme-switch::after,
+.dark .theme-switch::after {
+    content: '☀️';
+    right: auto;
+    left: 8px;
+    opacity: 0.3;
+}
 
 
