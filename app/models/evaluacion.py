@@ -14,7 +14,7 @@ class TipoEvaluacionEnum(str, Enum):
     EXPOSICION = 'exposicion'
     PRACTICA = 'practica'
     PARTICIPACION = 'participacion'
-    COTIDIANO = 'cotidiano'
+    
 
 
 class Evaluacion(db.Model):
