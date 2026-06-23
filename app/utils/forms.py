@@ -119,7 +119,7 @@ class EvaluacionForm(FlaskForm):
         ('exposicion', 'Exposición'),
         ('practica', 'Práctica'),
         ('participacion', 'Participación'),
-        ('cotidiano', 'Trabajo cotidiano'),
+       
     ], validators=[DataRequired()])
     ], validators=[DataRequired()])
     fecha = DateField('Fecha', validators=[DataRequired()], default=date.today)
