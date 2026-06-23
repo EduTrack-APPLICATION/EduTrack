@@ -118,10 +118,9 @@ class EvaluacionForm(FlaskForm):
         ('proyecto', 'Proyecto'),
         ('exposicion', 'Exposición'),
         ('practica', 'Práctica'),
-        ('participacion', 'Participación'),
-       
+        ('participacion', 'Participación'),  
     ], validators=[DataRequired()])
-    ], validators=[DataRequired()])
+
     fecha = DateField('Fecha', validators=[DataRequired()], default=date.today)
     puntaje_maximo = FloatField('Puntaje máximo', validators=[
         DataRequired(), NumberRange(min=1, max=1000)
