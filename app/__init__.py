@@ -3,6 +3,7 @@ Application Factory para EduTrack.
 Inicializa extensiones, registra blueprints y configura la app.
 """
 import os
+from datetime import datetime
 
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
@@ -66,6 +67,10 @@ def create_app(config_name='default'):
     migrate.init_app(app, db)
     csrf.init_app(app)
     mail.init_app(app)
+
+    # === Versión de assets para cache busting ===
+    # Se genera UNA vez al arrancar el servidor (mismo valor toda la sesión)
+    app.config['ASSET_VERSION'] = datetime.utcnow().strftime('%Y%m%d%H%M%S')
 
     # === Seguridad: HTTPS + headers en producción ===
     if not app.debug and not app.testing:
@@ -185,11 +190,24 @@ def create_app(config_name='default'):
             # Si la tabla no existe aún (primer arranque), ignorar
             pass
 
+    # === No cachear HTML (sí cachear CSS/JS con versión) ===
+    @app.after_request
+    def add_no_cache_html(response):
+        """Evita que el navegador cachee páginas HTML.
+        Los archivos estáticos (CSS/JS) usan ?v=ASSET_VERSION para cache busting."""
+        if response.mimetype == 'text/html':
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+
     # Context processor: variables globales en todos los templates
     @app.context_processor
     def inject_globals():
-        from datetime import datetime
-        return {'now': datetime.utcnow()}
+        return {
+            'now': datetime.utcnow(),
+            'asset_version': app.config.get('ASSET_VERSION', '1'),
+        }
 
     # Handlers de errores
     @app.errorhandler(404)
@@ -208,7 +226,7 @@ def create_app(config_name='default'):
     # Filtros Jinja personalizados
     from app.utils.filters import register_filters
     register_filters(app)
-   
+
     return app
 
 
