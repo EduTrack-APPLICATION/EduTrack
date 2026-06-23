@@ -13545,3 +13545,211 @@ html[data-theme="dark"] .today-chip:hover {
         animation: none !important;
     }
 }
+
+
+
+
+
+/* ============================================================
+   BOTTOM NAV — Estilo iOS pill activo
+   ============================================================ */
+
+@media (max-width: 991px) {
+
+    /* Reset del nav anterior */
+    .bottom-nav {
+        position: fixed !important;
+        bottom: 12px !important;
+        left: 12px !important;
+        right: 12px !important;
+        height: auto !important;
+        padding: 8px !important;
+        z-index: 90;
+
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 4px !important;
+
+        background: rgba(15, 23, 42, 0.92) !important;
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 28px !important;
+
+        box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.08) inset,
+            0 12px 32px rgba(0, 0, 0, 0.35),
+            0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* En modo claro, fondo más blanco translúcido */
+    html[data-theme="light"] .bottom-nav {
+        background: rgba(255, 255, 255, 0.85) !important;
+        border-color: rgba(231, 229, 228, 0.5) !important;
+        box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.8) inset,
+            0 12px 32px rgba(0, 0, 0, 0.12),
+            0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    /* Items del nav */
+    .bottom-nav-item {
+        flex: 0 1 auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+
+        padding: 10px 14px !important;
+        border-radius: 999px !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer;
+
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: rgba(255, 255, 255, 0.55) !important;
+        text-decoration: none !important;
+
+        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /* Modo claro: texto oscuro */
+    html[data-theme="light"] .bottom-nav-item {
+        color: rgba(68, 64, 60, 0.6) !important;
+    }
+
+    /* Icono del item */
+    .bottom-nav-item i {
+        font-size: 22px !important;
+        transition: transform 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) !important;
+        flex-shrink: 0;
+    }
+
+    /* Texto del item: por defecto oculto */
+    .bottom-nav-item span {
+        max-width: 0;
+        opacity: 0;
+        transition: max-width 0.35s cubic-bezier(0.2, 0.9, 0.3, 1),
+                    opacity 0.25s ease,
+                    margin 0.3s ease;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+    /* ITEM ACTIVO: pill rellena con azul */
+    .bottom-nav-item.active {
+        background: rgba(59, 130, 246, 0.18) !important;
+        color: #60A5FA !important;
+        padding: 10px 18px !important;
+    }
+
+    /* En modo claro: pill azul más vivo */
+    html[data-theme="light"] .bottom-nav-item.active {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: #2563EB !important;
+    }
+
+    /* Texto SE EXPANDE solo en el activo */
+    .bottom-nav-item.active span {
+        max-width: 160px;
+        opacity: 1;
+        margin-left: 2px;
+    }
+
+    /* Icono del activo: más vivo */
+    .bottom-nav-item.active i {
+        color: inherit !important;
+        transform: scale(1.05);
+    }
+
+    /* Hover en items NO activos */
+    .bottom-nav-item:not(.active):hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    html[data-theme="light"] .bottom-nav-item:not(.active):hover {
+        background: rgba(0, 0, 0, 0.04) !important;
+        color: rgba(28, 25, 23, 0.9) !important;
+    }
+
+    /* Tap effect (móvil) */
+    .bottom-nav-item:active {
+        transform: scale(0.92) !important;
+    }
+
+    .bottom-nav-item.active:active {
+        transform: scale(0.95) !important;
+    }
+
+    /* Dropdown del "Más" */
+    .bottom-more-menu {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 18px !important;
+        padding: 6px !important;
+        margin-bottom: 12px !important;
+    }
+
+    html[data-theme="light"] .bottom-more-menu {
+        background: rgba(255, 255, 255, 0.95) !important;
+        border-color: rgba(231, 229, 228, 0.5) !important;
+    }
+
+    .bottom-more-menu .dropdown-item {
+        color: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    html[data-theme="light"] .bottom-more-menu .dropdown-item {
+        color: rgba(28, 25, 23, 0.9) !important;
+    }
+
+    .bottom-more-menu .dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: #60A5FA !important;
+    }
+
+    html[data-theme="light"] .bottom-more-menu .dropdown-item:hover {
+        background: rgba(59, 130, 246, 0.1) !important;
+        color: #2563EB !important;
+    }
+
+    /* Padding extra al final del contenido para que no quede tapado */
+    body {
+        padding-bottom: 90px !important;
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+        .bottom-nav-item,
+        .bottom-nav-item span,
+        .bottom-nav-item i {
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+
+        .bottom-nav-item.active {
+            transform: none !important;
+        }
+    }
+}
+
+/* En desktop, mantener oculto el bottom nav */
+@media (min-width: 992px) {
+    .bottom-nav {
+        display: none !important;
+    }
+}
