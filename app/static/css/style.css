@@ -13000,39 +13000,3 @@ html:not(.dark):not([data-theme="dark"]) .search-modal-backdrop {
 /* ============================================================
    FIX dropdown <select> en modo oscuro
    ============================================================ */
-
-/* Las opciones del select en modo oscuro */
-[data-theme="dark"] select,
-.dark select,
-[data-theme="dark"] .form-select,
-.dark .form-select {
-    color-scheme: dark;
-    background-color: rgba(28, 25, 23, 0.95) !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-[data-theme="dark"] select option,
-.dark select option,
-[data-theme="dark"] .form-select option,
-.dark .form-select option {
-    background-color: #1c1917 !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    padding: 8px !important;
-}
-
-[data-theme="dark"] select option:hover,
-.dark select option:hover,
-[data-theme="dark"] select option:checked,
-.dark select option:checked {
-    background-color: #2563EB !important;
-    color: #fff !important;
-}
-
-/* Modo claro: asegurar que también se vea bien */
-select option,
-.form-select option {
-    color: #1c1917 !important;
-    background-color: #fff !important;
-    padding: 8px !important;
-}
