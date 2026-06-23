@@ -13041,4 +13041,75 @@ select option,
 }
 
 
+/* ============================================================
+   FIX cambio de tema sin necesidad de recargar
+   ============================================================ */
 
+/* Aplica colores explícitos a los KPI cards en cada modo,
+   sin depender de var() o gradientes complejos */
+
+html[data-theme="light"] .kpi-card,
+html[data-theme="light"] .dash2-card,
+html:not([data-theme="dark"]):not(.dark) .kpi-card,
+html:not([data-theme="dark"]):not(.dark) .dash2-card {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    color: #1c1917 !important;
+    border: 1px solid rgba(231, 229, 228, 0.5) !important;
+}
+
+html[data-theme="dark"] .kpi-card,
+html[data-theme="dark"] .dash2-card,
+html.dark .kpi-card,
+html.dark .dash2-card {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Labels visibles en ambos modos */
+html[data-theme="light"] .kpi-label,
+html:not([data-theme="dark"]):not(.dark) .kpi-label {
+    color: rgba(68, 64, 60, 0.7) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .kpi-label,
+html.dark .kpi-label {
+    color: rgba(255, 255, 255, 0.6) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Valores visibles en ambos modos */
+html[data-theme="light"] .kpi-value,
+html:not([data-theme="dark"]):not(.dark) .kpi-value {
+    color: #1c1917 !important;
+}
+
+html[data-theme="dark"] .kpi-value,
+html.dark .kpi-value {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Sub-texto del KPI */
+html[data-theme="light"] .kpi-sub,
+html:not([data-theme="dark"]):not(.dark) .kpi-sub {
+    color: rgba(68, 64, 60, 0.6) !important;
+}
+
+html[data-theme="dark"] .kpi-sub,
+html.dark .kpi-sub {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Transición fluida sin lag al cambiar tema */
+.kpi-card,
+.dash2-card,
+.kpi-label,
+.kpi-value,
+.kpi-sub {
+    transition: background-color 0.25s ease,
+                color 0.25s ease,
+                border-color 0.25s ease !important;
+}
