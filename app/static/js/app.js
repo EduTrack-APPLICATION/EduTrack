@@ -10,21 +10,31 @@
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     window.CSRF_TOKEN = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
-    // ===== Theme Toggle =====
+// ===== Theme Toggle =====
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
-
-    // El tema ya fue aplicado por el script inline en <head>.
-    // Solo necesitamos sincronizar el icono y manejar el toggle.
+    
+    // Helper: sincronizar AMBOS (data-theme + class) para evitar inconsistencias
+    function applyTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        localStorage.setItem('edutrack-theme', theme);
+    }
+    
+    // Sincronizar al cargar (el inline del <head> solo puso data-theme, faltaba la clase)
     const currentTheme = html.getAttribute('data-theme') || 'light';
+    applyTheme(currentTheme);
     updateThemeIcon(currentTheme);
-
+    
     if (themeToggle) {
         themeToggle.addEventListener('click', function () {
             const current = html.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('edutrack-theme', next);
+            applyTheme(next);
             updateThemeIcon(next);
         });
     }
