@@ -13753,3 +13753,243 @@ html[data-theme="dark"] .today-chip:hover {
         display: none !important;
     }
 }
+
+
+
+/* ============================================================
+   SIDEBAR — Item activo estilo pill iOS
+   ============================================================ */
+
+/* === Reset y estructura del nav === */
+.sidebar-nav {
+    padding: 12px 10px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* === Items del sidebar (todos) === */
+.sidebar .nav-link {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px !important;
+    border-radius: 999px !important;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none !important;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent !important;
+    transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+    margin: 0 !important;
+}
+
+/* Color por defecto (modo claro) */
+html[data-theme="light"] .sidebar .nav-link {
+    color: rgba(28, 25, 23, 0.65) !important;
+    background: transparent !important;
+}
+
+/* Color por defecto (modo oscuro) */
+html[data-theme="dark"] .sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.65) !important;
+    background: transparent !important;
+}
+
+/* Icono de cada item */
+.sidebar .nav-link i {
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) !important;
+    width: 22px;
+    text-align: center;
+}
+
+/* Texto del item */
+.sidebar .nav-link span {
+    flex: 1;
+    transition: transform 0.25s ease !important;
+}
+
+/* ============================================================
+   HOVER en items NO activos
+   ============================================================ */
+html[data-theme="light"] .sidebar .nav-link:not(.active):hover {
+    background: rgba(37, 99, 235, 0.06) !important;
+    color: var(--primary, #2563EB) !important;
+    border-color: rgba(37, 99, 235, 0.1) !important;
+    transform: translateX(2px);
+}
+
+html[data-theme="dark"] .sidebar .nav-link:not(.active):hover {
+    background: rgba(96, 165, 250, 0.08) !important;
+    color: var(--primary-light, #60A5FA) !important;
+    border-color: rgba(96, 165, 250, 0.15) !important;
+    transform: translateX(2px);
+}
+
+.sidebar .nav-link:not(.active):hover i {
+    transform: scale(1.1);
+}
+
+/* ============================================================
+   ITEM ACTIVO — Pill iOS
+   ============================================================ */
+
+/* Modo claro: pill azul translúcido con sombra */
+html[data-theme="light"] .sidebar .nav-link.active {
+    background: linear-gradient(135deg,
+        rgba(37, 99, 235, 0.12),
+        rgba(96, 165, 250, 0.08)) !important;
+    color: #2563EB !important;
+    font-weight: 600 !important;
+    border-color: rgba(37, 99, 235, 0.2) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 2px 8px rgba(37, 99, 235, 0.15),
+        0 1px 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Modo oscuro: pill azul claro */
+html[data-theme="dark"] .sidebar .nav-link.active {
+    background: linear-gradient(135deg,
+        rgba(96, 165, 250, 0.2),
+        rgba(96, 165, 250, 0.1)) !important;
+    color: #93C5FD !important;
+    font-weight: 600 !important;
+    border-color: rgba(96, 165, 250, 0.25) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 2px 8px rgba(96, 165, 250, 0.15),
+        0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Icono del item activo: más vivo */
+.sidebar .nav-link.active i {
+    color: inherit !important;
+    transform: scale(1.08);
+}
+
+/* Brillo deslizante en el item activo (efecto premium) */
+.sidebar .nav-link.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent);
+    animation: sidebarPillShine 3.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes sidebarPillShine {
+    0%, 100% { left: -100%; }
+    50%      { left: 160%; }
+}
+
+/* Hover sobre el item activo (sutil) */
+html[data-theme="light"] .sidebar .nav-link.active:hover {
+    background: linear-gradient(135deg,
+        rgba(37, 99, 235, 0.15),
+        rgba(96, 165, 250, 0.1)) !important;
+    transform: translateX(0);
+}
+
+html[data-theme="dark"] .sidebar .nav-link.active:hover {
+    background: linear-gradient(135deg,
+        rgba(96, 165, 250, 0.25),
+        rgba(96, 165, 250, 0.12)) !important;
+    transform: translateX(0);
+}
+
+/* ============================================================
+   Section headers (PRINCIPAL, GESTIÓN, ACADÉMICO, REPORTES, SISTEMA)
+   ============================================================ */
+.nav-section {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 14px 14px 6px !important;
+    margin: 0 !important;
+}
+
+html[data-theme="light"] .nav-section {
+    color: rgba(120, 113, 108, 0.55) !important;
+}
+
+html[data-theme="dark"] .nav-section {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* La primera sección no necesita tanto padding arriba */
+.nav-section:first-child {
+    padding-top: 4px !important;
+}
+
+/* ============================================================
+   Footer del sidebar (usuario)
+   ============================================================ */
+.sidebar-footer {
+    padding: 10px !important;
+    border-top: 1px solid rgba(231, 229, 228, 0.5);
+}
+
+html[data-theme="dark"] .sidebar-footer {
+    border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.user-mini {
+    border-radius: 14px !important;
+    padding: 10px !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer;
+}
+
+html[data-theme="light"] .user-mini:hover {
+    background: rgba(37, 99, 235, 0.06) !important;
+}
+
+html[data-theme="dark"] .user-mini:hover {
+    background: rgba(96, 165, 250, 0.08) !important;
+}
+
+/* ============================================================
+   Mantener compatibilidad con bottom nav móvil
+   ============================================================ */
+@media (max-width: 991px) {
+    .sidebar .nav-link {
+        border-radius: 12px !important;  /* menos redondo en móvil */
+    }
+
+    .sidebar .nav-link.active::before {
+        animation: none !important;  /* sin brillo en móvil para ahorrar batería */
+    }
+}
+
+/* ============================================================
+   Reduce motion para accesibilidad
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar .nav-link {
+        transition: background-color 0.2s ease, color 0.2s ease !important;
+    }
+
+    .sidebar .nav-link:not(.active):hover {
+        transform: none !important;
+    }
+
+    .sidebar .nav-link.active::before {
+        animation: none !important;
+    }
+
+    .sidebar .nav-link i {
+        transition: none !important;
+    }
+}
+
