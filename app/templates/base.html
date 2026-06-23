@@ -19,6 +19,7 @@
 
     <!-- Anti-flash de tema: aplicar tema guardado ANTES de pintar el body -->
     <!-- Anti-flash de tema: aplicar tema guardado ANTES de pintar el body -->
+   <!-- Anti-flash de tema: aplicar tema guardado ANTES de pintar el body -->
     <script nonce="{{ csp_nonce() }}">
         (function () {
             try {
@@ -27,13 +28,7 @@
                     saved = window.matchMedia('(prefers-color-scheme: dark)').matches
                         ? 'dark' : 'light';
                 }
-                // Aplicar AMBOS: data-theme y class para máxima compatibilidad
                 document.documentElement.setAttribute('data-theme', saved);
-                if (saved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
             } catch (e) { /* localStorage no disponible */ }
         })();
     </script>
