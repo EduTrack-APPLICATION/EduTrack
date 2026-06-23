@@ -13113,3 +13113,85 @@ html.dark .kpi-sub {
                 color 0.25s ease,
                 border-color 0.25s ease !important;
 }
+/* ============================================================
+   HOVER LIFT — las cards se "levantan" suavemente
+   ============================================================ */
+
+/* Efecto en todas las cards principales */
+.kpi-card,
+.dash2-card,
+.panel,
+.card {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background-color 0.25s ease,
+                border-color 0.25s ease !important;
+    will-change: transform;
+}
+
+/* Modo claro: levantarse con sombra suave */
+html[data-theme="light"] .kpi-card:hover,
+html[data-theme="light"] .dash2-card:hover,
+html[data-theme="light"] .panel:hover,
+html[data-theme="light"] .card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 12px 32px -8px rgba(0, 0, 0, 0.12),
+        0 4px 12px -2px rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Modo oscuro: levantarse con sombra más profunda */
+html[data-theme="dark"] .kpi-card:hover,
+html[data-theme="dark"] .dash2-card:hover,
+html[data-theme="dark"] .panel:hover,
+html[data-theme="dark"] .card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.08) inset,
+        0 12px 32px -8px rgba(0, 0, 0, 0.5),
+        0 4px 12px -2px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+/* Click "presiona" la card */
+.kpi-card:active,
+.dash2-card:active,
+.panel:active,
+.card:active {
+    transform: translateY(-1px) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* No aplicar el efecto a cards dentro de tablas o modales */
+.modal-content .card,
+.table .card,
+td .card,
+.search-modal-content .card {
+    transform: none !important;
+}
+
+.modal-content .card:hover,
+.table .card:hover,
+td .card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Reducir intensidad si el usuario prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .kpi-card,
+    .dash2-card,
+    .panel,
+    .card {
+        transition: background-color 0.2s ease, border-color 0.2s ease !important;
+    }
+
+    .kpi-card:hover,
+    .dash2-card:hover,
+    .panel:hover,
+    .card:hover {
+        transform: none !important;
+    }
+}
