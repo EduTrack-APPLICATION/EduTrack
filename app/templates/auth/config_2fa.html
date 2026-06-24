@@ -3,9 +3,9 @@
 {% block page_title %}Verificación en dos pasos{% endblock %}
 
 {% block content %}
-<div class="container-fluid" style="max-width: 720px;">
+<div class="config2fa-wrap">
 
-    <div class="d-flex align-items-center gap-3 mb-3">
+    <div class="d-flex align-items-center gap-3 mb-4">
         <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Volver
         </a>
@@ -15,23 +15,146 @@
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
+    {# ===== Card principal con estado del 2FA ===== #}
+    <div class="config2fa-card">
+
+        {# Halo de fondo según estado #}
+        <div class="config2fa-halo {% if current_user.totp_habilitado %}config2fa-halo-active{% else %}config2fa-halo-inactive{% endif %}"></div>
+
+        <div class="config2fa-content">
+
             {% if current_user.totp_habilitado %}
-                <h5 class="mb-2"><i class="bi bi-shield-check text-success"></i> 2FA activo</h5>
-                <p class="text-muted small mb-3">
-                    Tu cuenta está protegida con verificación en dos pasos.
-                    Te quedan <strong>{{ recovery_restantes }}</strong> códigos de recuperación.
+                {# ===== ESTADO: ACTIVO ===== #}
+                <div class="config2fa-icon config2fa-icon-active">
+                    <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
+                        <path d="M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z"
+                              stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+                        <path d="M17 24 L22 29 L31 19" stroke="currentColor" stroke-width="2.4"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <div class="config2fa-badge config2fa-badge-active">
+                    <span class="config2fa-dot"></span>
+                    Activo y protegiendo tu cuenta
+                </div>
+
+                <h2 class="config2fa-title">
+                    Tu cuenta está <span class="config2fa-title-accent">protegida</span>
+                </h2>
+
+                <p class="config2fa-text">
+                    La verificación en dos pasos está activa. Cada vez que inicies sesión, te pediremos un código de tu app autenticadora.
                 </p>
+
+                {# Stats de recovery codes #}
+                <div class="config2fa-stats">
+                    <div class="config2fa-stat">
+                        <div class="config2fa-stat-num">{{ recovery_restantes }}</div>
+                        <div class="config2fa-stat-label">códigos de recuperación restantes</div>
+                    </div>
+                </div>
+
+                {# Features #}
+                <div class="config2fa-features">
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico">
+                            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                                <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.2"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span>Código TOTP de 6 dígitos</span>
+                    </div>
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico">
+                            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                                <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.2"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span>10 códigos de recuperación</span>
+                    </div>
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico">
+                            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                                <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2.2"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span>Compatible con Google Authenticator, Authy, etc.</span>
+                    </div>
+                </div>
+
             {% else %}
-                <h5 class="mb-2"><i class="bi bi-shield-exclamation text-warning"></i> 2FA no activo</h5>
-                <p class="text-muted small mb-3">
-                    Añade una capa extra de seguridad a tu cuenta.
+                {# ===== ESTADO: INACTIVO ===== #}
+                <div class="config2fa-icon config2fa-icon-inactive">
+                    <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
+                        <path d="M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z"
+                              stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+                        <path d="M24 16 L24 24" stroke="currentColor" stroke-width="2.4"
+                              stroke-linecap="round"/>
+                        <circle cx="24" cy="30" r="1.5" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <div class="config2fa-badge config2fa-badge-inactive">
+                    <span class="config2fa-dot"></span>
+                    No activado
+                </div>
+
+                <h2 class="config2fa-title">
+                    Protege tu cuenta con <span class="config2fa-title-accent-warn">2FA</span>
+                </h2>
+
+                <p class="config2fa-text">
+                    La verificación en dos pasos añade una capa extra de seguridad. Aunque alguien obtenga tu contraseña, no podrá entrar sin tu celular.
                 </p>
-                <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary">
-                    <i class="bi bi-shield-lock"></i> Activar 2FA
+
+                {# Botón activar #}
+                <a href="{{ url_for('auth.setup_2fa') }}" class="config2fa-activate-btn">
+                    <span>Activar 2FA ahora</span>
+                    <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                        <path d="M5 10h10m0 0l-4-4m4 4l-4 4" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </a>
+
+                {# Features explicativas #}
+                <div class="config2fa-features">
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico config2fa-feat-ico-blue">
+                            <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                                <rect x="6" y="3" width="8" height="14" rx="1.5"
+                                      stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M10 14h.01" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <span>Usa tu celular como segundo factor</span>
+                    </div>
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico config2fa-feat-ico-blue">
+                            <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span>Código nuevo cada 30 segundos</span>
+                    </div>
+                    <div class="config2fa-feat">
+                        <div class="config2fa-feat-ico config2fa-feat-ico-blue">
+                            <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                                <path d="M10 2l3 3v5a8 8 0 11-6 0V5l3-3z"
+                                      stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                        </div>
+                        <span>10 códigos de recuperación de respaldo</span>
+                    </div>
+                </div>
+
             {% endif %}
+
         </div>
     </div>
 
