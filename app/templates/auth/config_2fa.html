@@ -1,40 +1,141 @@
-
 {% extends "base.html" %}
-{% block title %}Verificación 2FA · EduTrack{% endblock %}
+{% block title %}Configuración 2FA · EduTrack{% endblock %}
+{% block page_title %}Verificación en dos pasos{% endblock %}
 
 {% block content %}
-<div class="lg-recover">
+<div class="container-fluid" style="max-width: 720px;">
 
-    <div class="lg-recover-bg" aria-hidden="true">
-        <div class="lg-recover-orb lg-2fa-orb-1"></div>
-        <div class="lg-recover-orb lg-2fa-orb-2"></div>
-        <div class="lg-recover-orb lg-2fa-orb-3"></div>
-        <div class="lg-recover-noise"></div>
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div>
+            <h4 class="mb-0">Verificación en dos pasos</h4>
+            <small class="text-muted">Gestiona la seguridad adicional de tu cuenta</small>
+        </div>
     </div>
 
-    <div class="lg-recover-card">
+    {# ===== Estado actual del 2FA ===== #}
+    <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-3">
+            {% if current_user.totp_habilitado %}
+                <div class="config-2fa-status-icon config-2fa-active">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="mb-1">2FA está activo</h5>
+                    <p class="text-muted small mb-0">
+                        Tu cuenta está protegida con verificación en dos pasos.
+                    </p>
+                </div>
+                <span class="badge bg-success-subtle text-success px-3 py-2">
+                    <i class="bi bi-check-circle-fill"></i> Activo
+                </span>
+            {% else %}
+                <div class="config-2fa-status-icon config-2fa-inactive">
+                    <i class="bi bi-shield-exclamation"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="mb-1">2FA no está activo</h5>
+                    <p class="text-muted small mb-0">
+                        Añade una capa extra de seguridad a tu cuenta.
+                    </p>
+                </div>
+                <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary">
+                    <i class="bi bi-shield-lock"></i> Activar ahora
+                </a>
+            {% endif %}
+        </div>
+    </div>
 
-        <header class="lg-recover-head">
-            <div class="lg-recover-icon lg-2fa-icon">
-                <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
-                    <path d="M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z"
-                          stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
-                    <path d="M17 24 L22 29 L31 19" stroke="currentColor" stroke-width="2.4"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+    {# ===== Acciones disponibles SI 2FA está activo ===== #}
+    {% if current_user.totp_habilitado %}
+
+        {# === Códigos de recuperación === #}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-key-fill text-warning"></i>
+                    Códigos de recuperación
+                </h6>
             </div>
-            <div class="lg-recover-mark">Verificación de seguridad</div>
-        </header>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Los códigos de recuperación te permiten ingresar si pierdes acceso a tu app autenticadora.
+                    Te quedan <strong>{{ recovery_restantes }}</strong>
+                    de 10 códigos disponibles.
+                </p>
 
-        <div class="lg-recover-body">
-
-            <div class="lg-recover-heading">
-                <h1>Verifica tu identidad</h1>
-                <p>Ingresa el código de 6 dígitos de tu app autenticadora (Google Authenticator, Authy, etc.)</p>
+                <form method="POST" action="{{ url_for('auth.regenerar_recovery_codes') }}"
+                      data-confirm="Esto invalidará los códigos anteriores. ¿Continuar?">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="password_regen" class="form-label small">
+                            Confirma tu contraseña actual
+                        </label>
+                        <input type="password" name="password" id="password_regen"
+                               class="form-control" placeholder="Tu contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-sm">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Generar nuevos códigos de recuperación
+                    </button>
+                </form>
             </div>
+        </div>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
+        {# === Deshabilitar 2FA === #}
+        <div class="card mb-3 border-danger-subtle">
+            <div class="card-header">
+                <h6 class="mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Zona de peligro
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Deshabilitar el 2FA reducirá la seguridad de tu cuenta. Solo hazlo si es necesario.
+                </p>
+
+                <form method="POST" action="{{ url_for('auth.deshabilitar_2fa') }}"
+                      data-confirm="¿Realmente quieres deshabilitar el 2FA? Tu cuenta quedará menos protegida.">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="password_disable" class="form-label small">
+                            Confirma tu contraseña actual
+                        </label>
+                        <input type="password" name="password" id="password_disable"
+                               class="form-control" placeholder="Tu contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-shield-slash"></i> Deshabilitar 2FA
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    {% endif %}
+
+    {# ===== Info educativa si 2FA está inactivo ===== #}
+    {% if not current_user.totp_habilitado %}
+    <div class="card border-info-subtle">
+        <div class="card-body">
+            <h6 class="mb-3">
+                <i class="bi bi-info-circle-fill text-info"></i>
+                ¿Qué es la verificación en dos pasos?
+            </h6>
+            <ul class="text-muted small mb-0">
+                <li>Añade una capa de seguridad adicional a tu cuenta</li>
+                <li>Requiere un código temporal de tu celular para iniciar sesión</li>
+                <li>Funciona con Google Authenticator, Authy, Microsoft Authenticator y otras apps</li>
+                <li>Te damos 10 códigos de recuperación por si pierdes el celular</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}                {% if messages %}
                     {% for category, message in messages %}
                     <div class="lg-recover-alert lg-recover-alert-{{ 'danger' if category == 'error' else category }}">
                         <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
