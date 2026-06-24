@@ -621,9 +621,6 @@ Si EduTrack pasa de proyecto educativo a producto comercial, formalizar la entid
 
 Documentos legales para que los colegios firmen al usar el sistema, especialmente importante por el manejo de datos de menores de edad.
 
-#### Cumplimiento con Ley de Protección de Datos
-
-Costa Rica tiene la Ley 8968 de Protección de la Persona Frente al Tratamiento de sus Datos Personales. EduTrack maneja datos sensibles de menores, lo cual requiere registro en la PRODHAB y cumplimiento estricto.
 
 #### Acuerdo de servicio (SLA)
 
@@ -640,7 +637,7 @@ Documentar qué pasa si los desarrolladores originales dejan el proyecto. Inclui
 **Andrick Marín**
 
 
-**Danier**
+**Danier Quesada**
 - Co-desarrollador
 
 ---
