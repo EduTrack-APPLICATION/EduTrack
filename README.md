@@ -1,8 +1,7 @@
 # EduTrack
 
 Sistema de Gestión Académica para instituciones educativas de Costa Rica.
-
-Desarrollado originalmente para el Liceo Rural Manzanillo, EduTrack centraliza la gestión de estudiantes, profesores, materias, grupos, evaluaciones, asistencia y reportes en una plataforma web moderna, segura y accesible desde cualquier dispositivo.
+EduTrack centraliza la gestión de estudiantes, profesores, materias, grupos, evaluaciones, asistencia y reportes en una plataforma web moderna, segura y accesible desde cualquier dispositivo.
 
 **Sitio en producción**: [www.edu-track.school](https://www.edu-track.school)
 
