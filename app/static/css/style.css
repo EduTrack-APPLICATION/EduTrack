@@ -13993,3 +13993,166 @@ html[data-theme="dark"] .user-mini:hover {
     }
 }
 
+
+/* ============================================================
+   2FA — Modo recovery + toggle entre modos
+   ============================================================ */
+
+/* === Input de código de recuperación (formato XXXX-XXXX) === */
+.lg-2fa-recovery-wrap {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    padding: 4px;
+}
+
+.lg-2fa-recovery-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: #F59E0B;
+    box-shadow:
+        0 0 0 4px rgba(245, 158, 11, 0.15),
+        0 4px 16px rgba(245, 158, 11, 0.1);
+}
+
+.lg-2fa-recovery-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 14px 16px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1c1917;
+    outline: none;
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    text-align: center;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.lg-2fa-recovery-input::placeholder {
+    color: rgba(68, 64, 60, 0.3);
+    letter-spacing: 0.15em;
+}
+
+/* === Botón de recovery (ambar/dorado) === */
+.lg-2fa-recovery-btn {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 8px 20px rgba(245, 158, 11, 0.35) !important;
+}
+
+.lg-2fa-recovery-btn:hover {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 12px 28px rgba(245, 158, 11, 0.5) !important;
+}
+
+/* === Toggle entre modo normal y recovery === */
+.lg-2fa-toggle-wrap {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(231, 229, 228, 0.5);
+    text-align: center;
+}
+
+.lg-2fa-toggle-btn {
+    background: transparent;
+    border: 1px solid rgba(231, 229, 228, 0.6);
+    color: rgba(68, 64, 60, 0.75);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+.lg-2fa-toggle-btn:hover {
+    background: rgba(245, 158, 11, 0.08);
+    color: #92400e;
+    border-color: rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Contador de códigos restantes */
+.lg-2fa-recovery-count {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(68, 64, 60, 0.55);
+    font-weight: 500;
+}
+
+.lg-2fa-recovery-count strong {
+    color: #D97706;
+    font-weight: 700;
+}
+
+/* === Modo oscuro === */
+[data-theme="dark"] .lg-2fa-recovery-wrap,
+.dark .lg-2fa-recovery-wrap {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .lg-2fa-recovery-wrap:focus-within,
+.dark .lg-2fa-recovery-wrap:focus-within {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #FCD34D;
+    box-shadow:
+        0 0 0 4px rgba(245, 158, 11, 0.2),
+        0 4px 16px rgba(245, 158, 11, 0.15);
+}
+
+[data-theme="dark"] .lg-2fa-recovery-input,
+.dark .lg-2fa-recovery-input {
+    color: #fff;
+}
+
+[data-theme="dark"] .lg-2fa-recovery-input::placeholder,
+.dark .lg-2fa-recovery-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="dark"] .lg-2fa-toggle-wrap,
+.dark .lg-2fa-toggle-wrap {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .lg-2fa-toggle-btn,
+.dark .lg-2fa-toggle-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .lg-2fa-toggle-btn:hover,
+.dark .lg-2fa-toggle-btn:hover {
+    background: rgba(245, 158, 11, 0.1);
+    color: #FDE68A;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .lg-2fa-recovery-count,
+.dark .lg-2fa-recovery-count {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .lg-2fa-recovery-count strong,
+.dark .lg-2fa-recovery-count strong {
+    color: #FCD34D;
+}
+
+/* Estado loading del botón */
+.lg-recover-submit.is-loading {
+    opacity: 0.8;
+    cursor: wait;
+}
+
