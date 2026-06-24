@@ -14192,4 +14192,355 @@ html[data-theme="dark"] .user-mini:hover {
 .dark .config-2fa-inactive {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.08));
 }
+/* ============================================================
+   CONFIG 2FA — Pantalla de gestión del 2FA con liquid glass
+   ============================================================ */
+
+.config2fa-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Card principal con liquid glass */
+.config2fa-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(231, 229, 228, 0.5);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 12px 32px -8px rgba(0, 0, 0, 0.08),
+        0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .config2fa-card,
+.dark .config2fa-card {
+    background: rgba(28, 25, 23, 0.4);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 12px 32px -8px rgba(0, 0, 0, 0.4);
+}
+
+/* Halo de fondo (orbe difuminado) */
+.config2fa-halo {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    top: -120px;
+    right: -120px;
+    z-index: 0;
+    pointer-events: none;
+    animation: config2faFloat 8s ease-in-out infinite;
+}
+
+.config2fa-halo-active {
+    background: radial-gradient(circle, #10B981, transparent 70%);
+}
+
+.config2fa-halo-inactive {
+    background: radial-gradient(circle, #F59E0B, transparent 70%);
+}
+
+@keyframes config2faFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-20px, 20px) scale(1.05); }
+}
+
+[data-theme="dark"] .config2fa-halo,
+.dark .config2fa-halo {
+    opacity: 0.25;
+}
+
+/* Contenido sobre el halo */
+.config2fa-content {
+    position: relative;
+    z-index: 1;
+    padding: 40px 32px;
+    text-align: center;
+}
+
+/* Icono escudo */
+.config2fa-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.config2fa-card:hover .config2fa-icon {
+    transform: translateY(-4px) scale(1.05);
+}
+
+.config2fa-icon-active {
+    background: linear-gradient(135deg,
+        rgba(16, 185, 129, 0.2),
+        rgba(16, 185, 129, 0.08));
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3) inset,
+        0 8px 24px rgba(16, 185, 129, 0.25);
+}
+
+.config2fa-icon-inactive {
+    background: linear-gradient(135deg,
+        rgba(245, 158, 11, 0.2),
+        rgba(245, 158, 11, 0.08));
+    color: #F59E0B;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3) inset,
+        0 8px 24px rgba(245, 158, 11, 0.25);
+}
+
+/* Badge de estado */
+.config2fa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+    backdrop-filter: blur(8px);
+}
+
+.config2fa-badge-active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.config2fa-badge-inactive {
+    background: rgba(245, 158, 11, 0.12);
+    color: #92400E;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+[data-theme="dark"] .config2fa-badge-active,
+.dark .config2fa-badge-active {
+    color: #6EE7B7;
+}
+
+[data-theme="dark"] .config2fa-badge-inactive,
+.dark .config2fa-badge-inactive {
+    color: #FCD34D;
+}
+
+/* Punto pulsante del badge */
+.config2fa-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: config2faPulse 2s ease-in-out infinite;
+}
+
+@keyframes config2faPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Título */
+.config2fa-title {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    letter-spacing: -0.02em;
+    color: #1c1917;
+}
+
+[data-theme="dark"] .config2fa-title,
+.dark .config2fa-title {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.config2fa-title-accent {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.config2fa-title-accent-warn {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Texto descriptivo */
+.config2fa-text {
+    color: rgba(68, 64, 60, 0.7);
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0 auto 24px;
+    max-width: 480px;
+}
+
+[data-theme="dark"] .config2fa-text,
+.dark .config2fa-text {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* Stats (códigos de recuperación restantes) */
+.config2fa-stats {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 18px 32px;
+    margin: 8px auto 26px;
+}
+
+[data-theme="dark"] .config2fa-stats,
+.dark .config2fa-stats {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.config2fa-stat-num {
+    font-size: 36px;
+    font-weight: 800;
+    color: #10B981;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.config2fa-stat-label {
+    font-size: 11px;
+    color: rgba(68, 64, 60, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .config2fa-stat-label,
+.dark .config2fa-stat-label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Botón activar */
+.config2fa-activate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 8px auto 28px;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 8px 20px rgba(245, 158, 11, 0.35);
+    transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.config2fa-activate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3) inset,
+        0 12px 28px rgba(245, 158, 11, 0.5);
+}
+
+.config2fa-activate-btn svg {
+    transition: transform 0.25s ease;
+}
+
+.config2fa-activate-btn:hover svg {
+    transform: translateX(3px);
+}
+
+/* Features list */
+.config2fa-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    margin: 16px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(231, 229, 228, 0.5);
+}
+
+[data-theme="dark"] .config2fa-features,
+.dark .config2fa-features {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.config2fa-feat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    font-size: 13px;
+    color: rgba(68, 64, 60, 0.75);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .config2fa-feat,
+.dark .config2fa-feat {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.config2fa-feat-ico {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.config2fa-feat-ico-blue {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563EB;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .config2fa-content {
+        padding: 28px 20px;
+    }
+
+    .config2fa-title {
+        font-size: 24px;
+    }
+
+    .config2fa-stats {
+        padding: 14px 24px;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .config2fa-halo,
+    .config2fa-dot,
+    .config2fa-icon {
+        animation: none !important;
+        transition: none !important;
+    }
+}
 
