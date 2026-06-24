@@ -46,7 +46,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" novalidate class="lg-recover-form" id="form2FA" data-skip-transition>
+            <form method="POST" action="{{ url_for('auth.verificar_2fa') }}" novalidate class="lg-recover-form" id="form2FA" data-skip-transition>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 {# ===== Modo normal: código TOTP de 6 dígitos ===== #}
