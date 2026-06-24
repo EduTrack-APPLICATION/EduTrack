@@ -1,91 +1,168 @@
 {% extends "base.html" %}
-{% block title %}Verificación 2FA{% endblock %}
+{% block title %}Verificación 2FA · EduTrack{% endblock %}
 
 {% block auth_content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; padding:2rem 1rem;">
-<div class="card shadow-lg" style="max-width:440px; width:100%;">
-    <div class="card-body p-4 p-md-5">
+<div class="lg-recover">
 
-        {# Flash messages (igual que en login.html) #}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="lg-recover-bg" aria-hidden="true">
+        <div class="lg-recover-orb lg-2fa-orb-1"></div>
+        <div class="lg-recover-orb lg-2fa-orb-2"></div>
+        <div class="lg-recover-orb lg-2fa-orb-3"></div>
+        <div class="lg-recover-noise"></div>
+    </div>
+
+    <div class="lg-recover-card">
+
+        <header class="lg-recover-head">
+            <div class="lg-recover-icon lg-2fa-icon">
+                <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+                    <path d="M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z"
+                          stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+                    <path d="M17 24 L22 29 L31 19" stroke="currentColor" stroke-width="2.4"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="lg-recover-mark">Verificación de seguridad</div>
+        </header>
+
+        <div class="lg-recover-body">
+
+            <div class="lg-recover-heading">
+                <h1>Verificación en dos pasos</h1>
+                <p>Hola <strong>{{ username }}</strong>, ingresa el código de 6 dígitos de tu app de autenticación.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="lg-recover-alert lg-recover-alert-{{ 'danger' if category == 'error' else category }}">
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ message }}</span>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        <div class="text-center mb-4">
-            <div class="mfa-icon">
-                <i class="bi bi-shield-lock-fill"></i>
-            </div>
-            <h4 class="mt-3 mb-1">Verificación en dos pasos</h4>
-            <p class="text-muted small mb-0">
-                Hola <strong>{{ username }}</strong>, ingresa el código de 6 dígitos
-                de tu app de autenticación
-            </p>
-        </div>
+            <form method="POST" novalidate class="lg-recover-form" id="form2FA" data-skip-transition>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <form method="POST" id="form2FA" data-skip-transition>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {# ===== Modo normal: código TOTP de 6 dígitos ===== #}
+                <div id="modoNormal">
+                    <div class="lg-recover-field">
+                        <label for="codigoInput">Código de 6 dígitos</label>
+                        <div class="lg-2fa-code-wrap">
+                            <input type="text" name="codigo" id="codigoInput"
+                                   class="lg-2fa-code-input"
+                                   placeholder="000000"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   pattern="[0-9]{6}"
+                                   autocomplete="one-time-code"
+                                   autofocus required>
+                        </div>
+                        <div class="lg-2fa-hint">
+                            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span>Abre Google Authenticator, Authy, Microsoft Authenticator…</span>
+                        </div>
+                    </div>
 
-            <div id="modoNormal">
-                <div class="mb-3">
-                    <label class="form-label">Código de 6 dígitos</label>
-                    <input type="text" name="codigo" id="codigoInput"
-                           class="form-control form-control-lg mfa-code-input"
-                           maxlength="7" inputmode="numeric"
-                           autocomplete="one-time-code"
-                           placeholder="123456" autofocus required>
-                    <small class="text-muted">
-                        Abre Google Authenticator, Authy, Microsoft Authenticator, etc.
-                    </small>
+                    <button type="submit" class="lg-recover-submit lg-2fa-submit" id="btnVerificar">
+                        <span class="lg-recover-submit-text">Verificar y continuar</span>
+                        <svg class="lg-recover-submit-arrow" viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor"
+                                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
-                <button class="btn btn-primary btn-lg w-100" type="submit" id="btnVerificar">
-                    <i class="bi bi-check-lg"></i> Verificar
-                </button>
+
+                {# ===== Modo recovery: código de respaldo ===== #}
+                <div id="modoRecovery" style="display:none;">
+                    <input type="hidden" name="recovery" value="1" disabled id="hiddenRecovery">
+
+                    <div class="lg-recover-field">
+                        <label for="codigoRecoveryInput">Código de recuperación</label>
+                        <div class="lg-2fa-recovery-wrap">
+                            <input type="text" name="codigo_recovery" id="codigoRecoveryInput"
+                                   class="lg-2fa-recovery-input"
+                                   placeholder="XXXX-XXXX"
+                                   autocomplete="off"
+                                   disabled>
+                        </div>
+                        <div class="lg-2fa-hint">
+                            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                                <path d="M10 2l3 3v5a8 8 0 11-6 0V5l3-3z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <span>Uno de los 10 códigos que guardaste al configurar el 2FA</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="lg-recover-submit lg-2fa-recovery-btn" disabled>
+                        <span class="lg-recover-submit-text">Usar código de recuperación</span>
+                        <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                            <path d="M7 10h2m0 0h2m-2 0V8m0 2v2" stroke="currentColor" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {# ===== Toggle entre modos ===== #}
+                <div class="lg-2fa-toggle-wrap">
+                    <button type="button" class="lg-2fa-toggle-btn" id="toggleMode">
+                        <svg id="toggleIcon" viewBox="0 0 20 20" fill="none" width="14" height="14">
+                            <path id="toggleIconPath"
+                                  d="M10 2l3 3v5a8 8 0 11-6 0V5l3-3z"
+                                  stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                        <span id="toggleText">No tengo acceso a mi app, usar código de recuperación</span>
+                    </button>
+
+                    {% if recovery_restantes is defined and recovery_restantes > 0 %}
+                    <div class="lg-2fa-recovery-count">
+                        Tienes <strong>{{ recovery_restantes }}</strong>
+                        código{{ '' if recovery_restantes == 1 else 's' }} de recuperación disponible{{ '' if recovery_restantes == 1 else 's' }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <a href="{{ url_for('auth.login') }}" class="lg-recover-back" data-skip-transition>
+                    <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+                        <path d="M16 10H4m0 0l4-4m-4 4l4 4" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Volver al login</span>
+                </a>
+            </form>
+
+            <div class="lg-recover-features">
+                <div class="lg-recover-feat">
+                    <div class="lg-recover-feat-ico lg-2fa-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                            <path d="M10 2l3 3v5a8 8 0 11-6 0V5l3-3z" stroke="currentColor" stroke-width="1.6"/>
+                        </svg>
+                    </div>
+                    <span>Tu cuenta está protegida con 2FA</span>
+                </div>
+                <div class="lg-recover-feat">
+                    <div class="lg-recover-feat-ico lg-2fa-feat-ico">
+                        <svg viewBox="0 0 20 20" fill="none" width="12" height="12">
+                            <path d="M5 10l3 3 7-7" stroke="currentColor" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span>Encriptado de extremo a extremo</span>
+                </div>
             </div>
 
-            <div id="modoRecovery" style="display:none;">
-                <input type="hidden" name="recovery" value="1" disabled id="hiddenRecovery">
-                <div class="mb-3">
-                    <label class="form-label">Código de recuperación</label>
-                    <input type="text" name="codigo_recovery"
-                           class="form-control form-control-lg"
-                           placeholder="XXXX-XXXX" style="font-family:monospace;" disabled>
-                    <small class="text-muted">
-                        Uno de los 10 códigos que guardaste al configurar el 2FA.
-                    </small>
-                </div>
-                <button class="btn btn-warning btn-lg w-100" type="submit" disabled>
-                    <i class="bi bi-key"></i> Usar código de recuperación
-                </button>
-            </div>
-        </form>
-
-        <hr class="my-4">
-
-        <div class="text-center">
-            <button type="button" class="btn btn-sm btn-link" id="toggleMode">
-                <i class="bi bi-key"></i> No tengo acceso a mi app, usar código de recuperación
-            </button>
-            {% if recovery_restantes > 0 %}
-                <div class="small text-muted mt-1">
-                    Tienes {{ recovery_restantes }} código{{ '' if recovery_restantes == 1 else 's' }} de recuperación
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="text-center mt-3">
-            <a href="{{ url_for('auth.login') }}" class="text-muted small" data-skip-transition>
-                <i class="bi bi-arrow-left"></i> Volver al login
-            </a>
         </div>
     </div>
-</div>
+
 </div>
 {% endblock %}
 
@@ -94,38 +171,48 @@
 (function () {
     const form = document.getElementById('form2FA');
     const codeInput = document.getElementById('codigoInput');
+    const recoveryInput = document.getElementById('codigoRecoveryInput');
     const btnVerificar = document.getElementById('btnVerificar');
     const toggle = document.getElementById('toggleMode');
+    const toggleText = document.getElementById('toggleText');
+    const toggleIconPath = document.getElementById('toggleIconPath');
     const modoNormal = document.getElementById('modoNormal');
     const modoRecovery = document.getElementById('modoRecovery');
+    const hiddenRecovery = document.getElementById('hiddenRecovery');
 
-    // Solo numeros, max 6 (sin auto-submit, sin formato con espacio)
+    // Solo números, max 6 (sin auto-submit para evitar errores)
     if (codeInput) {
         codeInput.addEventListener('input', e => {
             e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
         });
     }
 
+    // Formato XXXX-XXXX para código de recuperación
+    if (recoveryInput) {
+        recoveryInput.addEventListener('input', e => {
+            let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (v.length > 4) v = v.slice(0, 4) + '-' + v.slice(4, 8);
+            e.target.value = v;
+        });
+    }
+
     // Protección contra doble-submit
     if (form && btnVerificar) {
         let enviando = false;
-        form.addEventListener('submit', e => {
-            if (enviando) {
-                e.preventDefault();
-                return false;
-            }
+        form.addEventListener('submit', () => {
+            if (enviando) return false;
             enviando = true;
-            btnVerificar.disabled = true;
-            btnVerificar.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-2"></span>Verificando...';
-            // Re-habilitar tras 5 segundos por si el servidor falla
-            setTimeout(() => {
-                enviando = false;
-                if (btnVerificar) {
-                    btnVerificar.disabled = false;
-                    btnVerificar.innerHTML = '<i class="bi bi-check-lg"></i> Verificar';
-                }
-            }, 5000);
+
+            const btnActivo = modoRecovery.style.display === 'none'
+                ? btnVerificar
+                : modoRecovery.querySelector('button[type="submit"]');
+
+            if (btnActivo) {
+                btnActivo.disabled = true;
+                btnActivo.classList.add('is-loading');
+                const txt = btnActivo.querySelector('.lg-recover-submit-text');
+                if (txt) txt.textContent = 'Verificando…';
+            }
         });
     }
 
@@ -134,26 +221,50 @@
         let modoRecov = false;
         toggle.addEventListener('click', () => {
             modoRecov = !modoRecov;
+
             modoNormal.style.display = modoRecov ? 'none' : '';
             modoRecovery.style.display = modoRecov ? '' : 'none';
 
-            // Habilitar/deshabilitar inputs para que el form correcto se envie
+            // Habilitar/deshabilitar inputs según el modo activo
             modoNormal.querySelectorAll('input, button').forEach(el => {
                 el.disabled = modoRecov;
             });
             modoRecovery.querySelectorAll('input, button').forEach(el => {
                 el.disabled = !modoRecov;
             });
+
             // El input del recovery debe llamarse "codigo" cuando se usa
-            const recInput = modoRecovery.querySelector('input[name="codigo_recovery"]');
-            if (recInput) {
-                recInput.name = modoRecov ? 'codigo' : 'codigo_recovery';
+            if (recoveryInput) {
+                recoveryInput.name = modoRecov ? 'codigo' : 'codigo_recovery';
             }
 
-            toggle.innerHTML = modoRecov
-                ? '<i class="bi bi-shield-lock"></i> Volver a usar la app de autenticación'
-                : '<i class="bi bi-key"></i> No tengo acceso a mi app, usar código de recuperación';
+            // Cambiar texto e icono del toggle
+            if (modoRecov) {
+                toggleText.textContent = 'Volver a usar la app de autenticación';
+                if (toggleIconPath) {
+                    toggleIconPath.setAttribute('d', 'M24 4 L40 12 L40 24 C40 33 33 40 24 44 C15 40 8 33 8 24 L8 12 Z');
+                }
+                if (recoveryInput) recoveryInput.focus();
+            } else {
+                toggleText.textContent = 'No tengo acceso a mi app, usar código de recuperación';
+                if (toggleIconPath) {
+                    toggleIconPath.setAttribute('d', 'M10 2l3 3v5a8 8 0 11-6 0V5l3-3z');
+                }
+                if (codeInput) codeInput.focus();
+            }
         });
+    }
+
+    // Shake si hay error
+    const card = document.querySelector('.lg-recover-card');
+    const hasError = document.querySelector('.lg-recover-alert-danger');
+    if (card && hasError) {
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 500);
+        if (codeInput) {
+            codeInput.value = '';
+            codeInput.focus();
+        }
     }
 })();
 </script>
