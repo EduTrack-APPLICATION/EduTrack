@@ -411,12 +411,11 @@ def importar_confirmar():
     # Generar cuentas del portal para los recién importados
     try:
         from app.utils.portal_helpers import generar_cuenta_estudiante
-        ids_creados = resumen.get('ids_creados') if isinstance(resumen, dict) else None
-        if ids_creados:
+        estudiantes_creados = resumen.get('estudiantes_creados') if isinstance(resumen, dict) else None
+        if estudiantes_creados:
             creadas = 0
-            for est_id in ids_creados:
-                est = Estudiante.query.get(est_id)
-                if est and generar_cuenta_estudiante(est, commit=False):
+            for est in estudiantes_creados:
+                if generar_cuenta_estudiante(est, commit=False):
                     creadas += 1
             db.session.commit()
             if creadas:
