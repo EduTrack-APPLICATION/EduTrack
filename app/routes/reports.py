@@ -32,6 +32,15 @@ def boletin(estudiante_id, grupo_id=None):
     estudiante = Estudiante.query.get_or_404(estudiante_id)
     grupo = Grupo.query.get(grupo_id) if grupo_id else None
 
+    if current_user.is_profesor() and current_user.profesor:
+        if grupo is not None:
+            if grupo.profesor_id != current_user.profesor.id:
+                flash('Sin permisos.', 'danger')
+                return redirect(url_for('reports.index'))
+        elif not any(g.profesor_id == current_user.profesor.id for g in estudiante.grupos):
+            flash('Sin permisos.', 'danger')
+            return redirect(url_for('reports.index'))
+
     buf = ReporteService.boletin_estudiante(estudiante, grupo=grupo)
     filename = f'boletin_{estudiante.codigo}.pdf'
     return send_file(buf, mimetype='application/pdf',
