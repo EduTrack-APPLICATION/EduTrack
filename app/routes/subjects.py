@@ -4,6 +4,8 @@ CRUD de Materias.
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 
+from sqlalchemy.exc import IntegrityError
+
 from app import db
 from app.models import Materia
 from app.utils.forms import MateriaForm
@@ -41,7 +43,12 @@ def crear():
             m = Materia()
             form.populate_obj(m)
             db.session.add(m)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe una materia con ese código.', 'danger')
+                return render_template('subjects/form.html', form=form, titulo='Nueva materia')
             flash(
                 f'Materia "{m.nombre}" creada. '
                 f'Ahora crea un grupo para poder asignar evaluaciones y matricular estudiantes.',
@@ -63,7 +70,13 @@ def editar(id):
             flash('Ya existe otra materia con ese código.', 'danger')
         else:
             form.populate_obj(materia)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe otra materia con ese código.', 'danger')
+                return render_template('subjects/form.html', form=form,
+                                       titulo=f'Editar: {materia.nombre}', materia=materia)
             flash('Materia actualizada.', 'success')
             return redirect(url_for('subjects.listar'))
     return render_template('subjects/form.html', form=form,

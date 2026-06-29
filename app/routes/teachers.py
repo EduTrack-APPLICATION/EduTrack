@@ -4,6 +4,8 @@ CRUD de Profesores (solo admin).
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 
+from sqlalchemy.exc import IntegrityError
+
 from app import db
 from app.models import Usuario, Profesor, Materia, RolEnum
 from app.utils.forms import ProfesorForm
@@ -63,21 +65,28 @@ def crear():
             )
             usuario.set_password(form.password.data)
             db.session.add(usuario)
-            db.session.flush()
 
-            profesor = Profesor(
-                usuario_id=usuario.id,
-                cedula=form.cedula.data,
-                nombre=form.nombre.data,
-                apellido=form.apellido.data,
-                telefono=form.telefono.data,
-                direccion=form.direccion.data,
-                especialidad=form.especialidad.data,
-                titulo=form.titulo.data,
-                activo=form.activo.data,
-            )
-            db.session.add(profesor)
-            db.session.commit()
+            try:
+                db.session.flush()
+
+                profesor = Profesor(
+                    usuario_id=usuario.id,
+                    cedula=form.cedula.data,
+                    nombre=form.nombre.data,
+                    apellido=form.apellido.data,
+                    telefono=form.telefono.data,
+                    direccion=form.direccion.data,
+                    especialidad=form.especialidad.data,
+                    titulo=form.titulo.data,
+                    activo=form.activo.data,
+                )
+                db.session.add(profesor)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe un usuario o profesor con esos datos (usuario, correo o cédula).',
+                      'danger')
+                return render_template('teachers/form.html', form=form, titulo='Nuevo profesor')
             flash(
                 f'Profesor {profesor.nombre_completo} creado correctamente. '
                 f'Credenciales: usuario "{username}" · '
@@ -147,7 +156,15 @@ def editar(id):
             if form.password.data:
                 profesor.usuario.set_password(form.password.data)
 
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe un usuario o profesor con esos datos (usuario, correo o cédula).',
+                      'danger')
+                return render_template('teachers/form.html', form=form,
+                                       titulo=f'Editar: {profesor.nombre_completo}',
+                                       profesor=profesor)
             flash('Profesor actualizado correctamente.', 'success')
             return redirect(url_for('teachers.detalle', id=id))
 

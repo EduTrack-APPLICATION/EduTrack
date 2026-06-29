@@ -4,6 +4,8 @@ CRUD de Grupos.
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 
+from sqlalchemy.exc import IntegrityError
+
 from app import db
 from app.models import Grupo, Materia, Profesor, Estudiante
 from app.utils.forms import GrupoForm
@@ -77,7 +79,12 @@ def crear():
             g = Grupo()
             form.populate_obj(g)
             db.session.add(g)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe un grupo con ese código.', 'danger')
+                return render_template('groups/form.html', form=form, titulo='Nuevo grupo')
             flash(f'Grupo {g.codigo} creado. Ahora matricula estudiantes para empezar a usarlo.',
                   'success')
             return redirect(url_for('groups.detalle', id=g.id))
@@ -132,7 +139,13 @@ def editar(id):
             flash('Ya existe otro grupo con ese código.', 'danger')
         else:
             form.populate_obj(grupo)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe otro grupo con ese código.', 'danger')
+                return render_template('groups/form.html', form=form,
+                                       titulo=f'Editar: {grupo.codigo}', grupo=grupo)
             flash('Grupo actualizado.', 'success')
             return redirect(url_for('groups.detalle', id=id))
     return render_template('groups/form.html', form=form,
