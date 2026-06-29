@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models import Estudiante, Grupo, EstadoEstudianteEnum
@@ -67,6 +68,10 @@ def crear():
         # Validar unicidad
         if Estudiante.query.filter_by(codigo=form.codigo.data).first():
             flash('Ya existe un estudiante con ese código.', 'danger')
+        elif form.cedula.data and Estudiante.query.filter_by(cedula=form.cedula.data).first():
+            flash('Ya existe un estudiante con esa cédula.', 'danger')
+        elif form.email.data and Estudiante.query.filter_by(email=form.email.data).first():
+            flash('Ya existe un estudiante con ese correo electrónico.', 'danger')
         else:
             est = Estudiante(
                 codigo=form.codigo.data, cedula=form.cedula.data,
@@ -79,7 +84,13 @@ def crear():
                 estado=form.estado.data,
             )
             db.session.add(est)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('Ya existe un estudiante con ese código, cédula o correo electrónico.',
+                      'danger')
+                return render_template('students/form.html', form=form, titulo='Nuevo estudiante')
 
             # Generar cuenta del portal automáticamente
             try:
@@ -148,12 +159,24 @@ def editar(id):
 
     if form.validate_on_submit():
         # Verificar duplicados (excluyendo el actual)
-        otro = Estudiante.query.filter(
+        otro_codigo = Estudiante.query.filter(
             Estudiante.codigo == form.codigo.data,
             Estudiante.id != id
         ).first()
-        if otro:
+        otro_cedula = form.cedula.data and Estudiante.query.filter(
+            Estudiante.cedula == form.cedula.data,
+            Estudiante.id != id
+        ).first()
+        otro_email = form.email.data and Estudiante.query.filter(
+            Estudiante.email == form.email.data,
+            Estudiante.id != id
+        ).first()
+        if otro_codigo:
             flash('Ya existe otro estudiante con ese código.', 'danger')
+        elif otro_cedula:
+            flash('Ya existe otro estudiante con esa cédula.', 'danger')
+        elif otro_email:
+            flash('Ya existe otro estudiante con ese correo electrónico.', 'danger')
         else:
             form.populate_obj(estudiante)
             db.session.commit()
